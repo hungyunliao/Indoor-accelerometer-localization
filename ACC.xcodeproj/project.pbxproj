@@ -12,6 +12,7 @@
 		13B648F11CF3B82B00CA656A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 13B648EF1CF3B82B00CA656A /* Main.storyboard */; };
 		13B648F31CF3B82B00CA656A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B648F21CF3B82B00CA656A /* Assets.xcassets */; };
 		13B648F61CF3B82B00CA656A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 13B648F41CF3B82B00CA656A /* LaunchScreen.storyboard */; };
+		13B648FE1CF3BA4A00CA656A /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 13B648FD1CF3BA4A00CA656A /* CoreMotion.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +23,7 @@
 		13B648F21CF3B82B00CA656A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		13B648F51CF3B82B00CA656A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		13B648F71CF3B82B00CA656A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		13B648FD1CF3BA4A00CA656A /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -29,6 +31,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				13B648FE1CF3BA4A00CA656A /* CoreMotion.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -38,6 +41,7 @@
 		13B648DF1CF3B82B00CA656A = {
 			isa = PBXGroup;
 			children = (
+				13B648FD1CF3BA4A00CA656A /* CoreMotion.framework */,
 				13B648EA1CF3B82B00CA656A /* ACC */,
 				13B648E91CF3B82B00CA656A /* Products */,
 			);
@@ -248,7 +252,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = ACC/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = HYL.ACC;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -259,7 +265,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = ACC/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = HYL.ACC;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -285,6 +293,7 @@
 				13B648FC1CF3B82B00CA656A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
