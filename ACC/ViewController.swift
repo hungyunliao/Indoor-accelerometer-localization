@@ -24,6 +24,10 @@ class ViewController: UIViewController {
     
     var distanceT : Double = 0.0
     var velocityX: Double = 0.0
+    var calibrationTimes: Int = 100
+    var calibrationSum: Double = 0.0
+    var avg : Double = 0.0
+    var isCalibrated: Bool = false
     
     // Outlets
     @IBOutlet var accX: UILabel?
@@ -61,6 +65,10 @@ class ViewController: UIViewController {
         
         distanceT = 0.0
         velocityX = 0.0
+        calibrationTimes = 100
+        calibrationSum = 0
+        avg = 0.0
+        isCalibrated = false
     }
     
     
@@ -95,15 +103,30 @@ class ViewController: UIViewController {
     
     func outputAccData(acceleration: CMAcceleration){
         
-        accX?.text = "\(acceleration.x * 9.81)"
-        if acceleration.x > currentMaxAccelXPositive
-        {
-            currentMaxAccelXPositive = acceleration.x
+        if !isCalibrated {
+            if calibrationTimes == 100 {
+                maxAccXPositive?.text = String(acceleration.x)
+            }
+            if calibrationTimes > 0 {
+                calibrationSum += acceleration.x
+                calibrationTimes -= 1
+            } else {
+                maxAccX?.text = String(calibrationSum)
+                avg = calibrationSum / 100
+                isCalibrated = true
+            }
         }
-        
-        if acceleration.x < currentMaxAccelX // negative
-        {
-            currentMaxAccelX = acceleration.x
+        else {
+            accX?.text = "\(acceleration.x - avg)"
+            if acceleration.x > currentMaxAccelXPositive
+            {
+                currentMaxAccelXPositive = acceleration.x
+            }
+            
+            if acceleration.x < currentMaxAccelX // negative
+            {
+                currentMaxAccelX = acceleration.x
+            }
         }
         
         accY?.text = "\(acceleration.y).2fg"
@@ -122,14 +145,15 @@ class ViewController: UIViewController {
             velocityX += acceleration.x * 9.81 * motionManager.accelerometerUpdateInterval
         }
         
-        maxAccX?.text = "\(currentMaxAccelX).2f"
-        maxAccXPositive?.text = "\(currentMaxAccelXPositive).2f"
+        //maxAccX?.text = "\(currentMaxAccelX).2f"
+        //maxAccXPositive?.text = "\(currentMaxAccelXPositive).2f"
         maxAccY?.text = "\(currentMaxAccelY).2f"
         maxAccZ?.text = "\(currentMaxAccelZ).2f"
         
         velX?.text = "\(velocityX)"
         distanceT += velocityX * motionManager.accelerometerUpdateInterval
         distance?.text = "\(distanceT)"
+        //distance?.text = "\(avg)"
         
         
     }
