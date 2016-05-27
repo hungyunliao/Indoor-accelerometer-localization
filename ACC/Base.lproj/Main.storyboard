@@ -149,13 +149,6 @@
                                 <color key="textColor" red="0.90196079019999997" green="0.90196079019999997" blue="0.90196079019999997" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ecm-ci-oMs">
-                                <rect key="frame" x="126" y="20" width="39" height="30"/>
-                                <state key="normal" title="Reset"/>
-                                <connections>
-                                    <action selector="reset" destination="BYZ-38-t0r" eventType="touchUpInside" id="Iiy-hG-Jjh"/>
-                                </connections>
-                            </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="0" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qag-bf-nqd">
                                 <rect key="frame" x="203" y="465" width="61" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
@@ -210,6 +203,19 @@
                                 <color key="textColor" red="0.90196079019999997" green="0.90196079019999997" blue="0.90196079019999997" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="msg" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hio-AP-BHW">
+                                <rect key="frame" x="23" y="24" width="148" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ecm-ci-oMs">
+                                <rect key="frame" x="179" y="20" width="39" height="30"/>
+                                <state key="normal" title="Reset"/>
+                                <connections>
+                                    <action selector="reset" destination="BYZ-38-t0r" eventType="touchUpInside" id="Iiy-hG-Jjh"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
@@ -218,7 +224,8 @@
                         <outlet property="accY" destination="EHY-4m-Kni" id="5LX-ns-eAO"/>
                         <outlet property="accZ" destination="oyW-el-kbY" id="8PL-qj-Ynn"/>
                         <outlet property="distance" destination="R6m-DC-4D1" id="7n9-Sx-xse"/>
-                        <outlet property="maxAccX" destination="Bbb-NO-Ieb" id="Tvl-sO-7ZT"/>
+                        <outlet property="info" destination="hio-AP-BHW" id="aSd-I2-X8a"/>
+                        <outlet property="maxAccXNegative" destination="Bbb-NO-Ieb" id="l96-Xg-RDT"/>
                         <outlet property="maxAccXPositive" destination="5wI-0g-yJ5" id="Kgz-Se-4xz"/>
                         <outlet property="maxAccY" destination="pwz-Jo-ZX0" id="9tY-1Q-Itq"/>
                         <outlet property="maxAccZ" destination="TzI-sB-TzM" id="eao-Sv-BV9"/>

@@ -34,7 +34,7 @@ class ViewController: UIViewController {
     var calibrationSum: Double = 0.0
     var avg: Double = 0.0
     var isCalibrated: Bool = false
-    var smoothX: Int = 0
+    var calibrationPointsRemained: Int = 0
     var accCaliSumX: Double = 0.0
     
     // Outlets
@@ -54,6 +54,7 @@ class ViewController: UIViewController {
     
     @IBOutlet var velX: UILabel?
     @IBOutlet var distance: UILabel?
+    @IBOutlet var info: UILabel?
     
     // Functions
     @IBAction func reset() {
@@ -72,7 +73,7 @@ class ViewController: UIViewController {
         calibrationSum = 0
         avg = 0.0
         isCalibrated = false
-        smoothX = numberOfPointsForCalibration
+        calibrationPointsRemained = numberOfPointsForCalibration
         accCaliSumX = 0.0
         
     }
@@ -108,6 +109,7 @@ class ViewController: UIViewController {
         
         if !isCalibrated {
             
+            info?.text = "Calibrating..."
             if calibrationTimes == calibrationTimeAssigned {
                 maxAccXPositive?.text = String(acceleration.x)
             }
@@ -123,9 +125,10 @@ class ViewController: UIViewController {
             
         } else {
             
-            if smoothX != 0 {
+            info?.text = "Detecting..."
+            if calibrationPointsRemained != 0 {
                 accCaliSumX += acceleration.x
-                smoothX -= 1
+                calibrationPointsRemained -= 1
             } else {
                 accCaliSumX /= Double(numberOfPointsForCalibration)
                 accX?.text = "\(accCaliSumX - avg)"
@@ -137,7 +140,7 @@ class ViewController: UIViewController {
                     currentMaxAccelXNegative = acceleration.x
                 }
                 accCaliSumX = 0.0
-                smoothX = numberOfPointsForCalibration
+                calibrationPointsRemained = numberOfPointsForCalibration
             }
             
         }
