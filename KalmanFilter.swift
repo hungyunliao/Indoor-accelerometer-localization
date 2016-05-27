@@ -8,20 +8,24 @@
 
 import Foundation
 
+/*
+    Initializating Kalman object in C:
+        KalmanFilter kalman(15, 50)
+        Double x[3] = {1, 2, 3}
+        Double y[3] = {1, 2, 3}
+        Double lrCoef[2] = {0, 0}
+*/
+
 class KalmanFilter {
     
     private var k: Double = 0.0 // Kalman gain
     private var p: Double = 0.0 // estimation error cvariance
-    private var q: Double = 0.0 // process noise cvariance
-    private var r: Double = 0.0 // measurement noise covariance
+    private var q: Double = 15 // process noise cvariance
+    private var r: Double = 50 // measurement noise covariance
     private var x: Double = 0.0 // value
     
-    
-    func KalmanFilter(q: Double, r: Double) {
-        p = sqrt(q * q + r * r)
-    }
-    
     func Update(value: Double) -> Double {
+        p = sqrt(q * q + r * r)
         p += q
         k = p / (p + r)
         x += k * (value - x)
@@ -37,7 +41,7 @@ class KalmanFilter {
 
 func SimpleLinearRegression (x: [Double], y: [Double]) -> (Double, Double) {
     
-    // x and y should be arrays of points. n is the length of the arrays
+    // x and y should be arrays of points. 
     
     var xbar: Double = 0.0
     var ybar: Double = 0.0

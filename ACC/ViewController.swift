@@ -12,7 +12,7 @@ import CoreMotion
 class ViewController: UIViewController {
     
     // System parameters setup
-    let accelerometerUpdateInterval: Double = 0.03
+    let accelerometerUpdateInterval: Double = 0.2
     let gyroUpdateInterval: Double = 0.2
     let calibrationTimeAssigned: Int = 100
     let numberOfPointsForCalibration: Int = 3
@@ -36,6 +36,14 @@ class ViewController: UIViewController {
     var isCalibrated: Bool = false
     var calibrationPointsRemained: Int = 0
     var accCaliSumX: Double = 0.0
+    
+    // Kalman Filter
+    var kalman: KalmanFilter = KalmanFilter()
+    var x: [Double] = [1, 2, 3]
+    var y: [Double] = [1, 2, 3]
+    var linearCoef = (slope: 0.0, intercept: 0.0)
+    var kValue: Double = 0.0
+    var outputX: Double = 0.0
     
     // Outlets
     @IBOutlet var accX: UILabel?
@@ -126,22 +134,34 @@ class ViewController: UIViewController {
         } else {
             
             info?.text = "Detecting..."
-            if calibrationPointsRemained != 0 {
-                accCaliSumX += acceleration.x
-                calibrationPointsRemained -= 1
-            } else {
-                accCaliSumX /= Double(numberOfPointsForCalibration)
-                accX?.text = "\(accCaliSumX - avg)"
-                if acceleration.x > currentMaxAccelXPositive {
-                    currentMaxAccelXPositive = acceleration.x
-                }
-                
-                if acceleration.x < currentMaxAccelXNegative { // negative
-                    currentMaxAccelXNegative = acceleration.x
-                }
-                accCaliSumX = 0.0
-                calibrationPointsRemained = numberOfPointsForCalibration
-            }
+            
+            linearCoef = SimpleLinearRegression(x, y: y)
+            
+            kValue = kalman.Update(acceleration.x)
+            
+            outputX = linearCoef.intercept + linearCoef.slope*kValue
+            
+            accX?.text = "\(outputX - avg)"
+            
+            
+            
+//            if calibrationPointsRemained != 0 {
+//                accCaliSumX += acceleration.x
+//                calibrationPointsRemained -= 1
+//            } else {
+//                accCaliSumX /= Double(numberOfPointsForCalibration)
+//                accX?.text = "\(accCaliSumX - avg)"
+//                if acceleration.x > currentMaxAccelXPositive {
+//                    currentMaxAccelXPositive = acceleration.x
+//                }
+//                
+//                if acceleration.x < currentMaxAccelXNegative { // negative
+//                    currentMaxAccelXNegative = acceleration.x
+//                }
+//                accCaliSumX = 0.0
+//                calibrationPointsRemained = numberOfPointsForCalibration
+//            }
+            
             
         }
         
