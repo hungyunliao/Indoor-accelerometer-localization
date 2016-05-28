@@ -67,3 +67,14 @@ func SimpleLinearRegression (x: [Double], y: [Double]) -> (Double, Double) {
     
     return linearCoef
 }
+
+// this STDEV function is from github: https://gist.github.com/jonelf/9ae2a2133e21e255e692
+func standardDeviation(arr : [Double]) -> Double
+{
+    let length = Double(arr.count)
+    let avg = arr.reduce(0, combine: {$0 + $1}) / length
+    let sumOfSquaredAvgDiff = arr.map { pow($0 - avg, 2.0)}.reduce(0, combine: {$0 + $1})
+    return sqrt(sumOfSquaredAvgDiff / length)
+}
+
+

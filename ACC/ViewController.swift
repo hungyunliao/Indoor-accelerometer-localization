@@ -12,8 +12,8 @@ import CoreMotion
 class ViewController: UIViewController {
     
     // System parameters setup
-    let accelerometerUpdateInterval: Double = 0.2
-    let gyroUpdateInterval: Double = 0.2
+    let accelerometerUpdateInterval: Double = 0.1
+    let gyroUpdateInterval: Double = 0.1
     let calibrationTimeAssigned: Int = 100
     let numberOfPointsForCalibration: Int = 3
     
@@ -37,6 +37,13 @@ class ViewController: UIViewController {
     var calibrationPointsRemained: Int = 0
     var accCaliSumX: Double = 0.0
     
+    var isCalibratedGyro: Bool = false
+    var calibrationTimesGyro: Int = 0
+    var calibrationSumGyro: Double = 0.0
+    var avgGyro: Double = 0.9
+    
+    var zeroVJudge = (a: 0.0, w: 0.0)
+    
     // Kalman Filter
     var kalman: KalmanFilter = KalmanFilter()
     var x: [Double] = [1, 2, 3]
@@ -44,6 +51,7 @@ class ViewController: UIViewController {
     var linearCoef = (slope: 0.0, intercept: 0.0)
     var kValue: Double = 0.0
     var outputX: Double = 0.0
+    var STDEV = [Double]()
     
     // Outlets
     @IBOutlet var accX: UILabel?
@@ -83,6 +91,10 @@ class ViewController: UIViewController {
         isCalibrated = false
         calibrationPointsRemained = numberOfPointsForCalibration
         accCaliSumX = 0.0
+        
+        calibrationTimesGyro = calibrationTimeAssigned
+        calibrationSumGyro = 0
+        isCalibratedGyro = false
         
     }
     
@@ -135,6 +147,7 @@ class ViewController: UIViewController {
             
             info?.text = "Detecting..."
             
+            /* KalmanFilter begins */
             linearCoef = SimpleLinearRegression(x, y: y)
             
             kValue = kalman.Update(acceleration.x)
@@ -143,13 +156,28 @@ class ViewController: UIViewController {
             
             accX?.text = "\(outputX - avg)"
             
+//            /* STDEV: used to compare the filter effect (KalmanFilter, 3-point filter, non) */
+//            if STDEV.count < 100 {
+//                STDEV.append(outputX - avg)
+//            } else {
+//                accX?.text = "\(standardDeviation(STDEV))"
+//            }
+//            /* End of STDEV */
+            /* KalmanFilter ends */
             
-            
+//            /* 3-point Filter begins */
 //            if calibrationPointsRemained != 0 {
 //                accCaliSumX += acceleration.x
 //                calibrationPointsRemained -= 1
 //            } else {
 //                accCaliSumX /= Double(numberOfPointsForCalibration)
+//                /* STDEV */
+//                if STDEV.count < 100 {
+//                    STDEV.append(accCaliSumX - avg)
+//                } else {
+//                    accX?.text = "\(standardDeviation(STDEV))"
+//                }
+//                /* End of STDEV */
 //                accX?.text = "\(accCaliSumX - avg)"
 //                if acceleration.x > currentMaxAccelXPositive {
 //                    currentMaxAccelXPositive = acceleration.x
@@ -161,7 +189,7 @@ class ViewController: UIViewController {
 //                accCaliSumX = 0.0
 //                calibrationPointsRemained = numberOfPointsForCalibration
 //            }
-            
+//            /* 3-point Filter ends */
             
         }
         
@@ -179,6 +207,15 @@ class ViewController: UIViewController {
             velocityX += Double(accX!.text!)! * 9.81 * motionManager.accelerometerUpdateInterval
         }
         
+        if Double((accX?.text!)!) < 0.1 {
+            zeroVJudge.a += 1
+            if zeroVJudge.a >= 50 && zeroVJudge.w >= 50 {
+                velocityX = 0
+            }
+        } else {
+            zeroVJudge.a = 0.0
+        }
+        
         //maxAccXNegative?.text = "\(currentMaxAccelXNegative).2f"
         //maxAccXPositive?.text = "\(currentMaxAccelXPositive).2f"
         maxAccY?.text = "\(currentMaxAccelY).2f"
@@ -192,6 +229,23 @@ class ViewController: UIViewController {
     }
     
     func outputRotData(rotation: CMRotationRate){
+        
+        
+        if !isCalibratedGyro {
+            if calibrationTimesGyro == calibrationTimeAssigned {
+                maxRotX?.text = String(rotation.x)
+            }
+            
+            if calibrationTimesGyro > 0 {
+                calibrationSumGyro += rotation.x
+                calibrationTimesGyro -= 1
+            } else {
+                avgGyro = calibrationSumGyro / Double(calibrationTimeAssigned)
+                maxRotX?.text = String(rotation.x - avgGyro)
+                isCalibrated = true
+            }
+
+        }
         
         rotX?.text = "\(rotation.x).2fr/s"
         if fabs(rotation.x) > fabs(currentMaxRotX) {
@@ -208,9 +262,15 @@ class ViewController: UIViewController {
             currentMaxRotZ = rotation.z
         }
         
-        maxRotX?.text = "\(currentMaxRotX).2f"
+        //maxRotX?.text = "\(currentMaxRotX).2f"
         maxRotY?.text = "\(currentMaxRotY).2f"
         maxRotZ?.text = "\(currentMaxRotZ).2f"
+        
+        if Double((rotX?.text!)!) < 0.01 {
+            zeroVJudge.w += 1
+        } else {
+            zeroVJudge.w = 0.0
+        }
         
     }
     
