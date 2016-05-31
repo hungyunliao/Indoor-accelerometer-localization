@@ -11,14 +11,14 @@ import CoreMotion
 
 class ViewController: UIViewController {
     
-    // System parameters setup
+    // MARK: System parameters setup
     var accelerometerUpdateInterval: Double = 0.1
     var gyroUpdateInterval: Double = 0.1
     var calibrationTimeAssigned: Int = 100
     var numberOfPointsForCalibration: Int = 3
     var zeroVelocityThreshold: Double = 10.0 // the higher, the longer the system takes setting the V to 0 while acc and w are 0.
     
-    // Instance variables
+    // MARK: Instance variables
     var currentMaxAccelXNegative: Double = 0.0
     var currentMaxAccelXPositive: Double = 0.0
     var currentMaxAccelY: Double = 0.0
@@ -33,7 +33,7 @@ class ViewController: UIViewController {
     var velocityX: Double = 0.0
     var velocityY: Double = 0.0
     var velocityZ: Double = 0.0
-    var calibrationTimes: Int = 0
+    var calibrationTimesRemained: Int = 0
     var avgX: Double = 0.0
     var avgY: Double = 0.0
     var avgZ: Double = 0.0
@@ -42,13 +42,14 @@ class ViewController: UIViewController {
     var accCaliSumX: Double = 0.0
     
     var isCalibratedGyro: Bool = false
-    var calibrationTimesGyro: Int = 0
-    var calibrationSumGyro: Double = 0.0
-    var avgGyro: Double = 0.9
+    var calibrationTimesGyroRemained: Int = 0
+    var avgGyroX: Double = 0.0
+    var avgGyroY: Double = 0.0
+    var avgGyroZ: Double = 0.0
     
-    var zeroVJudge = (a: 0.0, w: 0.0)
+    var staticStateJudgeTimer = (a: 0.0, w: 0.0)
     
-    // Kalman Filter
+    // MARK: Kalman Filter
     var kalmanX: KalmanFilter = KalmanFilter()
     var kalmanY: KalmanFilter = KalmanFilter()
     var kalmanZ: KalmanFilter = KalmanFilter()
@@ -61,9 +62,12 @@ class ViewController: UIViewController {
     var outputX: Double = 0.0
     var outputY: Double = 0.0
     var outputZ: Double = 0.0
+    var outputGyroX: Double = 0.0
+    var outputGyroY: Double = 0.0
+    var outputGyroZ: Double = 0.0
     var STDEV = [Double]()
     
-    // Outlets
+    // MARK: Outlets
     @IBOutlet var accX: UILabel?
     @IBOutlet var accY: UILabel?
     @IBOutlet var accZ: UILabel?
@@ -82,7 +86,7 @@ class ViewController: UIViewController {
     @IBOutlet var distance: UILabel?
     @IBOutlet var info: UILabel?
     
-    // Functions
+    // MARK: Functions
     @IBAction func reset() {
         
         currentMaxAccelXNegative = 0.0
@@ -100,7 +104,7 @@ class ViewController: UIViewController {
         outputX = 0.0
         outputY = 0.0
         outputZ = 0.0
-        calibrationTimes = calibrationTimeAssigned
+        calibrationTimesRemained = calibrationTimeAssigned
         avgX = 0.0
         avgY = 0.0
         avgZ = 0.0
@@ -108,8 +112,13 @@ class ViewController: UIViewController {
         calibrationPointsRemained = numberOfPointsForCalibration
         accCaliSumX = 0.0
         
-        calibrationTimesGyro = calibrationTimeAssigned
-        calibrationSumGyro = 0
+        calibrationTimesGyroRemained = calibrationTimeAssigned
+        avgGyroX = 0.0
+        avgGyroY = 0.0
+        avgGyroZ = 0.0
+        outputGyroX = 0.0
+        outputGyroY = 0.0
+        outputGyroZ = 0.0
         isCalibratedGyro = false
         
     }
@@ -147,11 +156,11 @@ class ViewController: UIViewController {
             
             info?.text = "Calibrating..."
             
-            if calibrationTimes > 0 {
+            if calibrationTimesRemained > 0 {
                 avgX += acceleration.x
                 avgY += acceleration.y
                 avgZ += acceleration.z
-                calibrationTimes -= 1
+                calibrationTimesRemained -= 1
             } else {
                 avgX /= Double(calibrationTimeAssigned)
                 avgY /= Double(calibrationTimeAssigned)
@@ -177,43 +186,9 @@ class ViewController: UIViewController {
             kValueZ = kalmanZ.Update(acceleration.z)
             outputZ = linearCoef.intercept + linearCoef.slope*kValueZ - avgZ
             accZ?.text = "\(outputZ)"
-            
-            //            /* STDEV: used to compare the filter effect (KalmanFilter, 3-point filter, non) */
-            //            if STDEV.count < 100 {
-            //                STDEV.append(outputX - avg)
-            //            } else {
-            //                accX?.text = "\(standardDeviation(STDEV))"
-            //            }
-            //            /* End of STDEV */
             /* KalmanFilter ends */
             
-            //            /* 3-point Filter begins */
-            //            if calibrationPointsRemained != 0 {
-            //                accCaliSumX += acceleration.x
-            //                calibrationPointsRemained -= 1
-            //            } else {
-            //                accCaliSumX /= Double(numberOfPointsForCalibration)
-            //                /* STDEV */
-            //                if STDEV.count < 100 {
-            //                    STDEV.append(accCaliSumX - avg)
-            //                } else {
-            //                    accX?.text = "\(standardDeviation(STDEV))"
-            //                }
-            //                /* End of STDEV */
-            //                accX?.text = "\(accCaliSumX - avg)"
-            //                if acceleration.x > currentMaxAccelXPositive {
-            //                    currentMaxAccelXPositive = acceleration.x
-            //                }
-            //
-            //                if acceleration.x < currentMaxAccelXNegative { // negative
-            //                    currentMaxAccelXNegative = acceleration.x
-            //                }
-            //                accCaliSumX = 0.0
-            //                calibrationPointsRemained = numberOfPointsForCalibration
-            //            }
-            //            /* 3-point Filter ends */
-            
-            
+            /* Note1 */
             
             if fabs(outputX) >= 0.1 {
                 velocityX += outputX * 9.81 * motionManager.accelerometerUpdateInterval
@@ -230,8 +205,8 @@ class ViewController: UIViewController {
             velZ?.text = "\(velocityZ)"
             
             if fabs(outputX) < 0.1 && fabs(outputY) < 0.1 && fabs(outputZ) < 0.1 { // 0.1 is regarded as the "static state" for acc
-                zeroVJudge.a += 1
-                if zeroVJudge.a >= zeroVelocityThreshold && zeroVJudge.w >= zeroVelocityThreshold {
+                staticStateJudgeTimer.a += 1
+                if staticStateJudgeTimer.a >= zeroVelocityThreshold && staticStateJudgeTimer.w >= zeroVelocityThreshold {
                     if velocityX != 0 {
                         velocityX /= 2
                         if fabs(velocityX) < 0.0001 {
@@ -252,9 +227,8 @@ class ViewController: UIViewController {
                     }
                 }
             } else {
-                zeroVJudge.a = 0.0
+                staticStateJudgeTimer.a = 0.0
             }
-            
             
             distanceTraveled += velocityX * motionManager.accelerometerUpdateInterval
             distance?.text = "\(distanceTraveled)"
@@ -265,46 +239,38 @@ class ViewController: UIViewController {
         
         
         if !isCalibratedGyro {
-            if calibrationTimesGyro == calibrationTimeAssigned {
-                maxRotX?.text = String(rotation.x)
-            }
+            //            if calibrationTimesGyro == calibrationTimeAssigned {
+            //                maxRotX?.text = String(rotation.x)
+            //            }
             
-            if calibrationTimesGyro > 0 {
-                calibrationSumGyro += rotation.x
-                calibrationTimesGyro -= 1
+            if calibrationTimesGyroRemained > 0 {
+                avgGyroX += rotation.x
+                avgGyroY += rotation.y
+                avgGyroZ += rotation.z
+                calibrationTimesGyroRemained -= 1
             } else {
-                avgGyro = calibrationSumGyro / Double(calibrationTimeAssigned)
-                maxRotX?.text = String(rotation.x - avgGyro)
+                avgGyroX /= Double(calibrationTimeAssigned)
+                avgGyroY /= Double(calibrationTimeAssigned)
+                avgGyroZ /= Double(calibrationTimeAssigned)
                 isCalibratedGyro = true
             }
             
-        }
-        
-        rotX?.text = "\(rotation.x).2fr/s"
-        if fabs(rotation.x) > fabs(currentMaxRotX) {
-            currentMaxRotX = rotation.x
-        }
-        
-        rotY?.text = "\(rotation.y).2fr/s"
-        if fabs(rotation.y) > fabs(currentMaxRotY) {
-            currentMaxRotY = rotation.y
-        }
-        
-        rotZ?.text = "\(rotation.z).2fr/s"
-        if fabs(rotation.z) > fabs(currentMaxRotZ) {
-            currentMaxRotZ = rotation.z
-        }
-        
-        //maxRotX?.text = "\(currentMaxRotX).2f"
-        maxRotY?.text = "\(currentMaxRotY).2f"
-        maxRotZ?.text = "\(currentMaxRotZ).2f"
-        
-        if Double((rotX?.text!)!) < 0.01 {  // 0.01 is regarded as "static state" for angle acc
-            zeroVJudge.w += 1
         } else {
-            zeroVJudge.w = 0.0
+            
+            outputGyroX = rotation.x - avgGyroX
+            outputGyroY = rotation.y - avgGyroY
+            outputGyroZ = rotation.z - avgGyroZ
+            
+            rotX?.text = "\(outputGyroX)"
+            rotY?.text = "\(outputGyroY)"
+            rotZ?.text = "\(outputGyroZ)"
+            
+            if outputGyroX < 0.01 && outputGyroY < 0.01 && outputGyroZ < 0.01 {  // 0.01 is regarded as "static state" for angle acc
+                staticStateJudgeTimer.w += 1
+            } else {
+                staticStateJudgeTimer.w = 0.0
+            }
         }
-        
     }
     
     override func didReceiveMemoryWarning() {
@@ -313,4 +279,40 @@ class ViewController: UIViewController {
     }
     
 }
+
+/* Note1 */
+//            /* STDEV: used to compare the filter effect (KalmanFilter, 3-point filter, non) */
+//            if STDEV.count < 100 {
+//                STDEV.append(outputX - avg)
+//            } else {
+//                accX?.text = "\(standardDeviation(STDEV))"
+//            }
+//            /* End of STDEV */
+/* KalmanFilter ends */
+
+//            /* 3-point Filter begins */
+//            if calibrationPointsRemained != 0 {
+//                accCaliSumX += acceleration.x
+//                calibrationPointsRemained -= 1
+//            } else {
+//                accCaliSumX /= Double(numberOfPointsForCalibration)
+//                /* STDEV */
+//                if STDEV.count < 100 {
+//                    STDEV.append(accCaliSumX - avg)
+//                } else {
+//                    accX?.text = "\(standardDeviation(STDEV))"
+//                }
+//                /* End of STDEV */
+//                accX?.text = "\(accCaliSumX - avg)"
+//                if acceleration.x > currentMaxAccelXPositive {
+//                    currentMaxAccelXPositive = acceleration.x
+//                }
+//
+//                if acceleration.x < currentMaxAccelXNegative { // negative
+//                    currentMaxAccelXNegative = acceleration.x
+//                }
+//                accCaliSumX = 0.0
+//                calibrationPointsRemained = numberOfPointsForCalibration
+//            }
+//            /* 3-point Filter ends */
 
