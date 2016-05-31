@@ -12,10 +12,11 @@ import CoreMotion
 class ViewController: UIViewController {
     
     // System parameters setup
-    let accelerometerUpdateInterval: Double = 0.1
-    let gyroUpdateInterval: Double = 0.1
-    let calibrationTimeAssigned: Int = 100
-    let numberOfPointsForCalibration: Int = 3
+    var accelerometerUpdateInterval: Double = 0.1
+    var gyroUpdateInterval: Double = 0.1
+    var calibrationTimeAssigned: Int = 100
+    var numberOfPointsForCalibration: Int = 3
+    var zeroVelocityThreshold: Double = 10.0 // the higher, the longer the system takes setting the V to 0 while acc and w are 0.
     
     // Instance variables
     var currentMaxAccelXNegative: Double = 0.0
@@ -207,10 +208,13 @@ class ViewController: UIViewController {
             velocityX += Double(accX!.text!)! * 9.81 * motionManager.accelerometerUpdateInterval
         }
         
-        if Double((accX?.text!)!) < 0.1 {
+        if Double((accX?.text!)!) < 0.1 { // 0.1 is regarded as the "static state" for acc
             zeroVJudge.a += 1
-            if zeroVJudge.a >= 50 && zeroVJudge.w >= 50 {
-                velocityX = 0
+            if zeroVJudge.a >= zeroVelocityThreshold && zeroVJudge.w >= zeroVelocityThreshold && velocityX != 0{
+                velocityX /= 2
+                if fabs(velocityX) < 0.0001 {
+                    velocityX = 0
+                }
             }
         } else {
             zeroVJudge.a = 0.0
@@ -266,7 +270,7 @@ class ViewController: UIViewController {
         maxRotY?.text = "\(currentMaxRotY).2f"
         maxRotZ?.text = "\(currentMaxRotZ).2f"
         
-        if Double((rotX?.text!)!) < 0.01 {
+        if Double((rotX?.text!)!) < 0.01 {  // 0.01 is regarded as "static state" for angle acc
             zeroVJudge.w += 1
         } else {
             zeroVJudge.w = 0.0
