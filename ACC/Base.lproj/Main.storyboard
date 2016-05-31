@@ -328,7 +328,7 @@
                         <outlet property="accX" destination="5mE-C0-WMn" id="apO-xQ-aLS"/>
                         <outlet property="accY" destination="EHY-4m-Kni" id="5LX-ns-eAO"/>
                         <outlet property="accZ" destination="oyW-el-kbY" id="8PL-qj-Ynn"/>
-                        <outlet property="distance" destination="R6m-DC-4D1" id="7n9-Sx-xse"/>
+                        <outlet property="disX" destination="R6m-DC-4D1" id="RzK-Ml-eYT"/>
                         <outlet property="info" destination="hio-AP-BHW" id="aSd-I2-X8a"/>
                         <outlet property="maxAccXNegative" destination="Bbb-NO-Ieb" id="l96-Xg-RDT"/>
                         <outlet property="maxAccXPositive" destination="5wI-0g-yJ5" id="BLF-MW-SLl"/>

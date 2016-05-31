@@ -16,6 +16,48 @@ import Foundation
         Double lrCoef[2] = {0, 0}
 */
 
+struct System {
+    var isCalibrated: Bool = false
+    var calibrationTimesRemained: Int = 0
+    
+    var avg: ThreeAxesSystem = ThreeAxesSystem()
+    var output: ThreeAxesSystem = ThreeAxesSystem()
+    var kValue: ThreeAxesSystem = ThreeAxesSystem()
+    var velocity: ThreeAxesSystem = ThreeAxesSystem()
+    var distance: ThreeAxesSystem = ThreeAxesSystem()
+    
+    mutating func reset() {
+        isCalibrated = false
+        calibrationTimesRemained = 0
+        
+        avg.x = 0.0
+        avg.y = 0.0
+        avg.z = 0.0
+        
+        output.x = 0.0
+        output.y = 0.0
+        output.z = 0.0
+        
+        kValue.x = 0.0
+        kValue.y = 0.0
+        kValue.z = 0.0
+        
+        velocity.x = 0.0
+        velocity.y = 0.0
+        velocity.z = 0.0
+        
+        distance.x = 0.0
+        distance.y = 0.0
+        distance.z = 0.0
+    }
+}
+
+struct ThreeAxesSystem {
+    var x: Double = 0.0
+    var y: Double = 0.0
+    var z: Double = 0.0
+}
+
 class KalmanFilter {
     
     private var k: Double = 0.0 // Kalman gain
