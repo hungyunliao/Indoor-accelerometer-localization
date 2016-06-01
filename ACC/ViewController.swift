@@ -15,14 +15,9 @@ class ViewController: UIViewController {
     var accelerometerUpdateInterval: Double = 0.1
     var gyroUpdateInterval: Double = 0.1
     var calibrationTimeAssigned: Int = 100
-    var numberOfPointsForCalibration: Int = 3
-    var zeroVelocityThreshold: Double = 10.0 // the higher, the longer the system takes setting the V to 0 while acc and w are 0.
+    var staticStateJudgeThreshold = (acc: 0.1, gyro: 0.1, timer: 10.0)
     
     // MARK: Instance variables
-    var currentMaxAccelXNegative: Double = 0.0
-    var currentMaxAccelXPositive: Double = 0.0
-    var currentMaxAccelY: Double = 0.0
-    var currentMaxAccelZ: Double = 0.0
     var currentMaxRotX: Double = 0.0
     var currentMaxRotY: Double = 0.0
     var currentMaxRotZ: Double = 0.0
@@ -30,50 +25,44 @@ class ViewController: UIViewController {
     
     var accSys: System = System()
     var gyroSys: System = System()
-    var staticStateJudgeTimer = (a: 0.0, w: 0.0)
     
     // MARK: Kalman Filter
-    var kalmanX: KalmanFilter = KalmanFilter()
-    var kalmanY: KalmanFilter = KalmanFilter()
-    var kalmanZ: KalmanFilter = KalmanFilter()
-    var x: [Double] = [1, 2, 3]
-    var y: [Double] = [1, 2, 3]
+    var arrayOfPoints: [Double] = [1, 2, 3]
     var linearCoef = (slope: 0.0, intercept: 0.0)
 
     var STDEV = [Double]()
     
     // MARK: Outlets
+    @IBOutlet var info: UILabel?
+    
+    @IBOutlet var disX: UILabel?
+    @IBOutlet var disY: UILabel?
+    @IBOutlet var disZ: UILabel?
+    
     @IBOutlet var accX: UILabel?
     @IBOutlet var accY: UILabel?
     @IBOutlet var accZ: UILabel?
-    @IBOutlet var maxAccXNegative: UILabel?
-    @IBOutlet var maxAccXPositive: UILabel?
+    
+    @IBOutlet var velX: UILabel?
     @IBOutlet var velY: UILabel?
     @IBOutlet var velZ: UILabel?
+    
     @IBOutlet var rotX: UILabel?
     @IBOutlet var rotY: UILabel?
     @IBOutlet var rotZ: UILabel?
-    @IBOutlet var maxRotX: UILabel?
-    @IBOutlet var maxRotY: UILabel?
-    @IBOutlet var maxRotZ: UILabel?
     
-    @IBOutlet var velX: UILabel?
-    @IBOutlet var disX: UILabel?
-    @IBOutlet var info: UILabel?
+    @IBOutlet var velXGyro: UILabel?
+    @IBOutlet var velYGyro: UILabel?
+    @IBOutlet var velZGyro: UILabel?
     
     // MARK: Functions
     @IBAction func reset() {
         
-        currentMaxAccelXNegative = 0.0
-        currentMaxAccelXPositive = 0.0
-        currentMaxAccelY = 0.0
-        currentMaxAccelZ = 0.0
         currentMaxRotX = 0.0
         currentMaxRotY = 0.0
         currentMaxRotZ = 0.0
         
         accSys.reset()
-        
         gyroSys.reset()
         
     }
@@ -101,11 +90,13 @@ class ViewController: UIViewController {
             }
         })
         
+        linearCoef = SimpleLinearRegression(arrayOfPoints, y: arrayOfPoints) // initializing the coef before the recording functions running
+        
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
     }
     
-    func outputAccData(acceleration: CMAcceleration){
+    func outputAccData(acceleration: CMAcceleration) {
         
         if !accSys.isCalibrated {
             
@@ -128,17 +119,15 @@ class ViewController: UIViewController {
             info?.text = "Detecting..."
             
             /* KalmanFilter begins */
-            linearCoef = SimpleLinearRegression(x, y: y)
-            
-            accSys.kValue.x = kalmanX.Update(acceleration.x)
+            accSys.kValue.x = accSys.kalman.x.Update(acceleration.x)
             accSys.output.x = linearCoef.intercept + linearCoef.slope*accSys.kValue.x - accSys.avg.x
             accX?.text = "\(accSys.output.x)"
             
-            accSys.kValue.y = kalmanY.Update(acceleration.y)
+            accSys.kValue.y = accSys.kalman.y.Update(acceleration.y)
             accSys.output.y = linearCoef.intercept + linearCoef.slope*accSys.kValue.y - accSys.avg.y
             accY?.text = "\(accSys.output.y)"
             
-            accSys.kValue.z = kalmanZ.Update(acceleration.z)
+            accSys.kValue.z = accSys.kalman.z.Update(acceleration.z)
             accSys.output.z = linearCoef.intercept + linearCoef.slope*accSys.kValue.z - accSys.avg.z
             accZ?.text = "\(accSys.output.z)"
             /* KalmanFilter ends */
@@ -148,20 +137,25 @@ class ViewController: UIViewController {
             if fabs(accSys.output.x) >= 0.1 {
                 accSys.velocity.x += accSys.output.x * 9.81 * motionManager.accelerometerUpdateInterval
             }
+            velX?.text = "\(accSys.velocity.x)"
+            
             if fabs(accSys.output.y) >= 0.1 {
                 accSys.velocity.y += accSys.output.y * 9.81 * motionManager.accelerometerUpdateInterval
             }
+            velY?.text = "\(accSys.velocity.y)"
+            
             if fabs(accSys.output.z) >= 0.1 {
                 accSys.velocity.z += accSys.output.z * 9.81 * motionManager.accelerometerUpdateInterval
             }
-            
-            velX?.text = "\(accSys.velocity.x)"
-            velY?.text = "\(accSys.velocity.y)"
             velZ?.text = "\(accSys.velocity.z)"
             
-            if fabs(accSys.output.x) < 0.1 && fabs(accSys.output.y) < 0.1 && fabs(accSys.output.z) < 0.1 { // 0.1 is regarded as the "static state" for acc
-                staticStateJudgeTimer.a += 1
-                if staticStateJudgeTimer.a >= zeroVelocityThreshold && staticStateJudgeTimer.w >= zeroVelocityThreshold {
+            
+            if (fabs(accSys.output.x) < staticStateJudgeThreshold.acc &&
+                fabs(accSys.output.y) < staticStateJudgeThreshold.acc &&
+                fabs(accSys.output.z) < staticStateJudgeThreshold.acc) {
+                accSys.staticStateJudgeTimer += 1
+                
+                if (accSys.staticStateJudgeTimer >= staticStateJudgeThreshold.timer && gyroSys.staticStateJudgeTimer >= staticStateJudgeThreshold.timer) {
                     if accSys.velocity.x != 0 {
                         accSys.velocity.x /= 2
                         if fabs(accSys.velocity.x) < 0.0001 {
@@ -182,20 +176,21 @@ class ViewController: UIViewController {
                     }
                 }
             } else {
-                staticStateJudgeTimer.a = 0.0
+                accSys.staticStateJudgeTimer = 0.0
             }
             
             accSys.distance.x += accSys.velocity.x * motionManager.accelerometerUpdateInterval
             disX?.text = "\(accSys.distance.x)"
             
             accSys.distance.y += accSys.velocity.y * motionManager.accelerometerUpdateInterval
+            disY?.text = "\(accSys.distance.y)"
             
             accSys.distance.z += accSys.velocity.z * motionManager.accelerometerUpdateInterval
+            disZ?.text = "\(accSys.distance.z)"
         }
     }
     
-    func outputRotData(rotation: CMRotationRate){
-        
+    func outputRotData(rotation: CMRotationRate) {
         
         if !gyroSys.isCalibrated {
             
@@ -213,19 +208,47 @@ class ViewController: UIViewController {
             
         } else {
             
-            gyroSys.output.x = rotation.x - gyroSys.avg.x
-            gyroSys.output.y = rotation.y - gyroSys.avg.y
-            gyroSys.output.z = rotation.z - gyroSys.avg.z
-        
+            gyroSys.kValue.x = gyroSys.kalman.x.Update(rotation.x)
+            gyroSys.output.x = linearCoef.intercept + linearCoef.slope*gyroSys.kValue.x - gyroSys.avg.x
+            
+            gyroSys.kValue.y = gyroSys.kalman.y.Update(rotation.y)
+            gyroSys.output.y = linearCoef.intercept + linearCoef.slope*gyroSys.kValue.y - gyroSys.avg.y
+            
+            gyroSys.kValue.z = gyroSys.kalman.z.Update(rotation.z)
+            gyroSys.output.z = linearCoef.intercept + linearCoef.slope*gyroSys.kValue.z - gyroSys.avg.z
+            
             rotX?.text = "\(gyroSys.output.x)"
             rotY?.text = "\(gyroSys.output.y)"
             rotZ?.text = "\(gyroSys.output.z)"
             
-            if gyroSys.output.x < 0.01 && gyroSys.output.y < 0.01 && gyroSys.output.z < 0.01 {  // 0.01 is regarded as "static state" for angle acc
-                staticStateJudgeTimer.w += 1
-            } else {
-                staticStateJudgeTimer.w = 0.0
+            if fabs(gyroSys.output.x) >= 0.1 {
+                gyroSys.velocity.x += gyroSys.output.x * 9.81 * motionManager.gyroUpdateInterval
             }
+            velXGyro?.text = "\(gyroSys.velocity.x)"
+            
+            if fabs(gyroSys.output.y) >= 0.1 {
+                gyroSys.velocity.y += gyroSys.output.y * 9.81 * motionManager.gyroUpdateInterval
+            }
+            velYGyro?.text = "\(gyroSys.velocity.y)"
+            
+            if fabs(gyroSys.output.z) >= 0.1 {
+                gyroSys.velocity.z += gyroSys.output.z * 9.81 * motionManager.gyroUpdateInterval
+            }
+            velZGyro?.text = "\(gyroSys.velocity.z)"
+            
+            
+            if (gyroSys.output.x < staticStateJudgeThreshold.gyro &&
+                gyroSys.output.y < staticStateJudgeThreshold.gyro &&
+                gyroSys.output.z < staticStateJudgeThreshold.gyro) {
+                gyroSys.staticStateJudgeTimer += 1
+            } else {
+                gyroSys.staticStateJudgeTimer = 0.0
+            }
+            
+            gyroSys.distance.x += gyroSys.velocity.x * motionManager.gyroUpdateInterval
+            gyroSys.distance.y += gyroSys.velocity.y * motionManager.gyroUpdateInterval
+            gyroSys.distance.z += gyroSys.velocity.z * motionManager.gyroUpdateInterval
+            
         }
     }
     

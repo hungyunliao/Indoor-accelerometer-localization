@@ -19,16 +19,20 @@ import Foundation
 struct System {
     var isCalibrated: Bool = false
     var calibrationTimesRemained: Int = 0
+    var staticStateJudgeTimer: Double = 0.0
     
-    var avg: ThreeAxesSystem = ThreeAxesSystem()
-    var output: ThreeAxesSystem = ThreeAxesSystem()
-    var kValue: ThreeAxesSystem = ThreeAxesSystem()
-    var velocity: ThreeAxesSystem = ThreeAxesSystem()
-    var distance: ThreeAxesSystem = ThreeAxesSystem()
+    var avg: ThreeAxesSystemDouble = ThreeAxesSystemDouble()
+    var output: ThreeAxesSystemDouble = ThreeAxesSystemDouble()
+    var kValue: ThreeAxesSystemDouble = ThreeAxesSystemDouble()
+    var velocity: ThreeAxesSystemDouble = ThreeAxesSystemDouble()
+    var distance: ThreeAxesSystemDouble = ThreeAxesSystemDouble()
+    
+    var kalman: ThreeAxesSystemKalman = ThreeAxesSystemKalman()
     
     mutating func reset() {
         isCalibrated = false
         calibrationTimesRemained = 0
+        staticStateJudgeTimer = 0.0
         
         avg.x = 0.0
         avg.y = 0.0
@@ -52,10 +56,16 @@ struct System {
     }
 }
 
-struct ThreeAxesSystem {
+struct ThreeAxesSystemDouble {
     var x: Double = 0.0
     var y: Double = 0.0
     var z: Double = 0.0
+}
+
+struct ThreeAxesSystemKalman {
+    var x: KalmanFilter = KalmanFilter()
+    var y: KalmanFilter = KalmanFilter()
+    var z: KalmanFilter = KalmanFilter()
 }
 
 class KalmanFilter {
