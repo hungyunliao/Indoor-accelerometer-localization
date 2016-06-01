@@ -17,26 +17,26 @@ import Foundation
 */
 
 struct System {
-    var isCalibrated: Bool = false
-    var calibrationTimesRemained: Int = 0
-    var staticStateJudgeTimer: Double = 0.0
+    var isCalibrated = false
+    var calibrationTimesDone = 0
+    var staticStateJudgeTimer = 0.0
     
-    var avg: ThreeAxesSystemDouble = ThreeAxesSystemDouble()
-    var output: ThreeAxesSystemDouble = ThreeAxesSystemDouble()
-    var kValue: ThreeAxesSystemDouble = ThreeAxesSystemDouble()
-    var velocity: ThreeAxesSystemDouble = ThreeAxesSystemDouble()
-    var distance: ThreeAxesSystemDouble = ThreeAxesSystemDouble()
+    var base = ThreeAxesSystemDouble()
+    var output = ThreeAxesSystemDouble()
+    var kValue = ThreeAxesSystemDouble()
+    var velocity = ThreeAxesSystemDouble()
+    var distance = ThreeAxesSystemDouble()
     
-    var kalman: ThreeAxesSystemKalman = ThreeAxesSystemKalman()
+    var kalman = ThreeAxesSystemKalman()
     
     mutating func reset() {
         isCalibrated = false
-        calibrationTimesRemained = 0
+        calibrationTimesDone = 0
         staticStateJudgeTimer = 0.0
         
-        avg.x = 0.0
-        avg.y = 0.0
-        avg.z = 0.0
+        base.x = 0.0
+        base.y = 0.0
+        base.z = 0.0
         
         output.x = 0.0
         output.y = 0.0
@@ -57,24 +57,24 @@ struct System {
 }
 
 struct ThreeAxesSystemDouble {
-    var x: Double = 0.0
-    var y: Double = 0.0
-    var z: Double = 0.0
+    var x = 0.0
+    var y = 0.0
+    var z = 0.0
 }
 
 struct ThreeAxesSystemKalman {
-    var x: KalmanFilter = KalmanFilter()
-    var y: KalmanFilter = KalmanFilter()
-    var z: KalmanFilter = KalmanFilter()
+    var x = KalmanFilter()
+    var y = KalmanFilter()
+    var z = KalmanFilter()
 }
 
 class KalmanFilter {
     
-    private var k: Double = 0.0 // Kalman gain
-    private var p: Double = 0.0 // estimation error cvariance
-    private var q: Double = 15 // process noise cvariance
-    private var r: Double = 50 // measurement noise covariance
-    private var x: Double = 0.0 // value
+    private var k = 0.0 // Kalman gain
+    private var p = 0.0 // estimation error cvariance
+    private var q = 15.0 // process noise cvariance
+    private var r = 50.0 // measurement noise covariance
+    private var x = 0.0 // value
     
     func Update(value: Double) -> Double {
         p = sqrt(q * q + r * r)
@@ -95,11 +95,11 @@ func SimpleLinearRegression (x: [Double], y: [Double]) -> (Double, Double) {
     
     // x and y should be arrays of points. 
     
-    var xbar: Double = 0.0
-    var ybar: Double = 0.0
-    var xybar: Double = 0.0
-    var xsqbar: Double = 0.0
-    let arrayLength: Int = x.count
+    var xbar = 0.0
+    var ybar = 0.0
+    var xybar = 0.0
+    var xsqbar = 0.0
+    let arrayLength = x.count
     var linearCoef = (slope: 0.0, intercept: 0.0)
     
     for i in 0..<arrayLength {

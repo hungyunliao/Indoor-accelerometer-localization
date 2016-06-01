@@ -15,14 +15,10 @@ class ViewController: UIViewController {
     var accelerometerUpdateInterval: Double = 0.1
     var gyroUpdateInterval: Double = 0.1
     var calibrationTimeAssigned: Int = 100
-    var staticStateJudgeThreshold = (acc: 0.1, gyro: 0.1, timer: 10.0)
+    var staticStateJudgeThreshold = (acc: 0.1, gyro: 0.1, timer: 5.0)
     
     // MARK: Instance variables
-    var currentMaxRotX: Double = 0.0
-    var currentMaxRotY: Double = 0.0
-    var currentMaxRotZ: Double = 0.0
     var motionManager = CMMotionManager()
-    
     var accSys: System = System()
     var gyroSys: System = System()
     
@@ -57,14 +53,8 @@ class ViewController: UIViewController {
     
     // MARK: Functions
     @IBAction func reset() {
-        
-        currentMaxRotX = 0.0
-        currentMaxRotY = 0.0
-        currentMaxRotZ = 0.0
-        
         accSys.reset()
         gyroSys.reset()
-        
     }
     
     override func viewDidLoad() {
@@ -102,15 +92,15 @@ class ViewController: UIViewController {
             
             info?.text = "Calibrating..."
             
-            if accSys.calibrationTimesRemained < calibrationTimeAssigned {
-                accSys.avg.x += acceleration.x
-                accSys.avg.y += acceleration.y
-                accSys.avg.z += acceleration.z
-                accSys.calibrationTimesRemained += 1
+            if accSys.calibrationTimesDone < calibrationTimeAssigned {
+                accSys.base.x += acceleration.x
+                accSys.base.y += acceleration.y
+                accSys.base.z += acceleration.z + 1 // MARK: should change
+                accSys.calibrationTimesDone += 1
             } else {
-                accSys.avg.x /= Double(calibrationTimeAssigned)
-                accSys.avg.y /= Double(calibrationTimeAssigned)
-                accSys.avg.z /= Double(calibrationTimeAssigned)
+                accSys.base.x /= Double(calibrationTimeAssigned)
+                accSys.base.y /= Double(calibrationTimeAssigned)
+                accSys.base.z /= Double(calibrationTimeAssigned)
                 accSys.isCalibrated = true
             }
             
@@ -120,15 +110,15 @@ class ViewController: UIViewController {
             
             /* KalmanFilter begins */
             accSys.kValue.x = accSys.kalman.x.Update(acceleration.x)
-            accSys.output.x = linearCoef.intercept + linearCoef.slope*accSys.kValue.x - accSys.avg.x
+            accSys.output.x = linearCoef.intercept + linearCoef.slope*accSys.kValue.x - accSys.base.x
             accX?.text = "\(accSys.output.x)"
             
             accSys.kValue.y = accSys.kalman.y.Update(acceleration.y)
-            accSys.output.y = linearCoef.intercept + linearCoef.slope*accSys.kValue.y - accSys.avg.y
+            accSys.output.y = linearCoef.intercept + linearCoef.slope*accSys.kValue.y - accSys.base.y
             accY?.text = "\(accSys.output.y)"
             
             accSys.kValue.z = accSys.kalman.z.Update(acceleration.z)
-            accSys.output.z = linearCoef.intercept + linearCoef.slope*accSys.kValue.z - accSys.avg.z
+            accSys.output.z = linearCoef.intercept + linearCoef.slope*accSys.kValue.z - accSys.base.z
             accZ?.text = "\(accSys.output.z)"
             /* KalmanFilter ends */
             
@@ -144,7 +134,7 @@ class ViewController: UIViewController {
             }
             velY?.text = "\(accSys.velocity.y)"
             
-            if fabs(accSys.output.z) >= 0.1 {
+            if fabs(accSys.output.z + 1) >= 0.1 {
                 accSys.velocity.z += accSys.output.z * 9.81 * motionManager.accelerometerUpdateInterval
             }
             velZ?.text = "\(accSys.velocity.z)"
@@ -152,27 +142,27 @@ class ViewController: UIViewController {
             
             if (fabs(accSys.output.x) < staticStateJudgeThreshold.acc &&
                 fabs(accSys.output.y) < staticStateJudgeThreshold.acc &&
-                fabs(accSys.output.z) < staticStateJudgeThreshold.acc) {
+                fabs(accSys.output.z + 1) < staticStateJudgeThreshold.acc) {
                 accSys.staticStateJudgeTimer += 1
                 
                 if (accSys.staticStateJudgeTimer >= staticStateJudgeThreshold.timer && gyroSys.staticStateJudgeTimer >= staticStateJudgeThreshold.timer) {
                     if accSys.velocity.x != 0 {
-                        accSys.velocity.x /= 2
-                        if fabs(accSys.velocity.x) < 0.0001 {
+//                        accSys.velocity.x /= 2
+//                        if fabs(accSys.velocity.x) < 0.0001 {
                             accSys.velocity.x = 0
-                        }
+//                        }
                     }
                     if accSys.velocity.y != 0 {
-                        accSys.velocity.y /= 2
-                        if fabs(accSys.velocity.y) < 0.0001 {
+//                        accSys.velocity.y /= 2
+//                        if fabs(accSys.velocity.y) < 0.0001 {
                             accSys.velocity.y = 0
-                        }
+//                        }
                     }
                     if accSys.velocity.z != 0 {
-                        accSys.velocity.z /= 2
-                        if fabs(accSys.velocity.z) < 0.0001 {
+//                        accSys.velocity.z /= 2
+//                        if fabs(accSys.velocity.z) < 0.0001 {
                             accSys.velocity.z = 0
-                        }
+//                        }
                     }
                 }
             } else {
@@ -194,32 +184,32 @@ class ViewController: UIViewController {
         
         if !gyroSys.isCalibrated {
             
-            if gyroSys.calibrationTimesRemained < calibrationTimeAssigned {
-                gyroSys.avg.x += rotation.x
-                gyroSys.avg.y += rotation.y
-                gyroSys.avg.z += rotation.z
-                gyroSys.calibrationTimesRemained += 1
+            if gyroSys.calibrationTimesDone < calibrationTimeAssigned {
+                gyroSys.base.x += rotation.x
+                gyroSys.base.y += rotation.y
+                gyroSys.base.z += rotation.z
+                gyroSys.calibrationTimesDone += 1
             } else {
-                gyroSys.avg.x /= Double(calibrationTimeAssigned)
-                gyroSys.avg.y /= Double(calibrationTimeAssigned)
-                gyroSys.avg.z /= Double(calibrationTimeAssigned)
+                gyroSys.base.x /= Double(calibrationTimeAssigned)
+                gyroSys.base.y /= Double(calibrationTimeAssigned)
+                gyroSys.base.z /= Double(calibrationTimeAssigned)
                 gyroSys.isCalibrated = true
             }
             
         } else {
             
             gyroSys.kValue.x = gyroSys.kalman.x.Update(rotation.x)
-            gyroSys.output.x = linearCoef.intercept + linearCoef.slope*gyroSys.kValue.x - gyroSys.avg.x
+            gyroSys.output.x = linearCoef.intercept + linearCoef.slope*gyroSys.kValue.x - gyroSys.base.x
+            rotX?.text = "\(gyroSys.output.x)"
             
             gyroSys.kValue.y = gyroSys.kalman.y.Update(rotation.y)
-            gyroSys.output.y = linearCoef.intercept + linearCoef.slope*gyroSys.kValue.y - gyroSys.avg.y
+            gyroSys.output.y = linearCoef.intercept + linearCoef.slope*gyroSys.kValue.y - gyroSys.base.y
+            rotY?.text = "\(gyroSys.output.y)"
             
             gyroSys.kValue.z = gyroSys.kalman.z.Update(rotation.z)
-            gyroSys.output.z = linearCoef.intercept + linearCoef.slope*gyroSys.kValue.z - gyroSys.avg.z
-            
-            rotX?.text = "\(gyroSys.output.x)"
-            rotY?.text = "\(gyroSys.output.y)"
+            gyroSys.output.z = linearCoef.intercept + linearCoef.slope*gyroSys.kValue.z - gyroSys.base.z
             rotZ?.text = "\(gyroSys.output.z)"
+            
             
             if fabs(gyroSys.output.x) >= 0.1 {
                 gyroSys.velocity.x += gyroSys.output.x * 9.81 * motionManager.gyroUpdateInterval
@@ -244,6 +234,7 @@ class ViewController: UIViewController {
             } else {
                 gyroSys.staticStateJudgeTimer = 0.0
             }
+            
             
             gyroSys.distance.x += gyroSys.velocity.x * motionManager.gyroUpdateInterval
             gyroSys.distance.y += gyroSys.velocity.y * motionManager.gyroUpdateInterval
