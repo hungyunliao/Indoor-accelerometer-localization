@@ -12,13 +12,19 @@ import CoreMotion
 class ViewController: UIViewController {
     
     // MARK: System parameters setup
-    var accelerometerUpdateInterval: Double = 0.1
+    var accelerometerUpdateInterval: Double = 0.01
     var gyroUpdateInterval: Double = 0.1
     var calibrationTimeAssigned: Int = 100
     var staticStateJudgeThreshold = (acc: 0.1, gyro: 0.1, timer: 5.0)
     
+    var staticStateJudge = (modulAcc: 0, modulGyro: 0, modulDiffAcc: 1)
+    var arrayForStatic = [Double](count: 7, repeatedValue: -1)
+    var index = 0
+    var modulusDiff = 0.0
+    
     // MARK: Instance variables
     var motionManager = CMMotionManager()
+    var accModulusAvg = 0.0
     var accSys: System = System()
     var gyroSys: System = System()
     
@@ -106,7 +112,7 @@ class ViewController: UIViewController {
             
         } else {
             
-            info?.text = "Detecting..."
+            //info?.text = "Detecting..."
             
             /* KalmanFilter begins */
             accSys.kValue.x = accSys.kalman.x.Update(acceleration.x)
@@ -140,33 +146,44 @@ class ViewController: UIViewController {
             velZ?.text = "\(accSys.velocity.z)"
             
             
-            if (fabs(accSys.output.x) < staticStateJudgeThreshold.acc &&
-                fabs(accSys.output.y) < staticStateJudgeThreshold.acc &&
-                fabs(accSys.output.z + 1) < staticStateJudgeThreshold.acc) {
-                accSys.staticStateJudgeTimer += 1
-                
-                if (accSys.staticStateJudgeTimer >= staticStateJudgeThreshold.timer && gyroSys.staticStateJudgeTimer >= staticStateJudgeThreshold.timer) {
-                    if accSys.velocity.x != 0 {
-//                        accSys.velocity.x /= 2
-//                        if fabs(accSys.velocity.x) < 0.0001 {
-                            accSys.velocity.x = 0
-//                        }
-                    }
-                    if accSys.velocity.y != 0 {
-//                        accSys.velocity.y /= 2
-//                        if fabs(accSys.velocity.y) < 0.0001 {
-                            accSys.velocity.y = 0
-//                        }
-                    }
-                    if accSys.velocity.z != 0 {
-//                        accSys.velocity.z /= 2
-//                        if fabs(accSys.velocity.z) < 0.0001 {
-                            accSys.velocity.z = 0
-//                        }
-                    }
+            /* Note2-1 */
+            
+            if index == arrayForStatic.count {
+                for i in 0..<(arrayForStatic.count - 1) {
+                    arrayForStatic[i] = arrayForStatic[i + 1]
                 }
+                arrayForStatic[index - 1] = modulus(acceleration.x, y: acceleration.y, z: acceleration.z)
+                accModulusAvg += arrayForStatic[3]
+                accModulusAvg /= 2
+                modulusDiff = modulusDifference(arrayForStatic, avgModulus: accModulusAvg)
             } else {
-                accSys.staticStateJudgeTimer = 0.0
+                arrayForStatic[index] = modulus(acceleration.x, y: acceleration.y, z: acceleration.z)
+                index += 1
+                if index == arrayForStatic.count {
+                    for i in 0...((arrayForStatic.count - 1)/2) {
+                        accModulusAvg += arrayForStatic[i]
+                    }
+                    accModulusAvg /= Double((arrayForStatic.count - 1)/2 + 1)
+                    modulusDiff = modulusDifference(arrayForStatic, avgModulus: accModulusAvg)
+                }
+            }
+            
+//            if fabs(modulusDiff) < 0.001 {
+//                staticStateJudge.modulDiffAcc = 1
+//            } else {
+//                staticStateJudge.modulDiffAcc = 0
+//            }
+            
+            if fabs(modulus(acceleration.x, y: acceleration.y, z: acceleration.z) - 1) < (1/9.8) {
+                staticStateJudge.modulAcc = 1
+            } else {
+                staticStateJudge.modulAcc = 0
+            }
+            
+            if staticStateJudge.modulAcc * staticStateJudge.modulGyro * staticStateJudge.modulDiffAcc == 1 {
+                info?.text = "static state"
+            } else {
+                info?.text = "dynamic state"
             }
             
             accSys.distance.x += accSys.velocity.x * motionManager.accelerometerUpdateInterval
@@ -210,35 +227,31 @@ class ViewController: UIViewController {
             gyroSys.output.z = linearCoef.intercept + linearCoef.slope*gyroSys.kValue.z - gyroSys.base.z
             rotZ?.text = "\(gyroSys.output.z)"
             
-            
+            // gyro is the angular speed, not the angular acceleration
             if fabs(gyroSys.output.x) >= 0.1 {
-                gyroSys.velocity.x += gyroSys.output.x * 9.81 * motionManager.gyroUpdateInterval
+                gyroSys.distance.x += gyroSys.output.x * motionManager.gyroUpdateInterval
             }
-            velXGyro?.text = "\(gyroSys.velocity.x)"
+            velXGyro?.text = "\(gyroSys.distance.x)"
             
             if fabs(gyroSys.output.y) >= 0.1 {
-                gyroSys.velocity.y += gyroSys.output.y * 9.81 * motionManager.gyroUpdateInterval
+                gyroSys.distance.y += gyroSys.output.y * motionManager.gyroUpdateInterval
             }
-            velYGyro?.text = "\(gyroSys.velocity.y)"
+            velYGyro?.text = "\(gyroSys.distance.y)"
             
             if fabs(gyroSys.output.z) >= 0.1 {
-                gyroSys.velocity.z += gyroSys.output.z * 9.81 * motionManager.gyroUpdateInterval
+                gyroSys.distance.z += gyroSys.output.z * motionManager.gyroUpdateInterval
             }
-            velZGyro?.text = "\(gyroSys.velocity.z)"
+            //velZGyro?.text = "\(gyroSys.distance.z)"
             
+            /* Note2-2 */
+
             
-            if (gyroSys.output.x < staticStateJudgeThreshold.gyro &&
-                gyroSys.output.y < staticStateJudgeThreshold.gyro &&
-                gyroSys.output.z < staticStateJudgeThreshold.gyro) {
-                gyroSys.staticStateJudgeTimer += 1
+            velZGyro?.text = "\(modulus(gyroSys.output.x, y: gyroSys.output.y, z: gyroSys.output.z))"
+            if modulus(gyroSys.output.x, y: gyroSys.output.y, z: gyroSys.output.z) < 0.1 {
+                staticStateJudge.modulGyro = 1
             } else {
-                gyroSys.staticStateJudgeTimer = 0.0
+                staticStateJudge.modulGyro = 0
             }
-            
-            
-            gyroSys.distance.x += gyroSys.velocity.x * motionManager.gyroUpdateInterval
-            gyroSys.distance.y += gyroSys.velocity.y * motionManager.gyroUpdateInterval
-            gyroSys.distance.z += gyroSys.velocity.z * motionManager.gyroUpdateInterval
             
         }
     }
@@ -286,3 +299,42 @@ class ViewController: UIViewController {
 //            }
 //            /* 3-point Filter ends */
 
+
+/* Note2-1 */
+//            if (fabs(accSys.output.x) < staticStateJudgeThreshold.acc &&
+//                fabs(accSys.output.y) < staticStateJudgeThreshold.acc &&
+//                fabs(accSys.output.z + 1) < staticStateJudgeThreshold.acc) {
+//                accSys.staticStateJudgeTimer += 1
+//
+//                if (accSys.staticStateJudgeTimer >= staticStateJudgeThreshold.timer && gyroSys.staticStateJudgeTimer >= staticStateJudgeThreshold.timer) {
+//                    if accSys.velocity.x != 0 {
+////                        accSys.velocity.x /= 2
+////                        if fabs(accSys.velocity.x) < 0.0001 {
+//                            accSys.velocity.x = 0
+////                        }
+//                    }
+//                    if accSys.velocity.y != 0 {
+////                        accSys.velocity.y /= 2
+////                        if fabs(accSys.velocity.y) < 0.0001 {
+//                            accSys.velocity.y = 0
+////                        }
+//                    }
+//                    if accSys.velocity.z != 0 {
+////                        accSys.velocity.z /= 2
+////                        if fabs(accSys.velocity.z) < 0.0001 {
+//                            accSys.velocity.z = 0
+////                        }
+//                    }
+//                }
+//            } else {
+//                accSys.staticStateJudgeTimer = 0.0
+//            }
+
+/* Note2-2 */
+//            if (gyroSys.output.x < staticStateJudgeThreshold.gyro &&
+//                gyroSys.output.y < staticStateJudgeThreshold.gyro &&
+//                gyroSys.output.z < staticStateJudgeThreshold.gyro) {
+//                gyroSys.staticStateJudgeTimer += 1
+//            } else {
+//                gyroSys.staticStateJudgeTimer = 0.0
+//            }
