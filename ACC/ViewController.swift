@@ -13,11 +13,13 @@ class ViewController: UIViewController {
     
     // MARK: System parameters setup
     var accelerometerUpdateInterval: Double = 0.01
-    var gyroUpdateInterval: Double = 0.1
+    var gyroUpdateInterval: Double = 0.01
     var calibrationTimeAssigned: Int = 100
     var staticStateJudgeThreshold = (acc: 0.1, gyro: 0.1, timer: 5.0)
     
-    var staticStateJudge = (modulAcc: 0, modulGyro: 0, modulDiffAcc: 1)
+    let gravityConstant = 9.80665
+    
+    var staticStateJudge = (modulAcc: 0, modulGyro: 0, modulDiffAcc: 0) // 1: static 0: dynamic
     var arrayForStatic = [Double](count: 7, repeatedValue: -1)
     var index = 0
     var modulusDiff = 0.0
@@ -27,6 +29,7 @@ class ViewController: UIViewController {
     var accModulusAvg = 0.0
     var accSys: System = System()
     var gyroSys: System = System()
+    var absSys: System = System()
     
     // MARK: Kalman Filter
     var arrayOfPoints: [Double] = [1, 2, 3]
@@ -61,6 +64,7 @@ class ViewController: UIViewController {
     @IBAction func reset() {
         accSys.reset()
         gyroSys.reset()
+        absSys.reset()
     }
     
     override func viewDidLoad() {
@@ -116,32 +120,32 @@ class ViewController: UIViewController {
             
             /* KalmanFilter begins */
             accSys.kValue.x = accSys.kalman.x.Update(acceleration.x)
-            accSys.output.x = linearCoef.intercept + linearCoef.slope*accSys.kValue.x - accSys.base.x
+            accSys.output.x = roundNum(linearCoef.intercept + linearCoef.slope*accSys.kValue.x - accSys.base.x)
             accX?.text = "\(accSys.output.x)"
             
             accSys.kValue.y = accSys.kalman.y.Update(acceleration.y)
-            accSys.output.y = linearCoef.intercept + linearCoef.slope*accSys.kValue.y - accSys.base.y
+            accSys.output.y = roundNum(linearCoef.intercept + linearCoef.slope*accSys.kValue.y - accSys.base.y)
             accY?.text = "\(accSys.output.y)"
             
             accSys.kValue.z = accSys.kalman.z.Update(acceleration.z)
-            accSys.output.z = linearCoef.intercept + linearCoef.slope*accSys.kValue.z - accSys.base.z
+            accSys.output.z = roundNum(linearCoef.intercept + linearCoef.slope*accSys.kValue.z - accSys.base.z)
             accZ?.text = "\(accSys.output.z)"
             /* KalmanFilter ends */
             
             /* Note1 */
             
             if fabs(accSys.output.x) >= 0.1 {
-                accSys.velocity.x += accSys.output.x * 9.81 * motionManager.accelerometerUpdateInterval
+                accSys.velocity.x += roundNum(accSys.output.x * gravityConstant * motionManager.accelerometerUpdateInterval)
             }
             velX?.text = "\(accSys.velocity.x)"
             
             if fabs(accSys.output.y) >= 0.1 {
-                accSys.velocity.y += accSys.output.y * 9.81 * motionManager.accelerometerUpdateInterval
+                accSys.velocity.y += roundNum(accSys.output.y * gravityConstant * motionManager.accelerometerUpdateInterval)
             }
             velY?.text = "\(accSys.velocity.y)"
             
             if fabs(accSys.output.z + 1) >= 0.1 {
-                accSys.velocity.z += accSys.output.z * 9.81 * motionManager.accelerometerUpdateInterval
+                accSys.velocity.z += roundNum(accSys.output.z * gravityConstant * motionManager.accelerometerUpdateInterval)
             }
             velZ?.text = "\(accSys.velocity.z)"
             
@@ -168,31 +172,35 @@ class ViewController: UIViewController {
                 }
             }
             
-//            if fabs(modulusDiff) < 0.001 {
-//                staticStateJudge.modulDiffAcc = 1
-//            } else {
-//                staticStateJudge.modulDiffAcc = 0
-//            }
+            if fabs(modulusDiff) < 0.1 {
+                staticStateJudge.modulDiffAcc = 1
+            } else {
+                staticStateJudge.modulDiffAcc = 0
+            }
             
-            if fabs(modulus(acceleration.x, y: acceleration.y, z: acceleration.z) - 1) < (1/9.8) {
+            if fabs(modulus(acceleration.x, y: acceleration.y, z: acceleration.z) - 1) < (1/gravityConstant) {
                 staticStateJudge.modulAcc = 1
             } else {
                 staticStateJudge.modulAcc = 0
             }
             
-            if staticStateJudge.modulAcc * staticStateJudge.modulGyro * staticStateJudge.modulDiffAcc == 1 {
+            if staticStateJudge.modulAcc * staticStateJudge.modulGyro * staticStateJudge.modulDiffAcc == 1 { // when all of the three indicators (modulAcc, modulGyro, modulDiffAcc) are true (1)
+                accSys.velocity.x = 0
+                accSys.velocity.y = 0
+                accSys.velocity.z = 0
+                
                 info?.text = "static state"
             } else {
                 info?.text = "dynamic state"
             }
             
-            accSys.distance.x += accSys.velocity.x * motionManager.accelerometerUpdateInterval
+            accSys.distance.x += roundNum(accSys.velocity.x * motionManager.accelerometerUpdateInterval)
             disX?.text = "\(accSys.distance.x)"
             
-            accSys.distance.y += accSys.velocity.y * motionManager.accelerometerUpdateInterval
+            accSys.distance.y += roundNum(accSys.velocity.y * motionManager.accelerometerUpdateInterval)
             disY?.text = "\(accSys.distance.y)"
             
-            accSys.distance.z += accSys.velocity.z * motionManager.accelerometerUpdateInterval
+            accSys.distance.z += roundNum(accSys.velocity.z * motionManager.accelerometerUpdateInterval)
             disZ?.text = "\(accSys.distance.z)"
         }
     }
@@ -216,30 +224,30 @@ class ViewController: UIViewController {
         } else {
             
             gyroSys.kValue.x = gyroSys.kalman.x.Update(rotation.x)
-            gyroSys.output.x = linearCoef.intercept + linearCoef.slope*gyroSys.kValue.x - gyroSys.base.x
+            gyroSys.output.x = roundNum(linearCoef.intercept + linearCoef.slope*gyroSys.kValue.x - gyroSys.base.x)
             rotX?.text = "\(gyroSys.output.x)"
             
             gyroSys.kValue.y = gyroSys.kalman.y.Update(rotation.y)
-            gyroSys.output.y = linearCoef.intercept + linearCoef.slope*gyroSys.kValue.y - gyroSys.base.y
+            gyroSys.output.y = roundNum(linearCoef.intercept + linearCoef.slope*gyroSys.kValue.y - gyroSys.base.y)
             rotY?.text = "\(gyroSys.output.y)"
             
             gyroSys.kValue.z = gyroSys.kalman.z.Update(rotation.z)
-            gyroSys.output.z = linearCoef.intercept + linearCoef.slope*gyroSys.kValue.z - gyroSys.base.z
+            gyroSys.output.z = roundNum(linearCoef.intercept + linearCoef.slope*gyroSys.kValue.z - gyroSys.base.z)
             rotZ?.text = "\(gyroSys.output.z)"
             
             // gyro is the angular speed, not the angular acceleration
             if fabs(gyroSys.output.x) >= 0.1 {
-                gyroSys.distance.x += gyroSys.output.x * motionManager.gyroUpdateInterval
+                gyroSys.distance.x += roundNum(gyroSys.output.x * motionManager.gyroUpdateInterval)
             }
             velXGyro?.text = "\(gyroSys.distance.x)"
             
             if fabs(gyroSys.output.y) >= 0.1 {
-                gyroSys.distance.y += gyroSys.output.y * motionManager.gyroUpdateInterval
+                gyroSys.distance.y += roundNum(gyroSys.output.y * motionManager.gyroUpdateInterval)
             }
             velYGyro?.text = "\(gyroSys.distance.y)"
             
             if fabs(gyroSys.output.z) >= 0.1 {
-                gyroSys.distance.z += gyroSys.output.z * motionManager.gyroUpdateInterval
+                gyroSys.distance.z += roundNum(gyroSys.output.z * motionManager.gyroUpdateInterval)
             }
             //velZGyro?.text = "\(gyroSys.distance.z)"
             
