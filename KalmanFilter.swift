@@ -8,6 +8,13 @@
 
 import Foundation
 
+
+// MARK: operator define
+infix operator ^ {}
+func ^ (radix: Double, power: Double) -> Double {
+    return pow(radix, power)
+}
+
 /*
     Initializating Kalman object in C:
         KalmanFilter kalman(15, 50)
@@ -127,6 +134,22 @@ func standardDeviation(arr : [Double]) -> Double
     let avg = arr.reduce(0, combine: {$0 + $1}) / length
     let sumOfSquaredAvgDiff = arr.map { pow($0 - avg, 2.0)}.reduce(0, combine: {$0 + $1})
     return sqrt(sumOfSquaredAvgDiff / length)
+}
+
+func modulus(x: Double, y: Double, z: Double) -> Double {
+    return sqrt((x ^ 2) + (y ^ 2) + (z ^ 2))
+}
+
+func modulusDifference(arr: [Double], avgModulus: Double) -> Double {
+    var sum = 0.0
+    for i in 0..<arr.count {
+        sum += ((arr[i] - avgModulus) ^ 2)
+    }
+    return sum / Double(arr.count)
+}
+
+func roundNum(number: Double) -> Double {
+    return round(number * 10000) / 10000
 }
 
 

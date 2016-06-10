@@ -14,10 +14,12 @@
 		13B648F31CF3B82B00CA656A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B648F21CF3B82B00CA656A /* Assets.xcassets */; };
 		13B648F61CF3B82B00CA656A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 13B648F41CF3B82B00CA656A /* LaunchScreen.storyboard */; };
 		13B648FE1CF3BA4A00CA656A /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 13B648FD1CF3BA4A00CA656A /* CoreMotion.framework */; };
+		13CCEB2F1D088C97005556A8 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13CCEB2E1D088C97005556A8 /* MapViewController.swift */; };
+		13CCEB331D0890E9005556A8 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13CCEB321D0890E9005556A8 /* MapView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		13AE20C31CF8B0C4004B0D6B /* KalmanFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KalmanFilter.swift; sourceTree = "<group>"; };
+		13AE20C31CF8B0C4004B0D6B /* KalmanFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = KalmanFilter.swift; path = ../KalmanFilter.swift; sourceTree = "<group>"; };
 		13B648E81CF3B82B00CA656A /* ACC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ACC.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B648EB1CF3B82B00CA656A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		13B648ED1CF3B82B00CA656A /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -26,6 +28,8 @@
 		13B648F51CF3B82B00CA656A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		13B648F71CF3B82B00CA656A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		13B648FD1CF3BA4A00CA656A /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
+		13CCEB2E1D088C97005556A8 /* MapViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
+		13CCEB321D0890E9005556A8 /* MapView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -43,7 +47,6 @@
 		13B648DF1CF3B82B00CA656A = {
 			isa = PBXGroup;
 			children = (
-				13AE20C31CF8B0C4004B0D6B /* KalmanFilter.swift */,
 				13B648FD1CF3BA4A00CA656A /* CoreMotion.framework */,
 				13B648EA1CF3B82B00CA656A /* ACC */,
 				13B648E91CF3B82B00CA656A /* Products */,
@@ -61,6 +64,9 @@
 		13B648EA1CF3B82B00CA656A /* ACC */ = {
 			isa = PBXGroup;
 			children = (
+				13CCEB321D0890E9005556A8 /* MapView.swift */,
+				13CCEB2E1D088C97005556A8 /* MapViewController.swift */,
+				13AE20C31CF8B0C4004B0D6B /* KalmanFilter.swift */,
 				13B648EB1CF3B82B00CA656A /* AppDelegate.swift */,
 				13B648ED1CF3B82B00CA656A /* ViewController.swift */,
 				13B648EF1CF3B82B00CA656A /* Main.storyboard */,
@@ -145,7 +151,9 @@
 			files = (
 				13AE20C41CF8B0C4004B0D6B /* KalmanFilter.swift in Sources */,
 				13B648EE1CF3B82B00CA656A /* ViewController.swift in Sources */,
+				13CCEB331D0890E9005556A8 /* MapView.swift in Sources */,
 				13B648EC1CF3B82B00CA656A /* AppDelegate.swift in Sources */,
+				13CCEB2F1D088C97005556A8 /* MapViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
