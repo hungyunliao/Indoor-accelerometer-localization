@@ -20,7 +20,41 @@
                         <subviews>
                             <view contentMode="redraw" translatesAutoresizingMaskIntoConstraints="NO" id="Wea-Np-VX3" customClass="MapView" customModule="ACC" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="551"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="X" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Fel-qe-4nj">
+                                        <rect key="frame" x="580" y="265" width="12" height="21"/>
+                                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eJQ-cg-Vko">
+                                        <rect key="frame" x="8" y="32" width="72" height="30"/>
+                                        <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                        <state key="normal" title="clean path">
+                                            <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="cleanpath:" destination="RWn-wI-3h0" eventType="touchUpInside" id="7FK-s9-LWq"/>
+                                        </connections>
+                                    </button>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Y" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="r2S-Qr-hMK">
+                                        <rect key="frame" x="295" y="32" width="11" height="21"/>
+                                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstItem="Fel-qe-4nj" firstAttribute="trailing" secondItem="Wea-Np-VX3" secondAttribute="trailingMargin" id="2P7-sF-hxY"/>
+                                    <constraint firstItem="eJQ-cg-Vko" firstAttribute="top" secondItem="Wea-Np-VX3" secondAttribute="top" constant="32" id="LX6-9o-ZiF"/>
+                                    <constraint firstItem="eJQ-cg-Vko" firstAttribute="leading" secondItem="Wea-Np-VX3" secondAttribute="leadingMargin" id="QA8-DZ-Wdj"/>
+                                    <constraint firstItem="Fel-qe-4nj" firstAttribute="centerY" secondItem="Wea-Np-VX3" secondAttribute="centerY" id="eGO-FE-8qq"/>
+                                    <constraint firstItem="r2S-Qr-hMK" firstAttribute="centerX" secondItem="Wea-Np-VX3" secondAttribute="centerX" id="gVk-zw-Ksa"/>
+                                    <constraint firstItem="r2S-Qr-hMK" firstAttribute="top" secondItem="eJQ-cg-Vko" secondAttribute="top" id="kSL-kb-eto"/>
+                                </constraints>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="mapx">
                                         <real key="value" value="0.0"/>
@@ -33,10 +67,10 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="Wea-Np-VX3" firstAttribute="bottom" secondItem="uSX-YK-u8I" secondAttribute="top" id="Miw-z8-f8I"/>
-                            <constraint firstAttribute="trailing" secondItem="Wea-Np-VX3" secondAttribute="trailing" id="a4t-cw-Hr3"/>
-                            <constraint firstItem="Wea-Np-VX3" firstAttribute="leading" secondItem="Fcd-Xl-hJM" secondAttribute="leading" id="soa-gH-NqP"/>
-                            <constraint firstItem="Wea-Np-VX3" firstAttribute="top" secondItem="Fcd-Xl-hJM" secondAttribute="top" id="xeA-CA-5ba"/>
+                            <constraint firstAttribute="trailing" secondItem="Wea-Np-VX3" secondAttribute="trailing" id="4Lu-jd-Mzb"/>
+                            <constraint firstItem="Wea-Np-VX3" firstAttribute="top" secondItem="Fcd-Xl-hJM" secondAttribute="top" id="7fh-yc-isv"/>
+                            <constraint firstItem="Wea-Np-VX3" firstAttribute="bottom" secondItem="uSX-YK-u8I" secondAttribute="top" id="frv-i0-M8l"/>
+                            <constraint firstItem="Wea-Np-VX3" firstAttribute="leading" secondItem="Fcd-Xl-hJM" secondAttribute="leading" id="jVx-BA-Dng"/>
                         </constraints>
                     </view>
                     <tabBarItem key="tabBarItem" title="Map" id="p21-07-ElE"/>
@@ -46,7 +80,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="esp-a6-bXS" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-341" y="479"/>
+            <point key="canvasLocation" x="-336" y="501"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="LFh-GF-BKb">

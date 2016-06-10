@@ -26,7 +26,7 @@ class ViewController: UIViewController {
     
     
     var test = 0
-    let transDB = NSUserDefaults.standardUserDefaults()
+    let publicDB = NSUserDefaults.standardUserDefaults()
     
     // MARK: Instance variables
     var motionManager = CMMotionManager()
@@ -205,8 +205,8 @@ class ViewController: UIViewController {
                 
                 
                 // save the changed position to the PUBLIC NSUserdefault object so that they can be accessed by other VIEW
-                transDB.setValue(accSys.distance.x, forKey: "x")
-                transDB.setValue(accSys.distance.y, forKey: "y")
+                publicDB.setValue(accSys.distance.x, forKey: "x")
+                publicDB.setValue(accSys.distance.y, forKey: "y")
                 // post the notification to the NotificationCenter to notify everyone who is in the observer list.
                 NSNotificationCenter.defaultCenter().postNotificationName("PositionChanged", object: nil)
             }
