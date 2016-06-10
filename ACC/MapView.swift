@@ -10,13 +10,14 @@ import UIKit
 
 @IBDesignable
 class MapView: UIView {
-
-    @IBInspectable var
-    mapx: Double = 0.0 { didSet { setNeedsDisplay() } }
-    @IBInspectable var
-    mapy: Double = 0.0 { didSet { setNeedsDisplay() } }
-
+    
+    @IBInspectable
+    var mapx: Double = 0.0 { didSet { setNeedsDisplay() } }
+    @IBInspectable
+    var mapy: Double = 0.0 { didSet { setNeedsDisplay() } }
+    
     override func drawRect(rect: CGRect) {
+        
         
         let path = UIBezierPath()
         
@@ -29,6 +30,7 @@ class MapView: UIView {
         UIColor.blueColor().set()
         
         path.stroke()
+        
     }
-
+    
 }

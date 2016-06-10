@@ -14,18 +14,66 @@ class MapViewController: UIViewController {
     var aax: Double = 0.0
     var aay: Double = 0.0
     
+    var prefs = NSUserDefaults.standardUserDefaults() {
+        didSet {
+            updateUI()
+        }
+    }
     
-    @IBOutlet weak var mapView: MapView!
+    
+    
+    @IBOutlet weak var mapView: MapView! {
+        didSet {
+            updateUI()
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         updateUI()
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(methodOfReceivedNotification(_:)), name:"NotificationIdentifier", object: nil)
+
+        
         self.view.backgroundColor = UIColor.greenColor()
+    }
+//    deinit {
+//        NSNotificationCenter.defaultCenter().removeObserver(self, name: NSUserDefaultsDidChangeNotification, object: nil)
+//    }
+    
+    func methodOfReceivedNotification(notification: NSNotification){
+        if let getX = prefs.stringForKey("x") {
+            mapView.mapx = Double(getX)!
+        } else {
+            mapView.mapx = 0
+        }
+        
+        if let getY = prefs.stringForKey("y") {
+            mapView.mapy = Double(getY)!
+        } else {
+            mapView.mapy = 0
+        }
+//        NSNotificationCenter.defaultCenter().removeObserver(self, name: "NotificationIdentifier", object: nil)
+//        NSNotificationCenter.defaultCenter().removeObserver(self)
+
     }
     
     func updateUI() {
-        mapView.mapx = 500.0
-        mapView.mapy = 40.0
+        
+        
+//        if let getX = prefs.stringForKey("x") {
+//            mapView.mapx = Double(getX)!
+//        } else {
+//            mapView.mapx = 0
+//        }
+//        
+//        if let getY = prefs.stringForKey("y") {
+//            mapView.mapy = Double(getY)!
+//        } else {
+//            mapView.mapy = 0
+//        }
+        
+        
     }
     
     //    func moveTo(x: Double, y: Double) {

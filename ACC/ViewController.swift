@@ -12,8 +12,8 @@ import CoreMotion
 class ViewController: UIViewController {
     
     // MARK: System parameters setup
-    var accelerometerUpdateInterval: Double = 0.01
-    var gyroUpdateInterval: Double = 0.01
+    var accelerometerUpdateInterval: Double = 0.1
+    var gyroUpdateInterval: Double = 0.1
     var calibrationTimeAssigned: Int = 100
     var staticStateJudgeThreshold = (acc: 0.1, gyro: 0.1, timer: 5.0)
     
@@ -23,6 +23,10 @@ class ViewController: UIViewController {
     var arrayForStatic = [Double](count: 7, repeatedValue: -1)
     var index = 0
     var modulusDiff = 0.0
+    
+    
+    var test = 0
+    let prefs = NSUserDefaults.standardUserDefaults()
     
     // MARK: Instance variables
     var motionManager = CMMotionManager()
@@ -94,6 +98,9 @@ class ViewController: UIViewController {
         
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        
+        
+        
     }
     
     func outputAccData(acceleration: CMAcceleration) {
@@ -202,6 +209,15 @@ class ViewController: UIViewController {
             
             accSys.distance.z += roundNum(accSys.velocity.z * motionManager.accelerometerUpdateInterval)
             disZ?.text = "\(accSys.distance.z)"
+            
+            test += 1
+            
+        
+
+            prefs.setValue( test * 10, forKey: "x")
+            prefs.setValue( test * 10, forKey: "y")
+            NSNotificationCenter.defaultCenter().postNotificationName("NotificationIdentifier", object: nil)
+            
         }
     }
     
