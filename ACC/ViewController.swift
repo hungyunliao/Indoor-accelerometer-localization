@@ -26,7 +26,7 @@ class ViewController: UIViewController {
     
     
     var test = 0
-    let prefs = NSUserDefaults.standardUserDefaults()
+    let transDB = NSUserDefaults.standardUserDefaults()
     
     // MARK: Instance variables
     var motionManager = CMMotionManager()
@@ -199,6 +199,16 @@ class ViewController: UIViewController {
                 info?.text = "static state"
             } else {
                 info?.text = "dynamic state"
+                
+                // if the device is moving (in dynamic state), meaning the position is changing, so the position needs to be updated, otherwise, the position need not be updated to save the resources.
+                test += 1
+                
+                
+                // save the changed position to the PUBLIC NSUserdefault object so that they can be accessed by other VIEW
+                transDB.setValue(accSys.distance.x, forKey: "x")
+                transDB.setValue(accSys.distance.y, forKey: "y")
+                // post the notification to the NotificationCenter to notify everyone who is in the observer list.
+                NSNotificationCenter.defaultCenter().postNotificationName("PositionChanged", object: nil)
             }
             
             accSys.distance.x += roundNum(accSys.velocity.x * motionManager.accelerometerUpdateInterval)
@@ -209,14 +219,6 @@ class ViewController: UIViewController {
             
             accSys.distance.z += roundNum(accSys.velocity.z * motionManager.accelerometerUpdateInterval)
             disZ?.text = "\(accSys.distance.z)"
-            
-            test += 1
-            
-        
-
-            prefs.setValue( test * 10, forKey: "x")
-            prefs.setValue( test * 10, forKey: "y")
-            NSNotificationCenter.defaultCenter().postNotificationName("NotificationIdentifier", object: nil)
             
         }
     }

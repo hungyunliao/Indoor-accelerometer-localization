@@ -12,20 +12,36 @@ import UIKit
 class MapView: UIView {
     
     @IBInspectable
-    var mapx: Double = 0.0 { didSet { setNeedsDisplay() } }
+    var mapx: Double = 0.0 {
+        willSet {
+            oldMapx = mapx
+        }
+        didSet {
+            setNeedsDisplay()
+        }
+    }
     @IBInspectable
-    var mapy: Double = 0.0 { didSet { setNeedsDisplay() } }
+    var mapy: Double = 0.0 {
+        willSet {
+            oldMapy = mapy
+        }
+        didSet {
+            setNeedsDisplay()
+        }
+    }
+    
+    var oldMapx: Double = 0.0
+    var oldMapy: Double = 0.0
     
     override func drawRect(rect: CGRect) {
         
-        
         let path = UIBezierPath()
         
-        path.moveToPoint(CGPoint(x: bounds.width/2, y: bounds.height/2))
+        path.moveToPoint(CGPoint(x: oldMapx + Double(bounds.width/2), y: oldMapy + Double(bounds.height/2)))
         
-        path.addLineToPoint(CGPoint(x: mapx, y: mapy))
+        path.addLineToPoint(CGPoint(x: mapx + Double(bounds.width/2), y: mapy + Double(bounds.height/2)))
         
-        path.lineWidth = 5.0
+        path.lineWidth = 2.0
         
         UIColor.blueColor().set()
         
