@@ -42,7 +42,7 @@ struct System {
         staticStateJudgeTimer = 0.0
         
         base.x = 0.0
-        base.y = 0.0
+        base.y = 0.0//aaa
         base.z = 0.0
         
         output.x = 0.0
