@@ -69,6 +69,7 @@ class ViewController: UIViewController {
         accSys.reset()
         gyroSys.reset()
         absSys.reset()
+        
     }
     
     override func viewDidLoad() {
