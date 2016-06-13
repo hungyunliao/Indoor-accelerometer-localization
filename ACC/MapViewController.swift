@@ -14,9 +14,15 @@ class MapViewController: UIViewController {
     var aax: Double = 0.0
     var aay: Double = 0.0
     
-    var transDB = NSUserDefaults.standardUserDefaults()
+    var publicDB = NSUserDefaults.standardUserDefaults()
     
     @IBOutlet weak var mapView: MapView!
+    
+    @IBAction func cleanpath(sender: UIButton) {
+        if mapView != nil {
+            mapView.cleanMovement()
+        }
+    }
     
     
     override func viewDidLoad() {
@@ -31,16 +37,16 @@ class MapViewController: UIViewController {
     
     func updatePosition(notification: NSNotification){
         
-        if let getX = transDB.stringForKey("x") {
-            mapView.mapx = Double(getX)!
+        if let getX = publicDB.stringForKey("x") {
+            mapView.moveXTo(Double(getX)!)
         } else {
-            mapView.mapx = 0
+            mapView.moveXTo(0.0)
         }
         
-        if let getY = transDB.stringForKey("y") {
-            mapView.mapy = Double(getY)!
+        if let getY = publicDB.stringForKey("y") {
+            mapView.moveYTo(Double(getY)!)
         } else {
-            mapView.mapy = 0
+            mapView.moveYTo(0.0)
         }
     }
     
