@@ -12,9 +12,12 @@ import UIKit
 class MapView: UIView {
     
     /* MARK: Private instances */
+    // Not yet implement "Z" axis
     private var mapX = [CGFloat]() { didSet { setNeedsDisplay() } }
-    
     private var mapY = [CGFloat]() { didSet { setNeedsDisplay() } }
+    
+    private var resetXOffset: CGFloat = 0.0
+    private var resetYOffset: CGFloat = 0.0
     
     private var originX: CGFloat {
         get {
@@ -36,19 +39,22 @@ class MapView: UIView {
     
     /* MARK: Public APIs */
     func setOrigin(x: Double, y: Double) {
+        cleanMovement()
         originX = CGFloat(x)
         originY = CGFloat(y)
     }
     
     func moveXTo(position: Double) {
-        mapX.append(CGFloat(position))
+        mapX.append(CGFloat(position) - resetXOffset)
     }
     
     func moveYTo(position: Double) {
-        mapY.append(CGFloat(position))
+        mapY.append(CGFloat(position) - resetYOffset)
     }
     
     func cleanMovement() {
+        resetXOffset += mapX.last!
+        resetYOffset += mapY.last!
         mapX.removeAll()
         mapY.removeAll()
     }
@@ -71,10 +77,9 @@ class MapView: UIView {
             for i in 0..<pointArrayLength {
                 path.addLineToPoint(CGPoint(x: mapX[i] + bounds.midX, y: mapY[i] + bounds.midY))
             }
-            
         }
         
-        path.lineWidth = 2.0
+        path.lineWidth = 3.0
         
         UIColor.blueColor().set()
         
@@ -87,9 +92,8 @@ class MapView: UIView {
         let linePath = UIBezierPath()
         linePath.moveToPoint(startPoint)
         linePath.addLineToPoint(endPoint)
-        linePath.lineWidth = 2.0
+        linePath.lineWidth = 1.0
         UIColor.blackColor().set()
-        linePath.stroke()
         
         return linePath
     }

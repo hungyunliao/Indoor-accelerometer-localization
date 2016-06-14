@@ -24,7 +24,7 @@ func ^ (radix: Double, power: Double) -> Double {
 */
 
 struct System {
-    var isCalibrated = false
+    var isCalibrated = true
     var calibrationTimesDone = 0
     var staticStateJudgeTimer = 0.0
     
@@ -37,12 +37,12 @@ struct System {
     var kalman = ThreeAxesSystemKalman()
     
     mutating func reset() {
-        isCalibrated = false
+        isCalibrated = true
         calibrationTimesDone = 0
         staticStateJudgeTimer = 0.0
         
         base.x = 0.0
-        base.y = 0.0//aaa
+        base.y = 0.0
         base.z = 0.0
         
         output.x = 0.0
@@ -64,24 +64,24 @@ struct System {
 }
 
 struct ThreeAxesSystemDouble {
-    var x = 1.0
+    var x = 0.0 // 1.0?
     var y = 0.0
     var z = 0.0
 }
 
 struct ThreeAxesSystemKalman {
-    var x = KalmanFilter()
-    var y = KalmanFilter()
-    var z = KalmanFilter()
+    var x: KalmanFilter = KalmanFilter()
+    var y: KalmanFilter = KalmanFilter()
+    var z: KalmanFilter = KalmanFilter()
 }
 
 class KalmanFilter {
     
-    private var k = 0.0 // Kalman gain
-    private var p = 0.0 // estimation error cvariance
-    private var q = 15.0 // process noise cvariance
-    private var r = 50.0 // measurement noise covariance
-    private var x = 0.0 // value
+    private var k: Double = 0.0 // Kalman gain
+    private var p: Double = 0.0 // estimation error cvariance
+    private var q: Double = 1.0 // process(predict) noise cvariance
+    private var r: Double = 0.0 // measurement noise covariance
+    private var x: Double = 0.0 // value
     
     func Update(value: Double) -> Double {
         p = sqrt(q * q + r * r)
@@ -95,6 +95,10 @@ class KalmanFilter {
     
     func GetK() -> Double {
         return k
+    }
+    
+    func SetR(value: Double) {
+        r = value
     }
 }
 
