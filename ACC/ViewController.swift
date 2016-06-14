@@ -142,9 +142,9 @@ class ViewController: UIViewController {
                 accSys.output.y = (accSys.output.y/Double(numberOfPointsForThreePtFilter)) - accSys.base.y
                 accSys.output.z = (accSys.output.z/Double(numberOfPointsForThreePtFilter)) - accSys.base.z
                 
-                accX?.text = "\(acceleration.x)"
-                accY?.text = "\(acceleration.y)"
-                accZ?.text = "\(acceleration.z)"
+                accX?.text = "\(roundNum(acceleration.x))"
+                accY?.text = "\(roundNum(acceleration.y))"
+                accZ?.text = "\(roundNum(acceleration.z))"
                 
                 threePtFilterPointsRemained = numberOfPointsForThreePtFilter
                 
@@ -207,29 +207,29 @@ class ViewController: UIViewController {
                 
                 // Velocity Calculation
                 if fabs(accSys.output.x) >= 0.1 {
-                    accSys.velocity.x += roundNum(accSys.output.x * gravityConstant * motionManager.accelerometerUpdateInterval)
+                    accSys.velocity.x += accSys.output.x * gravityConstant * motionManager.accelerometerUpdateInterval
                 }
-                velX?.text = "\(accSys.velocity.x)"
+                velX?.text = "\(roundNum(accSys.velocity.x))"
                 
                 if fabs(accSys.output.y) >= 0.1 {
-                    accSys.velocity.y += roundNum(accSys.output.y * gravityConstant * motionManager.accelerometerUpdateInterval)
+                    accSys.velocity.y += accSys.output.y * gravityConstant * motionManager.accelerometerUpdateInterval
                 }
-                velY?.text = "\(accSys.velocity.y)"
+                velY?.text = "\(roundNum(accSys.velocity.y))"
                 
                 if fabs(accSys.output.z) >= 0.1 {
-                    accSys.velocity.z += roundNum(accSys.output.z * gravityConstant * motionManager.accelerometerUpdateInterval)
+                    accSys.velocity.z += accSys.output.z * gravityConstant * motionManager.accelerometerUpdateInterval
                 }
-                velZ?.text = "\(accSys.velocity.z)"
+                velZ?.text = "\(roundNum(accSys.velocity.z))"
                 
                 // Distance Calculation
-                accSys.distance.x += roundNum(accSys.velocity.x * motionManager.accelerometerUpdateInterval)
-                disX?.text = "\(accSys.distance.x)"
+                accSys.distance.x += accSys.velocity.x * motionManager.accelerometerUpdateInterval
+                disX?.text = "\(roundNum(accSys.distance.x))"
                 
-                accSys.distance.y += roundNum(accSys.velocity.y * motionManager.accelerometerUpdateInterval)
-                disY?.text = "\(accSys.distance.y)"
+                accSys.distance.y += accSys.velocity.y * motionManager.accelerometerUpdateInterval
+                disY?.text = "\(roundNum(accSys.distance.y))"
                 
-                accSys.distance.z += roundNum(accSys.velocity.z * motionManager.accelerometerUpdateInterval)
-                disZ?.text = "\(accSys.distance.z)"
+                accSys.distance.z += accSys.velocity.z * motionManager.accelerometerUpdateInterval
+                disZ?.text = "\(roundNum(accSys.distance.z))"
                 
                 // clear the stored value for the next round of 3-point avg computation
                 accSys.output.x = 0
@@ -258,37 +258,37 @@ class ViewController: UIViewController {
         } else {
             
             gyroSys.kValue.x = gyroSys.kalman.x.Update(rotation.x)
-            gyroSys.output.x = roundNum(linearCoef.intercept + linearCoef.slope*gyroSys.kValue.x - gyroSys.base.x)
-            rotX?.text = "\(gyroSys.output.x)"
+            gyroSys.output.x = linearCoef.intercept + linearCoef.slope*gyroSys.kValue.x - gyroSys.base.x
+            rotX?.text = "\(roundNum(gyroSys.output.x))"
             
             gyroSys.kValue.y = gyroSys.kalman.y.Update(rotation.y)
-            gyroSys.output.y = roundNum(linearCoef.intercept + linearCoef.slope*gyroSys.kValue.y - gyroSys.base.y)
-            rotY?.text = "\(gyroSys.output.y)"
+            gyroSys.output.y = linearCoef.intercept + linearCoef.slope*gyroSys.kValue.y - gyroSys.base.y
+            rotY?.text = "\(roundNum(gyroSys.output.y))"
             
             gyroSys.kValue.z = gyroSys.kalman.z.Update(rotation.z)
-            gyroSys.output.z = roundNum(linearCoef.intercept + linearCoef.slope*gyroSys.kValue.z - gyroSys.base.z)
-            rotZ?.text = "\(gyroSys.output.z)"
+            gyroSys.output.z = linearCoef.intercept + linearCoef.slope*gyroSys.kValue.z - gyroSys.base.z
+            rotZ?.text = "\(roundNum(gyroSys.output.z))"
             
             // gyro is the angular speed, not the angular acceleration
             if fabs(gyroSys.output.x) >= 0.1 {
-                gyroSys.distance.x += roundNum(gyroSys.output.x * motionManager.gyroUpdateInterval)
+                gyroSys.distance.x += gyroSys.output.x * motionManager.gyroUpdateInterval
             }
-            velXGyro?.text = "\(gyroSys.distance.x)"
+            velXGyro?.text = "\(roundNum(gyroSys.distance.x))"
             
             if fabs(gyroSys.output.y) >= 0.1 {
-                gyroSys.distance.y += roundNum(gyroSys.output.y * motionManager.gyroUpdateInterval)
+                gyroSys.distance.y += gyroSys.output.y * motionManager.gyroUpdateInterval
             }
-            velYGyro?.text = "\(gyroSys.distance.y)"
+            velYGyro?.text = "\(roundNum(gyroSys.distance.y))"
             
             if fabs(gyroSys.output.z) >= 0.1 {
-                gyroSys.distance.z += roundNum(gyroSys.output.z * motionManager.gyroUpdateInterval)
+                gyroSys.distance.z += gyroSys.output.z * motionManager.gyroUpdateInterval
             }
             //velZGyro?.text = "\(gyroSys.distance.z)"
             
             /* Note2-2 */
             
             // Static Judgement Condition 3
-            velZGyro?.text = "\(modulus(gyroSys.output.x, y: gyroSys.output.y, z: gyroSys.output.z))"
+            velZGyro?.text = "\(roundNum(gyroSys.distance.z))"
             if modulus(gyroSys.output.x, y: gyroSys.output.y, z: gyroSys.output.z) < 0.1 {
                 staticStateJudge.modulGyro = true
             } else {
