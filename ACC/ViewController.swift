@@ -11,6 +11,10 @@ import CoreMotion
 
 class ViewController: UIViewController {
     
+    // MARK: test param
+    var test = 0
+    var sum = 0.0
+    
     // MARK: System parameters setup
     var accelerometerUpdateInterval: Double = 0.1
     var gyroUpdateInterval: Double = 0.1
@@ -24,8 +28,6 @@ class ViewController: UIViewController {
     var index = 0
     var modulusDiff = 0.0
     
-    
-    var test = 0
     let publicDB = NSUserDefaults.standardUserDefaults()
     
     // MARK: Instance variables
@@ -38,8 +40,12 @@ class ViewController: UIViewController {
     // MARK: Kalman Filter
     var arrayOfPoints: [Double] = [1, 2, 3]
     var linearCoef = (slope: 0.0, intercept: 0.0)
-
+    
     var STDEV = [Double]()
+    
+    // MARK: Three-Point Filter
+    let numberOfPointsForThreePtFilter = 3
+    var threePtFilterPointsRemained = 0
     
     // MARK: Outlets
     @IBOutlet var info: UILabel?
@@ -100,8 +106,6 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
-        
-        
     }
     
     func outputAccData(acceleration: CMAcceleration) {
@@ -126,101 +130,103 @@ class ViewController: UIViewController {
             
             //info?.text = "Detecting..."
             
-            /* KalmanFilter begins */
-            accSys.kValue.x = accSys.kalman.x.Update(acceleration.x)
-            accSys.output.x = roundNum(linearCoef.intercept + linearCoef.slope*accSys.kValue.x - accSys.base.x)
-            accX?.text = "\(accSys.output.x)"
+            /* Note 3 */
             
-            accSys.kValue.y = accSys.kalman.y.Update(acceleration.y)
-            accSys.output.y = roundNum(linearCoef.intercept + linearCoef.slope*accSys.kValue.y - accSys.base.y)
-            accY?.text = "\(accSys.output.y)"
-            
-            accSys.kValue.z = accSys.kalman.z.Update(acceleration.z)
-            accSys.output.z = roundNum(linearCoef.intercept + linearCoef.slope*accSys.kValue.z - accSys.base.z)
-            accZ?.text = "\(accSys.output.z)"
-            /* KalmanFilter ends */
-            
-            /* Note1 */
-            
-            if fabs(accSys.output.x) >= 0.1 {
-                accSys.velocity.x += roundNum(accSys.output.x * gravityConstant * motionManager.accelerometerUpdateInterval)
-            }
-            velX?.text = "\(accSys.velocity.x)"
-            
-            if fabs(accSys.output.y) >= 0.1 {
-                accSys.velocity.y += roundNum(accSys.output.y * gravityConstant * motionManager.accelerometerUpdateInterval)
-            }
-            velY?.text = "\(accSys.velocity.y)"
-            
-            if fabs(accSys.output.z + 1) >= 0.1 {
-                accSys.velocity.z += roundNum(accSys.output.z * gravityConstant * motionManager.accelerometerUpdateInterval)
-            }
-            velZ?.text = "\(accSys.velocity.z)"
-            
-            
-            /* Note2-1 */
-            
-            if index == arrayForStatic.count {
-                for i in 0..<(arrayForStatic.count - 1) {
-                    arrayForStatic[i] = arrayForStatic[i + 1]
-                }
-                arrayForStatic[index - 1] = modulus(acceleration.x, y: acceleration.y, z: acceleration.z)
-                accModulusAvg += arrayForStatic[3]
-                accModulusAvg /= 2
-                modulusDiff = modulusDifference(arrayForStatic, avgModulus: accModulusAvg)
+            /* 3-point Filter begins */
+            if threePtFilterPointsRemained != 0 {
+                accSys.output.x += acceleration.x
+                accSys.output.y += acceleration.y
+                accSys.output.z += acceleration.z
+                threePtFilterPointsRemained -= 1
             } else {
-                arrayForStatic[index] = modulus(acceleration.x, y: acceleration.y, z: acceleration.z)
-                index += 1
+                accSys.output.x = (accSys.output.x/Double(numberOfPointsForThreePtFilter)) - accSys.base.x
+                accSys.output.y = (accSys.output.y/Double(numberOfPointsForThreePtFilter)) - accSys.base.y
+                accSys.output.z = (accSys.output.z/Double(numberOfPointsForThreePtFilter)) - accSys.base.z
+                
+                threePtFilterPointsRemained = numberOfPointsForThreePtFilter
+                
+                /* 3-point Filter ends */
+                
+                
+                /* Note1 */
+                
+                if fabs(accSys.output.x) >= 0.1 {
+                    accSys.velocity.x += roundNum(accSys.output.x * gravityConstant * motionManager.accelerometerUpdateInterval)
+                }
+                velX?.text = "\(accSys.velocity.x)"
+                
+                if fabs(accSys.output.y) >= 0.1 {
+                    accSys.velocity.y += roundNum(accSys.output.y * gravityConstant * motionManager.accelerometerUpdateInterval)
+                }
+                velY?.text = "\(accSys.velocity.y)"
+                
+                if fabs(accSys.output.z + 1) >= 0.1 {
+                    accSys.velocity.z += roundNum(accSys.output.z * gravityConstant * motionManager.accelerometerUpdateInterval)
+                }
+                velZ?.text = "\(accSys.velocity.z)"
+                
+                
+                /* Note2-1 */
+                
                 if index == arrayForStatic.count {
-                    for i in 0...((arrayForStatic.count - 1)/2) {
-                        accModulusAvg += arrayForStatic[i]
+                    for i in 0..<(arrayForStatic.count - 1) {
+                        arrayForStatic[i] = arrayForStatic[i + 1]
                     }
-                    accModulusAvg /= Double((arrayForStatic.count - 1)/2 + 1)
+                    arrayForStatic[index - 1] = modulus(acceleration.x, y: acceleration.y, z: acceleration.z)
+                    accModulusAvg += arrayForStatic[3]
+                    accModulusAvg /= 2
                     modulusDiff = modulusDifference(arrayForStatic, avgModulus: accModulusAvg)
+                } else {
+                    arrayForStatic[index] = modulus(acceleration.x, y: acceleration.y, z: acceleration.z)
+                    index += 1
+                    if index == arrayForStatic.count {
+                        for i in 0...((arrayForStatic.count - 1)/2) {
+                            accModulusAvg += arrayForStatic[i]
+                        }
+                        accModulusAvg /= Double((arrayForStatic.count - 1)/2 + 1)
+                        modulusDiff = modulusDifference(arrayForStatic, avgModulus: accModulusAvg)
+                    }
                 }
-            }
-            
-            if fabs(modulusDiff) < 0.1 {
-                staticStateJudge.modulDiffAcc = 1
-            } else {
-                staticStateJudge.modulDiffAcc = 0
-            }
-            
-            if fabs(modulus(acceleration.x, y: acceleration.y, z: acceleration.z) - 1) < (1/gravityConstant) {
-                staticStateJudge.modulAcc = 1
-            } else {
-                staticStateJudge.modulAcc = 0
-            }
-            
-            if staticStateJudge.modulAcc * staticStateJudge.modulGyro * staticStateJudge.modulDiffAcc == 1 { // when all of the three indicators (modulAcc, modulGyro, modulDiffAcc) are true (1)
-                accSys.velocity.x = 0
-                accSys.velocity.y = 0
-                accSys.velocity.z = 0
                 
-                info?.text = "static state"
-            } else {
-                info?.text = "dynamic state"
+                if fabs(modulusDiff) < 0.1 {
+                    staticStateJudge.modulDiffAcc = 1
+                } else {
+                    staticStateJudge.modulDiffAcc = 0
+                }
                 
-                // if the device is moving (in dynamic state), meaning the position is changing, so the position needs to be updated, otherwise, the position need not be updated to save the resources.
-                test += 1
+                if fabs(modulus(acceleration.x, y: acceleration.y, z: acceleration.z) - 1) < (1/gravityConstant) {
+                    staticStateJudge.modulAcc = 1
+                } else {
+                    staticStateJudge.modulAcc = 0
+                }
                 
+                if staticStateJudge.modulAcc * staticStateJudge.modulGyro * staticStateJudge.modulDiffAcc == 1 { // when all of the three indicators (modulAcc, modulGyro, modulDiffAcc) are true (1)
+                    info?.text = "static state"
+                    accSys.velocity.x = 0
+                    accSys.velocity.y = 0
+                    accSys.velocity.z = 0
+                } else {
+                    info?.text = "dynamic state"
+                    
+                    // if the device is moving (in dynamic state), meaning the position is changing, so the position needs to be updated, otherwise, the position need not be updated to save the resources.
+                    
+                    
+                    // save the changed position to the PUBLIC NSUserdefault object so that they can be accessed by other VIEW
+                    publicDB.setValue(accSys.distance.x, forKey: "x")
+                    publicDB.setValue(accSys.distance.y, forKey: "y")
+                    // post the notification to the NotificationCenter to notify everyone who is in the observer list.
+                    NSNotificationCenter.defaultCenter().postNotificationName("PositionChanged", object: nil)
+                }
                 
-                // save the changed position to the PUBLIC NSUserdefault object so that they can be accessed by other VIEW
-                publicDB.setValue(accSys.distance.x, forKey: "x")
-                publicDB.setValue(accSys.distance.y, forKey: "y")
-                // post the notification to the NotificationCenter to notify everyone who is in the observer list.
-                NSNotificationCenter.defaultCenter().postNotificationName("PositionChanged", object: nil)
+                accSys.distance.x += roundNum(accSys.velocity.x * motionManager.accelerometerUpdateInterval)
+                disX?.text = "\(accSys.distance.x)"
+                
+                accSys.distance.y += roundNum(accSys.velocity.y * motionManager.accelerometerUpdateInterval)
+                disY?.text = "\(accSys.distance.y)"
+                
+                accSys.distance.z += roundNum(accSys.velocity.z * motionManager.accelerometerUpdateInterval)
+                disZ?.text = "\(accSys.distance.z)"
             }
-            
-            accSys.distance.x += roundNum(accSys.velocity.x * motionManager.accelerometerUpdateInterval)
-            disX?.text = "\(accSys.distance.x)"
-            
-            accSys.distance.y += roundNum(accSys.velocity.y * motionManager.accelerometerUpdateInterval)
-            disY?.text = "\(accSys.distance.y)"
-            
-            accSys.distance.z += roundNum(accSys.velocity.z * motionManager.accelerometerUpdateInterval)
-            disZ?.text = "\(accSys.distance.z)"
-            
         }
     }
     
@@ -271,7 +277,7 @@ class ViewController: UIViewController {
             //velZGyro?.text = "\(gyroSys.distance.z)"
             
             /* Note2-2 */
-
+            
             
             velZGyro?.text = "\(modulus(gyroSys.output.x, y: gyroSys.output.y, z: gyroSys.output.z))"
             if modulus(gyroSys.output.x, y: gyroSys.output.y, z: gyroSys.output.z) < 0.1 {
@@ -365,3 +371,21 @@ class ViewController: UIViewController {
 //            } else {
 //                gyroSys.staticStateJudgeTimer = 0.0
 //            }
+
+/* Note 3 */
+/* KalmanFilter begins */
+//            accSys.kValue.x = accSys.kalman.x.Update(acceleration.x)
+//            accSys.output.x = roundNum(linearCoef.intercept + linearCoef.slope*accSys.kValue.x - accSys.base.x)
+//            accX?.text = "\(accSys.output.x)"
+//
+//
+//
+//
+//            accSys.kValue.y = accSys.kalman.y.Update(acceleration.y)
+//            accSys.output.y = roundNum(linearCoef.intercept + linearCoef.slope*accSys.kValue.y - accSys.base.y)
+//            accY?.text = "\(accSys.output.y)"
+//
+//            accSys.kValue.z = accSys.kalman.z.Update(acceleration.z)
+//            accSys.output.z = roundNum(linearCoef.intercept + linearCoef.slope*accSys.kValue.z - accSys.base.z)
+//            accZ?.text = "\(accSys.output.z)"
+/* KalmanFilter ends */
