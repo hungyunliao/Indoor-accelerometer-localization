@@ -83,6 +83,7 @@ class ViewController: UIViewController {
         // Set Motion Manager Properties
         motionManager.accelerometerUpdateInterval = accelerometerUpdateInterval
         motionManager.gyroUpdateInterval = gyroUpdateInterval
+        motionManager.startDeviceMotionUpdates()//for gyro degree 
         
         // Recording data
         motionManager.startAccelerometerUpdatesToQueue(NSOperationQueue.currentQueue()!, withHandler: { (accelerometerData: CMAccelerometerData?, NSError) -> Void in
@@ -106,18 +107,44 @@ class ViewController: UIViewController {
         
     }
     
+    var arrayForCalculatingKalmanRX = [Double]()
+    var arrayForCalculatingKalmanRY = [Double]()
+    var arrayForCalculatingKalmanRZ = [Double]()
+    
     func outputAccData(acceleration: CMAcceleration) {
         
         if !accSys.isCalibrated {
             
-            info?.text = "Calibrating..."
+            info?.text = "Calibrating..." + String(accSys.calibrationTimesDone) + "/" + String(calibrationTimeAssigned)
             
             if accSys.calibrationTimesDone < calibrationTimeAssigned {
+                
+                arrayForCalculatingKalmanRX += [acceleration.x]
+                arrayForCalculatingKalmanRY += [acceleration.y]
+                arrayForCalculatingKalmanRZ += [acceleration.z]
+                print(acceleration.x)
+                
                 accSys.base.x += acceleration.x
                 accSys.base.y += acceleration.y
                 accSys.base.z += acceleration.z + 1 // MARK: should change
                 accSys.calibrationTimesDone += 1
             } else {
+                
+                var kalmanInitialRX = 0.0
+                var kalmanInitialRY = 0.0
+                var kalmanInitialRZ = 0.0
+                
+                for index in arrayForCalculatingKalmanRX {
+                    kalmanInitialRX += pow((index - accSys.base.x), 2)/Double(calibrationTimeAssigned)
+                }
+                for index in arrayForCalculatingKalmanRY {
+                    kalmanInitialRY += pow((index - accSys.base.y), 2)/Double(calibrationTimeAssigned)
+                }
+                for index in arrayForCalculatingKalmanRZ {
+                    kalmanInitialRZ += pow((index - accSys.base.z), 2)/Double(calibrationTimeAssigned)
+                }
+                print(kalmanInitialRX, kalmanInitialRY, kalmanInitialRZ)
+                
                 accSys.base.x /= Double(calibrationTimeAssigned)
                 accSys.base.y /= Double(calibrationTimeAssigned)
                 accSys.base.z /= Double(calibrationTimeAssigned)
@@ -269,26 +296,36 @@ class ViewController: UIViewController {
             gyroSys.output.z = linearCoef.intercept + linearCoef.slope*gyroSys.kValue.z - gyroSys.base.z
             rotZ?.text = "\(roundNum(gyroSys.output.z))"
             
-            // gyro is the angular speed, not the angular acceleration
-            if fabs(gyroSys.output.x) >= 0.1 {
-                gyroSys.distance.x += gyroSys.output.x * motionManager.gyroUpdateInterval
+            if let attitude = motionManager.deviceMotion?.attitude {
+                
+                // gyro is the angular speed, not the angular acceleration
+                
+                //the following 3 if statement may be deleted or modify the threshold to 360 base
+                /*
+                if fabs(gyroSys.output.x) >= 0.1 {
+                    gyroSys.distance.x += gyroSys.output.x * motionManager.gyroUpdateInterval
+                }
+                 */
+                velXGyro?.text = String(roundNum(attitude.yaw * 180 / M_PI))//"\(roundNum(gyroSys.distance.x))"
+                /*
+                if fabs(gyroSys.output.y) >= 0.1 {
+                    gyroSys.distance.y += gyroSys.output.y * motionManager.gyroUpdateInterval
+                }
+                 */
+                velYGyro?.text = String(roundNum(attitude.roll * 180 / M_PI)) //"\(roundNum(gyroSys.distance.y))"
+                /*
+                if fabs(gyroSys.output.z) >= 0.1 {
+                    gyroSys.distance.z += gyroSys.output.z * motionManager.gyroUpdateInterval
+                }
+                */
+                //velZGyro?.text = "\(gyroSys.distance.z)"
+            
+                /* Note2-2 */
+            
+                // Static Judgement Condition 3
+                velZGyro?.text =  String(roundNum(attitude.yaw * 180 / M_PI)) //"\(roundNum(gyroSys.distance.z))"
             }
-            velXGyro?.text = "\(roundNum(gyroSys.distance.x))"
             
-            if fabs(gyroSys.output.y) >= 0.1 {
-                gyroSys.distance.y += gyroSys.output.y * motionManager.gyroUpdateInterval
-            }
-            velYGyro?.text = "\(roundNum(gyroSys.distance.y))"
-            
-            if fabs(gyroSys.output.z) >= 0.1 {
-                gyroSys.distance.z += gyroSys.output.z * motionManager.gyroUpdateInterval
-            }
-            //velZGyro?.text = "\(gyroSys.distance.z)"
-            
-            /* Note2-2 */
-            
-            // Static Judgement Condition 3
-            velZGyro?.text = "\(roundNum(gyroSys.distance.z))"
             if modulus(gyroSys.output.x, y: gyroSys.output.y, z: gyroSys.output.z) < 0.1 {
                 staticStateJudge.modulGyro = true
             } else {
