@@ -23,7 +23,7 @@ class ViewController: UIViewController {
     
     let gravityConstant = 9.80665
     
-    var staticStateJudge = (modulAcc: 0, modulGyro: 0, modulDiffAcc: 0) // 1: static 0: dynamic
+    var staticStateJudge = (modulAcc: false, modulGyro: false, modulDiffAcc: false) // 1: static 0: dynamic
     var arrayForStatic = [Double](count: 7, repeatedValue: -1)
     var index = 0
     var modulusDiff = 0.0
@@ -35,7 +35,6 @@ class ViewController: UIViewController {
     var accModulusAvg = 0.0
     var accSys: System = System()
     var gyroSys: System = System()
-    var absSys: System = System()
     
     // MARK: Kalman Filter
     var arrayOfPoints: [Double] = [1, 2, 3]
@@ -74,7 +73,6 @@ class ViewController: UIViewController {
     @IBAction func reset() {
         accSys.reset()
         gyroSys.reset()
-        absSys.reset()
         
     }
     
@@ -139,32 +137,20 @@ class ViewController: UIViewController {
                 accSys.output.z += acceleration.z
                 threePtFilterPointsRemained -= 1
             } else {
+                
+                
                 accSys.output.x = (accSys.output.x/Double(numberOfPointsForThreePtFilter)) - accSys.base.x
                 accSys.output.y = (accSys.output.y/Double(numberOfPointsForThreePtFilter)) - accSys.base.y
                 accSys.output.z = (accSys.output.z/Double(numberOfPointsForThreePtFilter)) - accSys.base.z
                 
+                accX?.text = "\(acceleration.z)"
+                accY?.text = "\(accSys.base.z)"
+                accZ?.text = "\(accSys.output.z)"
+                
                 threePtFilterPointsRemained = numberOfPointsForThreePtFilter
                 
                 /* 3-point Filter ends */
-                
-                
                 /* Note1 */
-                
-                if fabs(accSys.output.x) >= 0.1 {
-                    accSys.velocity.x += roundNum(accSys.output.x * gravityConstant * motionManager.accelerometerUpdateInterval)
-                }
-                velX?.text = "\(accSys.velocity.x)"
-                
-                if fabs(accSys.output.y) >= 0.1 {
-                    accSys.velocity.y += roundNum(accSys.output.y * gravityConstant * motionManager.accelerometerUpdateInterval)
-                }
-                velY?.text = "\(accSys.velocity.y)"
-                
-                if fabs(accSys.output.z + 1) >= 0.1 {
-                    accSys.velocity.z += roundNum(accSys.output.z * gravityConstant * motionManager.accelerometerUpdateInterval)
-                }
-                velZ?.text = "\(accSys.velocity.z)"
-                
                 
                 /* Note2-1 */
                 
@@ -188,28 +174,29 @@ class ViewController: UIViewController {
                     }
                 }
                 
+                // Static Judgement Condition 1
                 if fabs(modulusDiff) < 0.1 {
-                    staticStateJudge.modulDiffAcc = 1
+                    staticStateJudge.modulDiffAcc = true
                 } else {
-                    staticStateJudge.modulDiffAcc = 0
+                    staticStateJudge.modulDiffAcc = false
                 }
                 
+                // Static Judgement Condition 2
                 if fabs(modulus(acceleration.x, y: acceleration.y, z: acceleration.z) - 1) < (1/gravityConstant) {
-                    staticStateJudge.modulAcc = 1
+                    staticStateJudge.modulAcc = true
                 } else {
-                    staticStateJudge.modulAcc = 0
+                    staticStateJudge.modulAcc = false
                 }
                 
-                if staticStateJudge.modulAcc * staticStateJudge.modulGyro * staticStateJudge.modulDiffAcc == 1 { // when all of the three indicators (modulAcc, modulGyro, modulDiffAcc) are true (1)
+                // Static Judgement Condition 1 && 2 && 3
+                if staticStateJudge.modulAcc && staticStateJudge.modulGyro && staticStateJudge.modulDiffAcc { // when all of the three indicators (modulAcc, modulGyro, modulDiffAcc) are true
                     info?.text = "static state"
                     accSys.velocity.x = 0
                     accSys.velocity.y = 0
                     accSys.velocity.z = 0
                 } else {
-                    info?.text = "dynamic state"
-                    
                     // if the device is moving (in dynamic state), meaning the position is changing, so the position needs to be updated, otherwise, the position need not be updated to save the resources.
-                    
+                    info?.text = "dynamic state"
                     
                     // save the changed position to the PUBLIC NSUserdefault object so that they can be accessed by other VIEW
                     publicDB.setValue(accSys.distance.x, forKey: "x")
@@ -218,6 +205,24 @@ class ViewController: UIViewController {
                     NSNotificationCenter.defaultCenter().postNotificationName("PositionChanged", object: nil)
                 }
                 
+                
+                // Velocity Calculation
+                if fabs(accSys.output.x) >= 0.1 {
+                    accSys.velocity.x += roundNum(accSys.output.x * gravityConstant * motionManager.accelerometerUpdateInterval)
+                }
+                velX?.text = "\(accSys.velocity.x)"
+                
+                if fabs(accSys.output.y) >= 0.1 {
+                    accSys.velocity.y += roundNum(accSys.output.y * gravityConstant * motionManager.accelerometerUpdateInterval)
+                }
+                velY?.text = "\(accSys.velocity.y)"
+                
+                if (fabs(accSys.output.z) - 1) >= 0.1 {
+                    accSys.velocity.z += roundNum(accSys.output.z * gravityConstant * motionManager.accelerometerUpdateInterval)
+                }
+                velZ?.text = "\(accSys.velocity.z)"
+                
+                // Distance Calculation
                 accSys.distance.x += roundNum(accSys.velocity.x * motionManager.accelerometerUpdateInterval)
                 disX?.text = "\(accSys.distance.x)"
                 
@@ -226,6 +231,11 @@ class ViewController: UIViewController {
                 
                 accSys.distance.z += roundNum(accSys.velocity.z * motionManager.accelerometerUpdateInterval)
                 disZ?.text = "\(accSys.distance.z)"
+                
+                // clear the stored value for the next round of 3-point avg computation
+                accSys.output.x = 0
+                accSys.output.y = 0
+                accSys.output.z = 0
             }
         }
     }
@@ -278,12 +288,12 @@ class ViewController: UIViewController {
             
             /* Note2-2 */
             
-            
+            // Static Judgement Condition 3
             velZGyro?.text = "\(modulus(gyroSys.output.x, y: gyroSys.output.y, z: gyroSys.output.z))"
             if modulus(gyroSys.output.x, y: gyroSys.output.y, z: gyroSys.output.z) < 0.1 {
-                staticStateJudge.modulGyro = 1
+                staticStateJudge.modulGyro = true
             } else {
-                staticStateJudge.modulGyro = 0
+                staticStateJudge.modulGyro = false
             }
             
         }

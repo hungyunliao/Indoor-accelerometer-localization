@@ -79,7 +79,7 @@ class MapView: UIView {
             }
         }
         
-        path.lineWidth = 2.0
+        path.lineWidth = 3.0
         
         UIColor.blueColor().set()
         
@@ -92,7 +92,7 @@ class MapView: UIView {
         let linePath = UIBezierPath()
         linePath.moveToPoint(startPoint)
         linePath.addLineToPoint(endPoint)
-        linePath.lineWidth = 2.0
+        linePath.lineWidth = 1.0
         UIColor.blackColor().set()
         linePath.stroke()
         
