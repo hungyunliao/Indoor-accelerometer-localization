@@ -24,7 +24,7 @@ func ^ (radix: Double, power: Double) -> Double {
 */
 
 struct System {
-    var isCalibrated = false
+    var isCalibrated = true
     var calibrationTimesDone = 0
     var staticStateJudgeTimer = 0.0
     
@@ -37,7 +37,7 @@ struct System {
     var kalman = ThreeAxesSystemKalman()
     
     mutating func reset() {
-        isCalibrated = false
+        isCalibrated = true
         calibrationTimesDone = 0
         staticStateJudgeTimer = 0.0
         

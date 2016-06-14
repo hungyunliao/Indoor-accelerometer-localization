@@ -94,7 +94,6 @@ class MapView: UIView {
         linePath.addLineToPoint(endPoint)
         linePath.lineWidth = 1.0
         UIColor.blackColor().set()
-        linePath.stroke()
         
         return linePath
     }

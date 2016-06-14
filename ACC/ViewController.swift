@@ -138,14 +138,13 @@ class ViewController: UIViewController {
                 threePtFilterPointsRemained -= 1
             } else {
                 
-                
                 accSys.output.x = (accSys.output.x/Double(numberOfPointsForThreePtFilter)) - accSys.base.x
                 accSys.output.y = (accSys.output.y/Double(numberOfPointsForThreePtFilter)) - accSys.base.y
                 accSys.output.z = (accSys.output.z/Double(numberOfPointsForThreePtFilter)) - accSys.base.z
                 
-                accX?.text = "\(acceleration.z)"
-                accY?.text = "\(accSys.base.z)"
-                accZ?.text = "\(accSys.output.z)"
+                accX?.text = "\(acceleration.x)"
+                accY?.text = "\(acceleration.y)"
+                accZ?.text = "\(acceleration.z)"
                 
                 threePtFilterPointsRemained = numberOfPointsForThreePtFilter
                 
@@ -217,7 +216,7 @@ class ViewController: UIViewController {
                 }
                 velY?.text = "\(accSys.velocity.y)"
                 
-                if (fabs(accSys.output.z) - 1) >= 0.1 {
+                if fabs(accSys.output.z) >= 0.1 {
                     accSys.velocity.z += roundNum(accSys.output.z * gravityConstant * motionManager.accelerometerUpdateInterval)
                 }
                 velZ?.text = "\(accSys.velocity.z)"
