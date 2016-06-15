@@ -82,6 +82,7 @@ class ViewController: UIViewController {
         // Set Motion Manager Properties
         motionManager.accelerometerUpdateInterval = accelerometerUpdateInterval
         motionManager.gyroUpdateInterval = gyroUpdateInterval
+        motionManager.startDeviceMotionUpdates()//for gyro degree 
         
         // Recording data
         motionManager.startAccelerometerUpdatesToQueue(NSOperationQueue.currentQueue()!, withHandler: { (accelerometerData: CMAccelerometerData?, NSError) -> Void in
@@ -105,18 +106,44 @@ class ViewController: UIViewController {
         
     }
     
+    var arrayForCalculatingKalmanRX = [Double]()
+    var arrayForCalculatingKalmanRY = [Double]()
+    var arrayForCalculatingKalmanRZ = [Double]()
+    
     func outputAccData(acceleration: CMAcceleration) {
         
         if !accSys.isCalibrated {
             
-            info?.text = "Calibrating..."
+            info?.text = "Calibrating..." + String(accSys.calibrationTimesDone) + "/" + String(calibrationTimeAssigned)
             
             if accSys.calibrationTimesDone < calibrationTimeAssigned {
+                
+                arrayForCalculatingKalmanRX += [acceleration.x]
+                arrayForCalculatingKalmanRY += [acceleration.y]
+                arrayForCalculatingKalmanRZ += [acceleration.z]
+                print(acceleration.x)
+                
                 accSys.base.x += acceleration.x
                 accSys.base.y += acceleration.y
                 accSys.base.z += acceleration.z + 1 // MARK: should change
                 accSys.calibrationTimesDone += 1
             } else {
+                
+                var kalmanInitialRX = 0.0
+                var kalmanInitialRY = 0.0
+                var kalmanInitialRZ = 0.0
+                
+                for index in arrayForCalculatingKalmanRX {
+                    kalmanInitialRX += pow((index - accSys.base.x), 2)/Double(calibrationTimeAssigned)
+                }
+                for index in arrayForCalculatingKalmanRY {
+                    kalmanInitialRY += pow((index - accSys.base.y), 2)/Double(calibrationTimeAssigned)
+                }
+                for index in arrayForCalculatingKalmanRZ {
+                    kalmanInitialRZ += pow((index - accSys.base.z), 2)/Double(calibrationTimeAssigned)
+                }
+                print(kalmanInitialRX, kalmanInitialRY, kalmanInitialRZ)
+                
                 accSys.base.x /= Double(calibrationTimeAssigned)
                 accSys.base.y /= Double(calibrationTimeAssigned)
                 accSys.base.z /= Double(calibrationTimeAssigned)
@@ -141,9 +168,9 @@ class ViewController: UIViewController {
                 accSys.output.y = (accSys.output.y/Double(numberOfPointsForThreePtFilter)) - accSys.base.y
                 accSys.output.z = (accSys.output.z/Double(numberOfPointsForThreePtFilter)) - accSys.base.z
                 
-                accX?.text = "\(acceleration.x)"
-                accY?.text = "\(acceleration.y)"
-                accZ?.text = "\(acceleration.z)"
+                accX?.text = "\(roundNum(acceleration.x))"
+                accY?.text = "\(roundNum(acceleration.y))"
+                accZ?.text = "\(roundNum(acceleration.z))"
                 
                 accSys.threePtFilterPointsDone = 0
                 
@@ -272,6 +299,7 @@ class ViewController: UIViewController {
                 gyroSys.velocity.y += rotation.y
                 gyroSys.velocity.z += rotation.z
                 gyroSys.threePtFilterPointsDone += 1
+                
             } else {
                 
                 gyroSys.velocity.x = (gyroSys.velocity.x/Double(numberOfPointsForThreePtFilter)) - gyroSys.base.x
@@ -301,6 +329,13 @@ class ViewController: UIViewController {
                     gyroSys.distance.z += roundNum(gyroSys.velocity.z * motionManager.gyroUpdateInterval)
                 }
                 disZGyro?.text = "\(gyroSys.distance.z)"
+                
+                if let attitude = motionManager.deviceMotion?.attitude {
+                    
+                    velXGyro?.text = String(roundNum(attitude.yaw * 180 / M_PI))
+                    velYGyro?.text = String(roundNum(attitude.roll * 180 / M_PI))
+                    velZGyro?.text =  String(roundNum(attitude.yaw * 180 / M_PI))
+                }
                 
                 /* Note2-2 */
                 
