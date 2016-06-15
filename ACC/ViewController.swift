@@ -332,9 +332,9 @@ class ViewController: UIViewController {
                 
                 if let attitude = motionManager.deviceMotion?.attitude {
                     
-                    velXGyro?.text = String(roundNum(attitude.pitch * 180 / M_PI))
-                    velYGyro?.text = String(roundNum(attitude.roll * 180 / M_PI))
-                    velZGyro?.text = String(roundNum(attitude.yaw * 180 / M_PI))
+                    disXGyro?.text = String(roundNum(attitude.pitch * 180 / M_PI))
+                    disYGyro?.text = String(roundNum(attitude.roll * 180 / M_PI))
+                    disZGyro?.text = String(roundNum(attitude.yaw * 180 / M_PI))
                 }
                 
                 /* Note2-2 */
