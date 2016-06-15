@@ -427,18 +427,18 @@
                         <outlet property="accY" destination="5wI-0g-yJ5" id="MnD-Ro-Xh9"/>
                         <outlet property="accZ" destination="Bbb-NO-Ieb" id="eK8-jg-hBf"/>
                         <outlet property="disX" destination="R6m-DC-4D1" id="RzK-Ml-eYT"/>
+                        <outlet property="disXGyro" destination="ZrZ-N6-vrW" id="hNc-aL-1Gc"/>
                         <outlet property="disY" destination="5mE-C0-WMn" id="NRC-cs-FxJ"/>
+                        <outlet property="disYGyro" destination="qag-bf-nqd" id="Bix-a1-VMC"/>
                         <outlet property="disZ" destination="EHY-4m-Kni" id="pIc-Xj-nb2"/>
+                        <outlet property="disZGyro" destination="mIx-KZ-Cjb" id="KCr-uJ-Zfz"/>
                         <outlet property="info" destination="hio-AP-BHW" id="aSd-I2-X8a"/>
-                        <outlet property="rotX" destination="y5a-G5-uwR" id="r9O-fV-bkG"/>
-                        <outlet property="rotY" destination="kkh-CU-jjZ" id="2th-d4-TDq"/>
-                        <outlet property="rotZ" destination="Zaz-ds-ypw" id="GrS-kp-Nh3"/>
                         <outlet property="velX" destination="pwz-Jo-ZX0" id="sDO-69-xhs"/>
-                        <outlet property="velXGyro" destination="ZrZ-N6-vrW" id="8qQ-ty-vlJ"/>
+                        <outlet property="velXGyro" destination="y5a-G5-uwR" id="jMh-ci-1Bd"/>
                         <outlet property="velY" destination="TzI-sB-TzM" id="2N9-Hj-Vbp"/>
-                        <outlet property="velYGyro" destination="qag-bf-nqd" id="eTS-Qc-s7X"/>
+                        <outlet property="velYGyro" destination="kkh-CU-jjZ" id="dAd-PT-Z5w"/>
                         <outlet property="velZ" destination="ffZ-fI-bHt" id="bx0-ls-mNZ"/>
-                        <outlet property="velZGyro" destination="mIx-KZ-Cjb" id="Gsz-nJ-dVn"/>
+                        <outlet property="velZGyro" destination="Zaz-ds-ypw" id="fwE-Gk-7F1"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>

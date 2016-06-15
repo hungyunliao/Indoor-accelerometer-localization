@@ -334,7 +334,7 @@ class ViewController: UIViewController {
                     
                     velXGyro?.text = String(roundNum(attitude.yaw * 180 / M_PI))
                     velYGyro?.text = String(roundNum(attitude.roll * 180 / M_PI))
-                    velZGyro?.text =  String(roundNum(attitude.yaw * 180 / M_PI))
+                    velZGyro?.text = String(roundNum(attitude.yaw * 180 / M_PI))
                 }
                 
                 /* Note2-2 */
