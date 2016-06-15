@@ -27,6 +27,7 @@ class MapView: UIView {
             self.originX = newValue
         }
     }
+    //gugjkgjk
     private var originY: CGFloat {
         get {
             return bounds.midY
