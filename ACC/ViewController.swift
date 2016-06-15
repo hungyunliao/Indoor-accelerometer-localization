@@ -72,7 +72,6 @@ class ViewController: UIViewController {
     @IBAction func reset() {
         accSys.reset()
         gyroSys.reset()
-        
     }
     
     override func viewDidLoad() {
@@ -96,6 +95,7 @@ class ViewController: UIViewController {
             self.outputRotData(gyroData!.rotationRate)
             if NSError != nil {
                 print("\(NSError)")
+                print("")
             }
         })
         
@@ -332,7 +332,7 @@ class ViewController: UIViewController {
                 
                 if let attitude = motionManager.deviceMotion?.attitude {
                     
-                    velXGyro?.text = String(roundNum(attitude.yaw * 180 / M_PI))
+                    velXGyro?.text = String(roundNum(attitude.pitch * 180 / M_PI))
                     velYGyro?.text = String(roundNum(attitude.roll * 180 / M_PI))
                     velZGyro?.text = String(roundNum(attitude.yaw * 180 / M_PI))
                 }
