@@ -109,7 +109,7 @@
 				TargetAttributes = {
 					13B648E71CF3B82B00CA656A = {
 						CreatedOnToolsVersion = 7.2;
-						DevelopmentTeam = 8Y7277W7L3;
+						DevelopmentTeam = AP6W2LX8JC;
 					};
 				};
 			};
@@ -269,7 +269,7 @@
 				INFOPLIST_FILE = ACC/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = kevinlien.ACC;
+				PRODUCT_BUNDLE_IDENTIFIER = HYL.ACC;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 			};
@@ -284,7 +284,7 @@
 				INFOPLIST_FILE = ACC/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = kevinlien.ACC;
+				PRODUCT_BUNDLE_IDENTIFIER = HYL.ACC;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 			};

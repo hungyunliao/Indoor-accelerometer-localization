@@ -27,6 +27,7 @@ struct System {
     var isCalibrated = true
     var calibrationTimesDone = 0
     var staticStateJudgeTimer = 0.0
+    var threePtFilterPointsDone = 0
     
     var base = ThreeAxesSystemDouble()
     var output = ThreeAxesSystemDouble()
@@ -40,6 +41,7 @@ struct System {
         isCalibrated = true
         calibrationTimesDone = 0
         staticStateJudgeTimer = 0.0
+        threePtFilterPointsDone = 0
         
         base.x = 0.0
         base.y = 0.0
