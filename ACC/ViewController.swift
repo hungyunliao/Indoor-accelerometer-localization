@@ -18,26 +18,21 @@ class ViewController: UIViewController {
     var sum = 0.0
     
     // MARK: System parameters setup
+    let gravityConstant = 9.80665
+    let publicDB = NSUserDefaults.standardUserDefaults()
     var accelerometerUpdateInterval: Double = 0.1
     var gyroUpdateInterval: Double = 0.1
+    var deviceMotionUpdateInterval: Double = 0.03
+    
     var calibrationTimeAssigned: Int = 100
     var staticStateJudgeThreshold = (acc: 0.1, gyro: 0.1, timer: 5.0)
-    var deviceMotionUpdateInterval: Double = 0.1
-    
-    let gravityConstant = 9.80665
-    
-    var staticStateJudge = (modulAcc: false, modulGyro: false, modulDiffAcc: false) // 1: static 0: dynamic
-    var arrayForStatic = [Double](count: 7, repeatedValue: -1)
-    var index = 0
-    var modulusDiff = 0.0
-    
-    let publicDB = NSUserDefaults.standardUserDefaults()
     
     // MARK: Instance variables
     var motionManager = CMMotionManager()
     var accModulusAvg = 0.0
     var accSys: System = System()
     var gyroSys: System = System()
+    var absSys: System = System()
     
     // MARK: Kalman Filter
     var arrayOfPoints: [Double] = [1, 2, 3]
@@ -48,13 +43,14 @@ class ViewController: UIViewController {
     var arrayForCalculatingKalmanRY = [Double]()
     var arrayForCalculatingKalmanRZ = [Double]()
     
+    // MARK: Static judement
+    var staticStateJudge = (modulAcc: false, modulGyro: false, modulDiffAcc: false) // 1: static 0: dynamic
+    var arrayForStatic = [Double](count: 7, repeatedValue: -1)
+    var index = 0
+    var modulusDiff = 0.0
     
     // MARK: Three-Point Filter
     let numberOfPointsForThreePtFilter = 3
-    
-    // MARK: Attitude Reference Frame
-    var attSys: System = System()
-    
     
     // MARK: Outlets
     @IBOutlet var info: UILabel?
@@ -82,6 +78,7 @@ class ViewController: UIViewController {
     @IBAction func reset() {
         accSys.reset()
         gyroSys.reset()
+        absSys.reset()
     }
     
     // MARK: Override functions
@@ -97,23 +94,23 @@ class ViewController: UIViewController {
         motionManager.deviceMotionUpdateInterval = deviceMotionUpdateInterval
         
         // Recording data
-//        motionManager.startAccelerometerUpdatesToQueue(NSOperationQueue.currentQueue()!, withHandler: { (accelerometerData: CMAccelerometerData?, NSError) -> Void in
-//            self.outputAccData(accelerometerData!.acceleration)
-//            if NSError != nil {
-//                print("\(NSError)")
-//            }
-//        })
-//        
-//        motionManager.startGyroUpdatesToQueue(NSOperationQueue.currentQueue()!, withHandler: { (gyroData: CMGyroData?, NSError) -> Void in
-//            self.outputRotData(gyroData!.rotationRate)
-//            if NSError != nil {
-//                print("\(NSError)")
-//            }
-//        })
+        motionManager.startAccelerometerUpdatesToQueue(NSOperationQueue.currentQueue()!, withHandler: { (accelerometerData: CMAccelerometerData?, NSError) -> Void in
+            self.outputAccData(accelerometerData!.acceleration)
+            if NSError != nil {
+                print("\(NSError)")
+            }
+        })
+        
+        motionManager.startGyroUpdatesToQueue(NSOperationQueue.currentQueue()!, withHandler: { (gyroData: CMGyroData?, NSError) -> Void in
+            self.outputRotData(gyroData!.rotationRate)
+            if NSError != nil {
+                print("\(NSError)")
+            }
+        })
         
         motionManager.startDeviceMotionUpdatesUsingReferenceFrame(CMAttitudeReferenceFrame.XTrueNorthZVertical, toQueue: NSOperationQueue.currentQueue()!, withHandler: { (motion,  error) in
             if motion != nil {
-                self.outputAttitudeData(motion!)
+                self.outputXTrueNorthMotionData(motion!)
             }
             if error != nil {
                 print("error here \(error)")
@@ -131,88 +128,143 @@ class ViewController: UIViewController {
     
     
     // MARK: Functions
-    func outputAttitudeData(motion: CMDeviceMotion) {
-        let acc: CMAcceleration = motion.userAcceleration
-        let rot = motion.attitude.rotationMatrix
-        attSys.distance.x = (acc.x*rot.m11 + acc.y*rot.m21 + acc.z*rot.m31) * gravityConstant
-        attSys.distance.y = (acc.x*rot.m12 + acc.y*rot.m22 + acc.z*rot.m32) * gravityConstant
-        attSys.distance.z = (acc.x*rot.m13 + acc.y*rot.m23 + acc.z*rot.m33) * gravityConstant
+    func outputXTrueNorthMotionData(motion: CMDeviceMotion) {
         
-        disX?.text = "\(attSys.distance.x)"
-        disY?.text = "\(attSys.distance.y)"
-        disZ?.text = "\(attSys.distance.z)"
+        
+        /* 3-point Filter begins */
+        if absSys.threePtFilterPointsDone < numberOfPointsForThreePtFilter {
+            
+            let acc: CMAcceleration = motion.userAcceleration
+            let rot = motion.attitude.rotationMatrix
+            
+            absSys.output.x += (acc.x*rot.m11 + acc.y*rot.m21 + acc.z*rot.m31)
+            absSys.output.y += (acc.x*rot.m12 + acc.y*rot.m22 + acc.z*rot.m32)
+            absSys.output.z += (acc.x*rot.m13 + acc.y*rot.m23 + acc.z*rot.m33)
+            absSys.threePtFilterPointsDone += 1
+        } else {
+            absSys.output.x = absSys.output.x/Double(numberOfPointsForThreePtFilter) * gravityConstant
+            absSys.output.y = absSys.output.y/Double(numberOfPointsForThreePtFilter) * gravityConstant
+            absSys.output.z = absSys.output.z/Double(numberOfPointsForThreePtFilter) * gravityConstant
+            absSys.threePtFilterPointsDone = 0
+            /* 3-point Filter ends */
+            
+            // Static Judgement Condition 1 && 2 && 3
+            if staticStateJudge.modulAcc && staticStateJudge.modulGyro && staticStateJudge.modulDiffAcc { // when all of the three indicators (modulAcc, modulGyro, modulDiffAcc) are true
+                absSys.velocity.x = 0
+                absSys.velocity.y = 0
+                absSys.velocity.z = 0
+            } else {
+                if fabs(absSys.output.x) > 0.1 {
+                    absSys.velocity.x += absSys.output.x * deviceMotionUpdateInterval * 3
+                    absSys.distance.x += absSys.velocity.x * deviceMotionUpdateInterval * 3
+                }
+                if fabs(absSys.output.y) > 0.1 {
+                    absSys.velocity.y += absSys.output.y * deviceMotionUpdateInterval * 3
+                    absSys.distance.y += absSys.velocity.y * deviceMotionUpdateInterval * 3
+                }
+                if fabs(absSys.output.z) > 0.1 {
+                    absSys.velocity.z += absSys.output.z * deviceMotionUpdateInterval * 3
+                    absSys.distance.z += absSys.velocity.z * deviceMotionUpdateInterval * 3
+                }
+                
+                // save the changed position to the PUBLIC NSUserdefault object so that they can be accessed by other VIEW
+                publicDB.setValue(absSys.distance.x, forKey: "x")
+                publicDB.setValue(absSys.distance.y, forKey: "y")
+                // post the notification to the NotificationCenter to notify everyone who is in the observer list.
+                NSNotificationCenter.defaultCenter().postNotificationName("PositionChanged", object: nil)
+            }
+            
+            
+            accX?.text = "\(roundNum(absSys.output.x))"
+            accY?.text = "\(roundNum(absSys.output.y))"
+            accZ?.text = "\(roundNum(absSys.output.z))"
+            
+            velX?.text = "\(roundNum(absSys.velocity.x))"
+            velY?.text = "\(roundNum(absSys.velocity.y))"
+            velZ?.text = "\(roundNum(absSys.velocity.z))"
+            
+            disX?.text = "\(roundNum(absSys.distance.x))"
+            disY?.text = "\(roundNum(absSys.distance.y))"
+            disZ?.text = "\(roundNum(absSys.distance.z))"
+            
+            absSys.output.x = 0
+            absSys.output.y = 0
+            absSys.output.z = 0
+        }
     }
     
     
     func outputAccData(acceleration: CMAcceleration) {
         
-        if !accSys.isCalibrated {
-            
-            info?.text = "Calibrating..." + String(accSys.calibrationTimesDone) + "/" + String(calibrationTimeAssigned)
-            
-            if accSys.calibrationTimesDone < calibrationTimeAssigned {
-                
-                arrayForCalculatingKalmanRX += [acceleration.x]
-                arrayForCalculatingKalmanRY += [acceleration.y]
-                arrayForCalculatingKalmanRZ += [acceleration.z]
-                print(acceleration.x)
-                
-                accSys.base.x += acceleration.x
-                accSys.base.y += acceleration.y
-                accSys.base.z += acceleration.z + 1 // MARK: should change
-                accSys.calibrationTimesDone += 1
-            } else {
-                
-                var kalmanInitialRX = 0.0
-                var kalmanInitialRY = 0.0
-                var kalmanInitialRZ = 0.0
-                
-                for index in arrayForCalculatingKalmanRX {
-                    kalmanInitialRX += pow((index - accSys.base.x), 2)/Double(calibrationTimeAssigned)
-                }
-                for index in arrayForCalculatingKalmanRY {
-                    kalmanInitialRY += pow((index - accSys.base.y), 2)/Double(calibrationTimeAssigned)
-                }
-                for index in arrayForCalculatingKalmanRZ {
-                    kalmanInitialRZ += pow((index - accSys.base.z), 2)/Double(calibrationTimeAssigned)
-                }
-                print(kalmanInitialRX, kalmanInitialRY, kalmanInitialRZ)
-                
-                accSys.base.x /= Double(calibrationTimeAssigned)
-                accSys.base.y /= Double(calibrationTimeAssigned)
-                accSys.base.z /= Double(calibrationTimeAssigned)
-                accSys.isCalibrated = true
-            }
-            
-        } else {
-            
-            //info?.text = "Detecting..."
-            
-            /* Note 3 */
-            
-            /* 3-point Filter begins */
-            if accSys.threePtFilterPointsDone < numberOfPointsForThreePtFilter {
-                accSys.output.x += acceleration.x
-                accSys.output.y += acceleration.y
-                accSys.output.z += acceleration.z
-                accSys.threePtFilterPointsDone += 1
-            } else {
-                
-                accSys.output.x = (accSys.output.x/Double(numberOfPointsForThreePtFilter)) - accSys.base.x
-                accSys.output.y = (accSys.output.y/Double(numberOfPointsForThreePtFilter)) - accSys.base.y
-                accSys.output.z = (accSys.output.z/Double(numberOfPointsForThreePtFilter)) - accSys.base.z
-                
-                accX?.text = "\(roundNum(acceleration.x))"
-                accY?.text = "\(roundNum(acceleration.y))"
-                accZ?.text = "\(roundNum(acceleration.z))"
-                
-                accSys.threePtFilterPointsDone = 0
-                
-                /* 3-point Filter ends */
-                /* Note1 */
-                
-                /* Note2-1 */
-                
+//        if !accSys.isCalibrated {
+//            
+//            info?.text = "Calibrating..." + String(accSys.calibrationTimesDone) + "/" + String(calibrationTimeAssigned)
+//            
+//            if accSys.calibrationTimesDone < calibrationTimeAssigned {
+//                
+//                arrayForCalculatingKalmanRX += [acceleration.x]
+//                arrayForCalculatingKalmanRY += [acceleration.y]
+//                arrayForCalculatingKalmanRZ += [acceleration.z]
+//                print(acceleration.x)
+//                
+//                accSys.base.x += acceleration.x
+//                accSys.base.y += acceleration.y
+//                accSys.base.z += acceleration.z + 1 // MARK: should change
+//                accSys.calibrationTimesDone += 1
+//            } else {
+//                
+//                var kalmanInitialRX = 0.0
+//                var kalmanInitialRY = 0.0
+//                var kalmanInitialRZ = 0.0
+//                
+//                for index in arrayForCalculatingKalmanRX {
+//                    kalmanInitialRX += pow((index - accSys.base.x), 2)/Double(calibrationTimeAssigned)
+//                }
+//                for index in arrayForCalculatingKalmanRY {
+//                    kalmanInitialRY += pow((index - accSys.base.y), 2)/Double(calibrationTimeAssigned)
+//                }
+//                for index in arrayForCalculatingKalmanRZ {
+//                    kalmanInitialRZ += pow((index - accSys.base.z), 2)/Double(calibrationTimeAssigned)
+//                }
+//                print(kalmanInitialRX, kalmanInitialRY, kalmanInitialRZ)
+//                
+//                accSys.base.x /= Double(calibrationTimeAssigned)
+//                accSys.base.y /= Double(calibrationTimeAssigned)
+//                accSys.base.z /= Double(calibrationTimeAssigned)
+//                accSys.isCalibrated = true
+//            }
+//            
+//        } else {
+//            
+//            //info?.text = "Detecting..."
+//            
+//            /* Note 3 */
+//            
+//            /* 3-point Filter begins */
+//            if accSys.threePtFilterPointsDone < numberOfPointsForThreePtFilter {
+//                accSys.output.x += acceleration.x
+//                accSys.output.y += acceleration.y
+//                accSys.output.z += acceleration.z
+//                accSys.threePtFilterPointsDone += 1
+//            } else {
+//                
+//                accSys.output.x = (accSys.output.x/Double(numberOfPointsForThreePtFilter)) - accSys.base.x
+//                accSys.output.y = (accSys.output.y/Double(numberOfPointsForThreePtFilter)) - accSys.base.y
+//                accSys.output.z = (accSys.output.z/Double(numberOfPointsForThreePtFilter)) - accSys.base.z
+//                
+////                accX?.text = "\(roundNum(acceleration.x))"
+////                accY?.text = "\(roundNum(acceleration.y))"
+////                accZ?.text = "\(roundNum(acceleration.z))"
+//                
+//                accSys.threePtFilterPointsDone = 0
+//                
+//                /* 3-point Filter ends */
+//                /* Note1 */
+//                
+//                /* Note2-1 */
+        
+        
+                // Static Judgement Condition 3
                 if index == arrayForStatic.count {
                     for i in 0..<(arrayForStatic.count - 1) {
                         arrayForStatic[i] = arrayForStatic[i + 1]
@@ -232,148 +284,146 @@ class ViewController: UIViewController {
                         modulusDiff = modulusDifference(arrayForStatic, avgModulus: accModulusAvg)
                     }
                 }
-                
-                // Static Judgement Condition 1
                 if fabs(modulusDiff) < 0.1 {
                     staticStateJudge.modulDiffAcc = true
                 } else {
                     staticStateJudge.modulDiffAcc = false
                 }
                 
-                // Static Judgement Condition 2
+                // Static Judgement Condition 1
                 if fabs(modulus(acceleration.x, y: acceleration.y, z: acceleration.z) - 1) < (1/gravityConstant) {
                     staticStateJudge.modulAcc = true
                 } else {
                     staticStateJudge.modulAcc = false
                 }
                 
-                // Static Judgement Condition 1 && 2 && 3
-                if staticStateJudge.modulAcc && staticStateJudge.modulGyro && staticStateJudge.modulDiffAcc { // when all of the three indicators (modulAcc, modulGyro, modulDiffAcc) are true
-                    info?.text = "static state"
-                    accSys.velocity.x = 0
-                    accSys.velocity.y = 0
-                    accSys.velocity.z = 0
-                } else {
-                    // if the device is moving (in dynamic state), meaning the position is changing, so the position needs to be updated, otherwise, the position need not be updated to save the resources.
-                    info?.text = "dynamic state"
-                    
-                    
-                    /*
-                        Need a func that transfers the gravity acceleration depending on the GyroInfo into x, y, z direction says accSys.gravityOffset.x, accSys.gravityOffset.y and accSys.gravityOffset.z
-                        and then following velocity can be calculated.
-                        accSys.velocity.x += (accSys.output.x - accSys.gravityOffset.x) * gravityConstant * motionManager.accelerometerUpdateInterval
-                        and so y, z
-                     
-                     */
-                    
-                    
-                    // Velocity Calculation
-                    if fabs(accSys.output.x) >= 0.1 {
-                        accSys.velocity.x += roundNum(accSys.output.x * gravityConstant * motionManager.accelerometerUpdateInterval)
-                    }
-                    velX?.text = "\(accSys.velocity.x)"
-                    
-                    if fabs(accSys.output.y) >= 0.1 {
-                        accSys.velocity.y += roundNum(accSys.output.y * gravityConstant * motionManager.accelerometerUpdateInterval)
-                    }
-                    velY?.text = "\(accSys.velocity.y)"
-                    
-                    if fabs(accSys.output.z) >= 0.1 {
-                        accSys.velocity.z += roundNum(accSys.output.z * gravityConstant * motionManager.accelerometerUpdateInterval)
-                    }
-                    velZ?.text = "\(accSys.velocity.z)"
-                    
-                    // Distance Calculation
-                    accSys.distance.x += roundNum(accSys.velocity.x * motionManager.accelerometerUpdateInterval)
-                    //disX?.text = "\(accSys.distance.x)"
-                    
-                    accSys.distance.y += roundNum(accSys.velocity.y * motionManager.accelerometerUpdateInterval)
-                    //disY?.text = "\(accSys.distance.y)"
-                    
-                    accSys.distance.z += roundNum(accSys.velocity.z * motionManager.accelerometerUpdateInterval)
-                    //disZ?.text = "\(accSys.distance.z)"
-                    
-                    
-                    // save the changed position to the PUBLIC NSUserdefault object so that they can be accessed by other VIEW
-                    publicDB.setValue(accSys.distance.x, forKey: "x")
-                    publicDB.setValue(accSys.distance.y, forKey: "y")
-                    // post the notification to the NotificationCenter to notify everyone who is in the observer list.
-                    NSNotificationCenter.defaultCenter().postNotificationName("PositionChanged", object: nil)
-                }
-                
-                // clear the stored value for the next round of 3-point avg computation
-                accSys.output.x = 0
-                accSys.output.y = 0
-                accSys.output.z = 0
-            }
-        }
+//                // Static Judgement Condition 1 && 2 && 3
+//                if staticStateJudge.modulAcc && staticStateJudge.modulGyro && staticStateJudge.modulDiffAcc { // when all of the three indicators (modulAcc, modulGyro, modulDiffAcc) are true
+//                    info?.text = "static state"
+//                    accSys.velocity.x = 0
+//                    accSys.velocity.y = 0
+//                    accSys.velocity.z = 0
+//                } else {
+//                    // if the device is moving (in dynamic state), meaning the position is changing, so the position needs to be updated, otherwise, the position need not be updated to save the resources.
+//                    info?.text = "dynamic state"
+//                    
+//                    
+//                    /*
+//                        Need a func that transfers the gravity acceleration depending on the GyroInfo into x, y, z direction says accSys.gravityOffset.x, accSys.gravityOffset.y and accSys.gravityOffset.z
+//                        and then following velocity can be calculated.
+//                        accSys.velocity.x += (accSys.output.x - accSys.gravityOffset.x) * gravityConstant * motionManager.accelerometerUpdateInterval
+//                        and so y, z
+//                     
+//                     */
+//                    
+//                    
+//                    // Velocity Calculation
+//                    if fabs(accSys.output.x) >= 0.1 {
+//                        accSys.velocity.x += roundNum(accSys.output.x * gravityConstant * motionManager.accelerometerUpdateInterval)
+//                    }
+//                    //velX?.text = "\(accSys.velocity.x)"
+//                    
+//                    if fabs(accSys.output.y) >= 0.1 {
+//                        accSys.velocity.y += roundNum(accSys.output.y * gravityConstant * motionManager.accelerometerUpdateInterval)
+//                    }
+//                    //velY?.text = "\(accSys.velocity.y)"
+//                    
+//                    if fabs(accSys.output.z) >= 0.1 {
+//                        accSys.velocity.z += roundNum(accSys.output.z * gravityConstant * motionManager.accelerometerUpdateInterval)
+//                    }
+//                    //velZ?.text = "\(accSys.velocity.z)"
+//                    
+//                    // Distance Calculation
+//                    accSys.distance.x += roundNum(accSys.velocity.x * motionManager.accelerometerUpdateInterval)
+//                    //disX?.text = "\(accSys.distance.x)"
+//                    
+//                    accSys.distance.y += roundNum(accSys.velocity.y * motionManager.accelerometerUpdateInterval)
+//                    //disY?.text = "\(accSys.distance.y)"
+//                    
+//                    accSys.distance.z += roundNum(accSys.velocity.z * motionManager.accelerometerUpdateInterval)
+//                    //disZ?.text = "\(accSys.distance.z)"
+//                    
+//                    
+////                    // save the changed position to the PUBLIC NSUserdefault object so that they can be accessed by other VIEW
+////                    publicDB.setValue(accSys.distance.x, forKey: "x")
+////                    publicDB.setValue(accSys.distance.y, forKey: "y")
+////                    // post the notification to the NotificationCenter to notify everyone who is in the observer list.
+////                    NSNotificationCenter.defaultCenter().postNotificationName("PositionChanged", object: nil)
+//                }
+//                
+//                // clear the stored value for the next round of 3-point avg computation
+//                accSys.output.x = 0
+//                accSys.output.y = 0
+//                accSys.output.z = 0
+//            }
+//        }
     }
     
     func outputRotData(rotation: CMRotationRate) {
         
-        if !gyroSys.isCalibrated {
-            
-            if gyroSys.calibrationTimesDone < calibrationTimeAssigned {
-                gyroSys.base.x += rotation.x
-                gyroSys.base.y += rotation.y
-                gyroSys.base.z += rotation.z
-                gyroSys.calibrationTimesDone += 1
-            } else {
-                gyroSys.base.x /= Double(calibrationTimeAssigned)
-                gyroSys.base.y /= Double(calibrationTimeAssigned)
-                gyroSys.base.z /= Double(calibrationTimeAssigned)
-                gyroSys.isCalibrated = true
-            }
-            
-        } else {
-            
-            /* 3-point Filter begins */
-            if gyroSys.threePtFilterPointsDone < numberOfPointsForThreePtFilter {
-                gyroSys.velocity.x += rotation.x
-                gyroSys.velocity.y += rotation.y
-                gyroSys.velocity.z += rotation.z
-                gyroSys.threePtFilterPointsDone += 1
-                
-            } else {
-                
-                gyroSys.velocity.x = (gyroSys.velocity.x/Double(numberOfPointsForThreePtFilter)) - gyroSys.base.x
-                gyroSys.velocity.y = (gyroSys.velocity.y/Double(numberOfPointsForThreePtFilter)) - gyroSys.base.y
-                gyroSys.velocity.z = (gyroSys.velocity.z/Double(numberOfPointsForThreePtFilter)) - gyroSys.base.z
-                
-                velXGyro?.text = "\(gyroSys.velocity.x)"
-                velYGyro?.text = "\(gyroSys.velocity.y)"
-                velZGyro?.text = "\(gyroSys.velocity.z)"
-                
-                gyroSys.threePtFilterPointsDone = 0
-                
-                /* 3-point Filter ends */
-                
-                // gyro is the angular velocity, not the angular acceleration
-                if fabs(gyroSys.velocity.x) >= 0.1 {
-                    gyroSys.distance.x += roundNum(gyroSys.velocity.x * motionManager.gyroUpdateInterval)
-                }
-                disXGyro?.text = "\(gyroSys.distance.x)"
-                
-                if fabs(gyroSys.velocity.y) >= 0.1 {
-                    gyroSys.distance.y += roundNum(gyroSys.velocity.y * motionManager.gyroUpdateInterval)
-                }
-                disYGyro?.text = "\(gyroSys.distance.y)"
-                
-                if fabs(gyroSys.velocity.z) >= 0.1 {
-                    gyroSys.distance.z += roundNum(gyroSys.velocity.z * motionManager.gyroUpdateInterval)
-                }
-                disZGyro?.text = "\(gyroSys.distance.z)"
-                
-                if let attitude = motionManager.deviceMotion?.attitude {
-                    
-                    disXGyro?.text = String(roundNum(attitude.pitch * 180 / M_PI))
-                    disYGyro?.text = String(roundNum(attitude.roll * 180 / M_PI))
-                    disZGyro?.text = String(roundNum(attitude.yaw * 180 / M_PI))
-                }
-                
-                /* Note2-2 */
-                
-                // Static Judgement Condition 3
+//        if !gyroSys.isCalibrated {
+//            
+//            if gyroSys.calibrationTimesDone < calibrationTimeAssigned {
+//                gyroSys.base.x += rotation.x
+//                gyroSys.base.y += rotation.y
+//                gyroSys.base.z += rotation.z
+//                gyroSys.calibrationTimesDone += 1
+//            } else {
+//                gyroSys.base.x /= Double(calibrationTimeAssigned)
+//                gyroSys.base.y /= Double(calibrationTimeAssigned)
+//                gyroSys.base.z /= Double(calibrationTimeAssigned)
+//                gyroSys.isCalibrated = true
+//            }
+//            
+//        } else {
+//            
+//            /* 3-point Filter begins */
+//            if gyroSys.threePtFilterPointsDone < numberOfPointsForThreePtFilter {
+//                gyroSys.velocity.x += rotation.x
+//                gyroSys.velocity.y += rotation.y
+//                gyroSys.velocity.z += rotation.z
+//                gyroSys.threePtFilterPointsDone += 1
+//                
+//            } else {
+//                
+//                gyroSys.velocity.x = (gyroSys.velocity.x/Double(numberOfPointsForThreePtFilter)) - gyroSys.base.x
+//                gyroSys.velocity.y = (gyroSys.velocity.y/Double(numberOfPointsForThreePtFilter)) - gyroSys.base.y
+//                gyroSys.velocity.z = (gyroSys.velocity.z/Double(numberOfPointsForThreePtFilter)) - gyroSys.base.z
+//                
+//                velXGyro?.text = "\(gyroSys.velocity.x)"
+//                velYGyro?.text = "\(gyroSys.velocity.y)"
+//                velZGyro?.text = "\(gyroSys.velocity.z)"
+//                
+//                gyroSys.threePtFilterPointsDone = 0
+//                
+//                /* 3-point Filter ends */
+//                
+//                // gyro is the angular velocity, not the angular acceleration
+//                if fabs(gyroSys.velocity.x) >= 0.1 {
+//                    gyroSys.distance.x += roundNum(gyroSys.velocity.x * motionManager.gyroUpdateInterval)
+//                }
+//                disXGyro?.text = "\(gyroSys.distance.x)"
+//                
+//                if fabs(gyroSys.velocity.y) >= 0.1 {
+//                    gyroSys.distance.y += roundNum(gyroSys.velocity.y * motionManager.gyroUpdateInterval)
+//                }
+//                disYGyro?.text = "\(gyroSys.distance.y)"
+//                
+//                if fabs(gyroSys.velocity.z) >= 0.1 {
+//                    gyroSys.distance.z += roundNum(gyroSys.velocity.z * motionManager.gyroUpdateInterval)
+//                }
+//                disZGyro?.text = "\(gyroSys.distance.z)"
+//                
+//                if let attitude = motionManager.deviceMotion?.attitude {
+//                    
+//                    disXGyro?.text = String(roundNum(attitude.pitch * 180 / M_PI))
+//                    disYGyro?.text = String(roundNum(attitude.roll * 180 / M_PI))
+//                    disZGyro?.text = String(roundNum(attitude.yaw * 180 / M_PI))
+//                }
+//                
+//                /* Note2-2 */
+//                
+                // Static Judgement Condition 2
                 if modulus(gyroSys.output.x, y: gyroSys.output.y, z: gyroSys.output.z) < 0.1 {
                     staticStateJudge.modulGyro = true
                 } else {
@@ -381,8 +431,8 @@ class ViewController: UIViewController {
                 }
 
 
-            }
-        }
+//            }
+//        }
     }
     
 }

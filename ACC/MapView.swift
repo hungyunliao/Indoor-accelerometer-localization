@@ -15,8 +15,8 @@ class MapView: UIView {
     // Not yet implement "Z" axis
     private var mapX = [CGFloat]() { didSet { setNeedsDisplay() } }
     private var mapY = [CGFloat]() { didSet { setNeedsDisplay() } }
+    private var scale: CGFloat = 1.0
     
-    // Test Don't commit this one
     private var resetXOffset: CGFloat = 0.0
     private var resetYOffset: CGFloat = 0.0
     
@@ -40,6 +40,10 @@ class MapView: UIView {
     
     
     /* MARK: Public APIs */
+    func setScale(scale: Double) {
+        self.scale = CGFloat(scale)
+    }
+    
     func setOrigin(x: Double, y: Double) {
         cleanMovement()
         originX = CGFloat(x)
@@ -47,11 +51,11 @@ class MapView: UIView {
     }
     
     func moveXTo(position: Double) {
-        mapX.append(CGFloat(position) - resetXOffset)
+        mapX.append(CGFloat(position)*scale - resetXOffset)
     }
     
     func moveYTo(position: Double) {
-        mapY.append(CGFloat(position) - resetYOffset)
+        mapY.append(CGFloat(position)*scale - resetYOffset)
     }
     
     func cleanMovement() {
