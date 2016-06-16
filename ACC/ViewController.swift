@@ -8,6 +8,8 @@
 
 import UIKit
 import CoreMotion
+//import CoreLocation
+//import MapKit
 
 class ViewController: UIViewController {
     
@@ -51,9 +53,7 @@ class ViewController: UIViewController {
     let numberOfPointsForThreePtFilter = 3
     
     // MARK: Attitude Reference Frame
-    var attX = 0.0
-    var attY = 0.0
-    var attZ = 0.0
+    var attSys: System = System()
     
     
     // MARK: Outlets
@@ -97,26 +97,26 @@ class ViewController: UIViewController {
         motionManager.deviceMotionUpdateInterval = deviceMotionUpdateInterval
         
         // Recording data
-        motionManager.startAccelerometerUpdatesToQueue(NSOperationQueue.currentQueue()!, withHandler: { (accelerometerData: CMAccelerometerData?, NSError) -> Void in
-            self.outputAccData(accelerometerData!.acceleration)
-            if NSError != nil {
-                print("\(NSError)")
-            }
-        })
+//        motionManager.startAccelerometerUpdatesToQueue(NSOperationQueue.currentQueue()!, withHandler: { (accelerometerData: CMAccelerometerData?, NSError) -> Void in
+//            self.outputAccData(accelerometerData!.acceleration)
+//            if NSError != nil {
+//                print("\(NSError)")
+//            }
+//        })
+//        
+//        motionManager.startGyroUpdatesToQueue(NSOperationQueue.currentQueue()!, withHandler: { (gyroData: CMGyroData?, NSError) -> Void in
+//            self.outputRotData(gyroData!.rotationRate)
+//            if NSError != nil {
+//                print("\(NSError)")
+//            }
+//        })
         
-        motionManager.startGyroUpdatesToQueue(NSOperationQueue.currentQueue()!, withHandler: { (gyroData: CMGyroData?, NSError) -> Void in
-            self.outputRotData(gyroData!.rotationRate)
-            if NSError != nil {
-                print("\(NSError)")
-            }
-        })
-        
-        motionManager.startDeviceMotionUpdatesUsingReferenceFrame(CMAttitudeReferenceFrame.XTrueNorthZVertical, toQueue: NSOperationQueue.currentQueue()!, withHandler: { (motion: CMDeviceMotion?,  error) in
+        motionManager.startDeviceMotionUpdatesUsingReferenceFrame(CMAttitudeReferenceFrame.XTrueNorthZVertical, toQueue: NSOperationQueue.currentQueue()!, withHandler: { (motion,  error) in
             if motion != nil {
                 self.outputAttitudeData(motion!)
             }
             if error != nil {
-                print("\(error)")
+                print("error here \(error)")
             }
         })
         
@@ -134,13 +134,13 @@ class ViewController: UIViewController {
     func outputAttitudeData(motion: CMDeviceMotion) {
         let acc: CMAcceleration = motion.userAcceleration
         let rot = motion.attitude.rotationMatrix
-        attX = (acc.x*rot.m11 + acc.y*rot.m21 + acc.z*rot.m31)*self.gravityConstant
-        attY = (acc.x*rot.m12 + acc.y*rot.m22 + acc.z*rot.m32)*self.gravityConstant
-        attZ = (acc.x*rot.m13 + acc.y*rot.m23 + acc.z*rot.m33)*self.gravityConstant
+        attSys.distance.x = (acc.x*rot.m11 + acc.y*rot.m21 + acc.z*rot.m31) * gravityConstant
+        attSys.distance.y = (acc.x*rot.m12 + acc.y*rot.m22 + acc.z*rot.m32) * gravityConstant
+        attSys.distance.z = (acc.x*rot.m13 + acc.y*rot.m23 + acc.z*rot.m33) * gravityConstant
         
-        disX?.text = "\(attX)"
-        disY?.text = "\(attY)"
-        disZ?.text = "\(attZ)"
+        disX?.text = "\(attSys.distance.x)"
+        disY?.text = "\(attSys.distance.y)"
+        disZ?.text = "\(attSys.distance.z)"
     }
     
     
