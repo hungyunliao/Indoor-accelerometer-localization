@@ -20,6 +20,7 @@ class ViewController: UIViewController {
     var gyroUpdateInterval: Double = 0.1
     var calibrationTimeAssigned: Int = 100
     var staticStateJudgeThreshold = (acc: 0.1, gyro: 0.1, timer: 5.0)
+    var deviceMotionUpdateInterval: Double = 0.1
     
     let gravityConstant = 9.80665
     
@@ -40,10 +41,20 @@ class ViewController: UIViewController {
     var arrayOfPoints: [Double] = [1, 2, 3]
     var linearCoef = (slope: 0.0, intercept: 0.0)
     
-    var STDEV = [Double]()
+    // MARK: Refined Kalman Filter
+    var arrayForCalculatingKalmanRX = [Double]()
+    var arrayForCalculatingKalmanRY = [Double]()
+    var arrayForCalculatingKalmanRZ = [Double]()
+    
     
     // MARK: Three-Point Filter
     let numberOfPointsForThreePtFilter = 3
+    
+    // MARK: Attitude Reference Frame
+    var attX = 0.0
+    var attY = 0.0
+    var attZ = 0.0
+    
     
     // MARK: Outlets
     @IBOutlet var info: UILabel?
@@ -68,20 +79,22 @@ class ViewController: UIViewController {
     @IBOutlet var disYGyro: UILabel?
     @IBOutlet var disZGyro: UILabel?
     
-    // MARK: Functions
     @IBAction func reset() {
         accSys.reset()
         gyroSys.reset()
     }
     
+    // MARK: Override functions
     override func viewDidLoad() {
+        super.viewDidLoad()
         
         self.reset()
         
         // Set Motion Manager Properties
         motionManager.accelerometerUpdateInterval = accelerometerUpdateInterval
         motionManager.gyroUpdateInterval = gyroUpdateInterval
-        motionManager.startDeviceMotionUpdates()//for gyro degree 
+        motionManager.startDeviceMotionUpdates()//for gyro degree
+        motionManager.deviceMotionUpdateInterval = deviceMotionUpdateInterval
         
         // Recording data
         motionManager.startAccelerometerUpdatesToQueue(NSOperationQueue.currentQueue()!, withHandler: { (accelerometerData: CMAccelerometerData?, NSError) -> Void in
@@ -95,20 +108,41 @@ class ViewController: UIViewController {
             self.outputRotData(gyroData!.rotationRate)
             if NSError != nil {
                 print("\(NSError)")
-                print("")
             }
         })
         
-        linearCoef = SimpleLinearRegression(arrayOfPoints, y: arrayOfPoints) // initializing the coef before the recording functions running
+        motionManager.startDeviceMotionUpdatesUsingReferenceFrame(CMAttitudeReferenceFrame.XTrueNorthZVertical, toQueue: NSOperationQueue.currentQueue()!, withHandler: { (motion: CMDeviceMotion?,  error) in
+            if motion != nil {
+                self.outputAttitudeData(motion!)
+            }
+            if error != nil {
+                print("\(error)")
+            }
+        })
         
-        super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        linearCoef = SimpleLinearRegression(arrayOfPoints, y: arrayOfPoints) // For Kalman. Initializing the coef before the recording functions running
         
     }
     
-    var arrayForCalculatingKalmanRX = [Double]()
-    var arrayForCalculatingKalmanRY = [Double]()
-    var arrayForCalculatingKalmanRZ = [Double]()
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    
+    // MARK: Functions
+    func outputAttitudeData(motion: CMDeviceMotion) {
+        let acc: CMAcceleration = motion.userAcceleration
+        let rot = motion.attitude.rotationMatrix
+        attX = (acc.x*rot.m11 + acc.y*rot.m21 + acc.z*rot.m31)*self.gravityConstant
+        attY = (acc.x*rot.m12 + acc.y*rot.m22 + acc.z*rot.m32)*self.gravityConstant
+        attZ = (acc.x*rot.m13 + acc.y*rot.m23 + acc.z*rot.m33)*self.gravityConstant
+        
+        disX?.text = "\(attX)"
+        disY?.text = "\(attY)"
+        disZ?.text = "\(attZ)"
+    }
+    
     
     func outputAccData(acceleration: CMAcceleration) {
         
@@ -251,13 +285,13 @@ class ViewController: UIViewController {
                     
                     // Distance Calculation
                     accSys.distance.x += roundNum(accSys.velocity.x * motionManager.accelerometerUpdateInterval)
-                    disX?.text = "\(accSys.distance.x)"
+                    //disX?.text = "\(accSys.distance.x)"
                     
                     accSys.distance.y += roundNum(accSys.velocity.y * motionManager.accelerometerUpdateInterval)
-                    disY?.text = "\(accSys.distance.y)"
+                    //disY?.text = "\(accSys.distance.y)"
                     
                     accSys.distance.z += roundNum(accSys.velocity.z * motionManager.accelerometerUpdateInterval)
-                    disZ?.text = "\(accSys.distance.z)"
+                    //disZ?.text = "\(accSys.distance.z)"
                     
                     
                     // save the changed position to the PUBLIC NSUserdefault object so that they can be accessed by other VIEW
@@ -349,11 +383,6 @@ class ViewController: UIViewController {
 
             }
         }
-    }
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
     
 }
