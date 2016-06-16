@@ -66,7 +66,7 @@ struct System {
 }
 
 struct ThreeAxesSystemDouble {
-    var x = 0.0 // 1.0?
+    var x = 0.0
     var y = 0.0
     var z = 0.0
 }

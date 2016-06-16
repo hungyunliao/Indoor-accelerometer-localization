@@ -16,6 +16,7 @@ class MapView: UIView {
     private var mapX = [CGFloat]() { didSet { setNeedsDisplay() } }
     private var mapY = [CGFloat]() { didSet { setNeedsDisplay() } }
     
+    // Test Don't commit this one
     private var resetXOffset: CGFloat = 0.0
     private var resetYOffset: CGFloat = 0.0
     
@@ -36,7 +37,6 @@ class MapView: UIView {
         }
     }
     
-    //commit this line
     
     /* MARK: Public APIs */
     func setOrigin(x: Double, y: Double) {
@@ -112,6 +112,7 @@ class MapView: UIView {
         let pattern: [CGFloat] = [4, 2]
         var i: CGFloat = 1
         
+        // draw x-direction lines
         while (i <= bounds.height) {
             gridPath = getLinePath(CGPoint(x: 0, y: centerPoint.y + i*gridSize), endPoint: CGPoint(x: bounds.width, y: centerPoint.y + i*gridSize))
             gridPath.setLineDash(pattern, count: 2, phase: 0.0)
@@ -125,6 +126,7 @@ class MapView: UIView {
         
         i = 1
         
+        // draw y-direction lines
         while (i <= bounds.width) {
             gridPath = getLinePath(CGPoint(x: centerPoint.x + i*gridSize, y: 0), endPoint: CGPoint(x: centerPoint.x + i*gridSize, y: bounds.height))
             gridPath.setLineDash(pattern, count: 2, phase: 0.0)
