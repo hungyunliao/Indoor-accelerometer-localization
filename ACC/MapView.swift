@@ -15,6 +15,7 @@ class MapView: UIView {
     // Not yet implement "Z" axis
     private var mapX = [CGFloat]() { didSet { setNeedsDisplay() } }
     private var mapY = [CGFloat]() { didSet { setNeedsDisplay() } }
+    private var scale: CGFloat = 1.0
     
     private var resetXOffset: CGFloat = 0.0
     private var resetYOffset: CGFloat = 0.0
@@ -27,6 +28,7 @@ class MapView: UIView {
             self.originX = newValue
         }
     }
+    
     private var originY: CGFloat {
         get {
             return bounds.midY
@@ -38,6 +40,10 @@ class MapView: UIView {
     
     
     /* MARK: Public APIs */
+    func setScale(scale: Double) {
+        self.scale = CGFloat(scale)
+    }
+    
     func setOrigin(x: Double, y: Double) {
         cleanMovement()
         originX = CGFloat(x)
@@ -45,16 +51,18 @@ class MapView: UIView {
     }
     
     func moveXTo(position: Double) {
-        mapX.append(CGFloat(position) - resetXOffset)
+        mapX.append(CGFloat(position)*scale - resetXOffset)
     }
     
     func moveYTo(position: Double) {
-        mapY.append(CGFloat(position) - resetYOffset)
+        mapY.append(CGFloat(position)*scale - resetYOffset)
     }
     
     func cleanMovement() {
-        resetXOffset += mapX.last!
-        resetYOffset += mapY.last!
+        if !mapX.isEmpty && !mapY.isEmpty {
+            resetXOffset += mapX.last!
+            resetYOffset += mapY.last!
+        }
         mapX.removeAll()
         mapY.removeAll()
     }
@@ -62,11 +70,16 @@ class MapView: UIView {
     override func drawRect(rect: CGRect) {
         
         let xAxis = getLinePath(CGPoint(x: 0, y: bounds.midY), endPoint: CGPoint(x: bounds.width, y: bounds.midY))
+        xAxis.lineWidth = 2.0
+        UIColor.whiteColor().set()
         xAxis.stroke()
         
         let yAxis = getLinePath(CGPoint(x: bounds.midX, y: 20), endPoint: CGPoint(x: bounds.midX, y: bounds.height))
+        yAxis.lineWidth = 2.0
+        UIColor.whiteColor().set()
         yAxis.stroke()
         
+        drawGrid(CGPoint(x: originX, y: originY), gridSize: CGFloat(30))
         
         let path = UIBezierPath()
         path.moveToPoint(CGPoint(x: originX, y: originY))
@@ -81,7 +94,7 @@ class MapView: UIView {
         
         path.lineWidth = 3.0
         
-        UIColor.blueColor().set()
+        UIColor.yellowColor().set()
         
         path.stroke()
         
@@ -92,10 +105,43 @@ class MapView: UIView {
         let linePath = UIBezierPath()
         linePath.moveToPoint(startPoint)
         linePath.addLineToPoint(endPoint)
-        linePath.lineWidth = 1.0
-        UIColor.blackColor().set()
         
         return linePath
     }
     
+    private func drawGrid(centerPoint: CGPoint, gridSize: CGFloat) {
+        
+        var gridPath = UIBezierPath()
+        UIColor.grayColor().set()
+        gridPath.lineWidth = 1.0
+        let pattern: [CGFloat] = [4, 2]
+        var i: CGFloat = 1
+        
+        // draw x-direction lines
+        while (i <= bounds.height) {
+            gridPath = getLinePath(CGPoint(x: 0, y: centerPoint.y + i*gridSize), endPoint: CGPoint(x: bounds.width, y: centerPoint.y + i*gridSize))
+            gridPath.setLineDash(pattern, count: 2, phase: 0.0)
+            gridPath.stroke()
+            
+            gridPath = getLinePath(CGPoint(x: 0, y: centerPoint.y +  -i*gridSize), endPoint: CGPoint(x: bounds.width, y: centerPoint.y + -i*gridSize))
+            gridPath.setLineDash(pattern, count: 2, phase: 0.0)
+            gridPath.stroke()
+            i += 1
+        }
+        
+        i = 1
+        
+        // draw y-direction lines
+        while (i <= bounds.width) {
+            gridPath = getLinePath(CGPoint(x: centerPoint.x + i*gridSize, y: 0), endPoint: CGPoint(x: centerPoint.x + i*gridSize, y: bounds.height))
+            gridPath.setLineDash(pattern, count: 2, phase: 0.0)
+            gridPath.stroke()
+            
+            gridPath = getLinePath(CGPoint(x: centerPoint.x + -i*gridSize, y: 0), endPoint: CGPoint(x: centerPoint.x + -i*gridSize, y: bounds.height))
+            gridPath.setLineDash(pattern, count: 2, phase: 0.0)
+            gridPath.stroke()
+            
+            i += 1
+        }
+    }
 }
