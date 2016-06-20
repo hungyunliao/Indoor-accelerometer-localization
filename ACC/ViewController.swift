@@ -23,6 +23,7 @@ class ViewController: UIViewController {
     var accelerometerUpdateInterval: Double = 0.1
     var gyroUpdateInterval: Double = 0.1
     var deviceMotionUpdateInterval: Double = 0.03
+    let velocityThreshold = 0.01
     
     var calibrationTimeAssigned: Int = 100
     var staticStateJudgeThreshold = (acc: 0.1, gyro: 0.1, timer: 5.0)
@@ -154,15 +155,15 @@ class ViewController: UIViewController {
                 absSys.velocity.y = 0
                 absSys.velocity.z = 0
             } else {
-                if fabs(absSys.output.x) > 0.1 {
+                if fabs(absSys.output.x) > velocityThreshold {
                     absSys.velocity.x += absSys.output.x * deviceMotionUpdateInterval * 3
                     absSys.distance.x += absSys.velocity.x * deviceMotionUpdateInterval * 3
                 }
-                if fabs(absSys.output.y) > 0.1 {
+                if fabs(absSys.output.y) > velocityThreshold {
                     absSys.velocity.y += absSys.output.y * deviceMotionUpdateInterval * 3
                     absSys.distance.y += absSys.velocity.y * deviceMotionUpdateInterval * 3
                 }
-                if fabs(absSys.output.z) > 0.1 {
+                if fabs(absSys.output.z) > velocityThreshold {
                     absSys.velocity.z += absSys.output.z * deviceMotionUpdateInterval * 3
                     absSys.distance.z += absSys.velocity.z * deviceMotionUpdateInterval * 3
                 }
@@ -292,7 +293,7 @@ class ViewController: UIViewController {
                         modulusDiff = modulusDifference(arrayForStatic, avgModulus: accModulusAvg)
                     }
                 }
-                if fabs(modulusDiff) < 0.1 {
+                if fabs(modulusDiff) < velocityThreshold {
                     staticStateJudge.modulDiffAcc = true
                 } else {
                     staticStateJudge.modulDiffAcc = false
@@ -326,17 +327,17 @@ class ViewController: UIViewController {
 //                    
 //                    
 //                    // Velocity Calculation
-//                    if fabs(accSys.output.x) >= 0.1 {
+//                    if fabs(accSys.output.x) >= velocityThreshold {
 //                        accSys.velocity.x += roundNum(accSys.output.x * gravityConstant * motionManager.accelerometerUpdateInterval)
 //                    }
 //                    //velX?.text = "\(accSys.velocity.x)"
 //                    
-//                    if fabs(accSys.output.y) >= 0.1 {
+//                    if fabs(accSys.output.y) >= velocityThreshold {
 //                        accSys.velocity.y += roundNum(accSys.output.y * gravityConstant * motionManager.accelerometerUpdateInterval)
 //                    }
 //                    //velY?.text = "\(accSys.velocity.y)"
 //                    
-//                    if fabs(accSys.output.z) >= 0.1 {
+//                    if fabs(accSys.output.z) >= velocityThreshold {
 //                        accSys.velocity.z += roundNum(accSys.output.z * gravityConstant * motionManager.accelerometerUpdateInterval)
 //                    }
 //                    //velZ?.text = "\(accSys.velocity.z)"
@@ -407,17 +408,17 @@ class ViewController: UIViewController {
 //                /* 3-point Filter ends */
 //                
 //                // gyro is the angular velocity, not the angular acceleration
-//                if fabs(gyroSys.velocity.x) >= 0.1 {
+//                if fabs(gyroSys.velocity.x) >= velocityThreshold {
 //                    gyroSys.distance.x += roundNum(gyroSys.velocity.x * motionManager.gyroUpdateInterval)
 //                }
 //                disXGyro?.text = "\(gyroSys.distance.x)"
 //                
-//                if fabs(gyroSys.velocity.y) >= 0.1 {
+//                if fabs(gyroSys.velocity.y) >= velocityThreshold {
 //                    gyroSys.distance.y += roundNum(gyroSys.velocity.y * motionManager.gyroUpdateInterval)
 //                }
 //                disYGyro?.text = "\(gyroSys.distance.y)"
 //                
-//                if fabs(gyroSys.velocity.z) >= 0.1 {
+//                if fabs(gyroSys.velocity.z) >= velocityThreshold {
 //                    gyroSys.distance.z += roundNum(gyroSys.velocity.z * motionManager.gyroUpdateInterval)
 //                }
 //                disZGyro?.text = "\(gyroSys.distance.z)"
@@ -432,7 +433,7 @@ class ViewController: UIViewController {
 //                /* Note2-2 */
 //                
                 // Static Judgement Condition 2
-                if modulus(gyroSys.output.x, y: gyroSys.output.y, z: gyroSys.output.z) < 0.1 {
+                if modulus(gyroSys.output.x, y: gyroSys.output.y, z: gyroSys.output.z) < velocityThreshold {
                     staticStateJudge.modulGyro = true
                 } else {
                     staticStateJudge.modulGyro = false
