@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import CoreLocation
+import MapKit
 
 @IBDesignable
 class MapView: UIView {
@@ -68,6 +70,14 @@ class MapView: UIView {
     }
     
     override func drawRect(rect: CGRect) {
+        
+//        let center = CLLocationCoordinate2D(latitude: Double(mapX.last!),longitude: Double(mapY.last!))
+//        
+//        let rad = CLLocationDistance(1000)
+//        
+//        let circle = MKCircle(centerCoordinate: center, radius: rad)
+        
+        
         
         let xAxis = getLinePath(CGPoint(x: 0, y: bounds.midY), endPoint: CGPoint(x: bounds.width, y: bounds.midY))
         xAxis.lineWidth = 2.0

@@ -34,7 +34,7 @@ class MapViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         mapView.backgroundColor = UIColor.blackColor()
-        mapView.setScale(100.0)
+        mapView.setScale(50.0)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(updatePosition(_:)), name:"PositionChanged", object: nil)
         //self.view.backgroundColor = UIColor.greenColor()
     }
@@ -52,7 +52,7 @@ class MapViewController: UIViewController {
         
         if let getDisY = publicDB.stringForKey("y") {
             mapView.moveYTo(Double(getDisY)!)
-            disX.text = "\(roundNum(Double(getDisY)!))"
+            disY.text = "\(roundNum(Double(getDisY)!))"
         }
         
         if let getAccX = publicDB.stringForKey("accX") {
