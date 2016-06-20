@@ -44,7 +44,7 @@ class ViewController: UIViewController {
     var arrayForCalculatingKalmanRZ = [Double]()
     
     // MARK: Static judement
-    var staticStateJudge = (modulAcc: false, modulGyro: false, modulDiffAcc: false) // 1: static 0: dynamic
+    var staticStateJudge = (modulAcc: false, modulGyro: false, modulDiffAcc: false) // true: static false: dynamic
     var arrayForStatic = [Double](count: 7, repeatedValue: -1)
     var index = 0
     var modulusDiff = 0.0
@@ -167,6 +167,11 @@ class ViewController: UIViewController {
                     absSys.distance.z += absSys.velocity.z * deviceMotionUpdateInterval * 3
                 }
                 
+                publicDB.setValue(absSys.output.x, forKey: "accX")
+                publicDB.setValue(absSys.output.y, forKey: "accY")
+                publicDB.setValue(absSys.velocity.x, forKey: "velX")
+                publicDB.setValue(absSys.velocity.x, forKey: "velY")
+                
                 // save the changed position to the PUBLIC NSUserdefault object so that they can be accessed by other VIEW
                 publicDB.setValue(absSys.distance.x, forKey: "x")
                 publicDB.setValue(absSys.distance.y, forKey: "y")
@@ -262,6 +267,9 @@ class ViewController: UIViewController {
 //                /* Note1 */
 //                
 //                /* Note2-1 */
+                accSys.output.x = acceleration.x * gravityConstant
+                accSys.output.y = acceleration.y * gravityConstant
+                accSys.output.z = acceleration.z * gravityConstant
         
         
                 // Static Judgement Condition 3
@@ -269,12 +277,12 @@ class ViewController: UIViewController {
                     for i in 0..<(arrayForStatic.count - 1) {
                         arrayForStatic[i] = arrayForStatic[i + 1]
                     }
-                    arrayForStatic[index - 1] = modulus(acceleration.x, y: acceleration.y, z: acceleration.z)
+                    arrayForStatic[index - 1] = modulus(accSys.output.x, y: accSys.output.y, z: accSys.output.z)
                     accModulusAvg += arrayForStatic[3]
                     accModulusAvg /= 2
                     modulusDiff = modulusDifference(arrayForStatic, avgModulus: accModulusAvg)
                 } else {
-                    arrayForStatic[index] = modulus(acceleration.x, y: acceleration.y, z: acceleration.z)
+                    arrayForStatic[index] = modulus(accSys.output.x, y: accSys.output.y, z: accSys.output.z)
                     index += 1
                     if index == arrayForStatic.count {
                         for i in 0...((arrayForStatic.count - 1)/2) {
@@ -291,7 +299,7 @@ class ViewController: UIViewController {
                 }
                 
                 // Static Judgement Condition 1
-                if fabs(modulus(acceleration.x, y: acceleration.y, z: acceleration.z) - 1) < (1/gravityConstant) {
+                if fabs(modulus(accSys.output.x, y: accSys.output.y, z: accSys.output.z) - gravityConstant) < 1 {
                     staticStateJudge.modulAcc = true
                 } else {
                     staticStateJudge.modulAcc = false

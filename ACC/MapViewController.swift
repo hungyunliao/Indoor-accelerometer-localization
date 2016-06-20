@@ -24,11 +24,17 @@ class MapViewController: UIViewController {
         }
     }
     
+    @IBOutlet weak var accX: UILabel!
+    @IBOutlet weak var accY: UILabel!
+    @IBOutlet weak var velX: UILabel!
+    @IBOutlet weak var velY: UILabel!
+    @IBOutlet weak var disX: UILabel!
+    @IBOutlet weak var disY: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         mapView.backgroundColor = UIColor.blackColor()
-        mapView.setScale(5.0)
+        mapView.setScale(100.0)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(updatePosition(_:)), name:"PositionChanged", object: nil)
         //self.view.backgroundColor = UIColor.greenColor()
     }
@@ -39,17 +45,29 @@ class MapViewController: UIViewController {
     
     func updatePosition(notification: NSNotification){
         
-        if let getX = publicDB.stringForKey("x") {
-            mapView.moveXTo(Double(getX)!)
-        } else {
-            mapView.moveXTo(0.0)
+        if let getDisX = publicDB.stringForKey("x") {
+            mapView.moveXTo(Double(getDisX)!)
+            disX.text = "\(roundNum(Double(getDisX)!))"
         }
         
-        if let getY = publicDB.stringForKey("y") {
-            mapView.moveYTo(Double(getY)!)
-        } else {
-            mapView.moveYTo(0.0)
+        if let getDisY = publicDB.stringForKey("y") {
+            mapView.moveYTo(Double(getDisY)!)
+            disX.text = "\(roundNum(Double(getDisY)!))"
         }
+        
+        if let getAccX = publicDB.stringForKey("accX") {
+            accX.text = "\(roundNum(Double(getAccX)!))"
+        }
+        if let getAccY = publicDB.stringForKey("accY") {
+            accY.text = "\(roundNum(Double(getAccY)!))"
+        }
+        if let getVelX = publicDB.stringForKey("velX") {
+            velX.text = "\(roundNum(Double(getVelX)!))"
+        }
+        if let getVelY = publicDB.stringForKey("velY") {
+            velY.text = "\(roundNum(Double(getVelY)!))"
+        }
+        
     }
     
     /*
