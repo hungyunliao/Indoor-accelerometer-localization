@@ -7,8 +7,6 @@
 //
 
 import UIKit
-import CoreLocation
-import MapKit
 
 @IBDesignable
 class MapView: UIView {
@@ -71,14 +69,6 @@ class MapView: UIView {
     
     override func drawRect(rect: CGRect) {
         
-//        let center = CLLocationCoordinate2D(latitude: Double(mapX.last!),longitude: Double(mapY.last!))
-//        
-//        let rad = CLLocationDistance(1000)
-//        
-//        let circle = MKCircle(centerCoordinate: center, radius: rad)
-        
-        
-        
         let xAxis = getLinePath(CGPoint(x: 0, y: bounds.midY), endPoint: CGPoint(x: bounds.width, y: bounds.midY))
         xAxis.lineWidth = 2.0
         UIColor.whiteColor().set()
@@ -93,21 +83,31 @@ class MapView: UIView {
         
         let path = UIBezierPath()
         path.moveToPoint(CGPoint(x: originX, y: originY))
-        
         if !mapX.isEmpty && !mapY.isEmpty {
             
             let pointArrayLength = min(mapX.count, mapY.count)
             for i in 0..<pointArrayLength {
-                path.addLineToPoint(CGPoint(x: mapX[i] + bounds.midX, y: mapY[i] + bounds.midY))
+                path.addLineToPoint(CGPoint(x: mapX[i] + originX, y: mapY[i] + originY))
             }
         }
-        
         path.lineWidth = 3.0
-        
         UIColor.yellowColor().set()
-        
         path.stroke()
         
+        var circle = UIBezierPath()
+        if !mapX.isEmpty && !mapY.isEmpty {
+            circle = getCircle(atCenter: CGPoint(x: mapX.last! + originX, y: mapY.last! + originY), radius: CGFloat(5))
+        } else {
+            circle = getCircle(atCenter: CGPoint(x: originX, y: originY), radius: CGFloat(5))
+        }
+        UIColor.cyanColor().set()
+        circle.fill()
+        
+    }
+    
+    
+    private func getCircle(atCenter center: CGPoint, radius: CGFloat) -> UIBezierPath {
+        return UIBezierPath(arcCenter: center, radius: radius, startAngle: 0.0, endAngle: CGFloat(2*M_PI), clockwise: false)
     }
     
     private func getLinePath(startPoint: CGPoint, endPoint: CGPoint) -> UIBezierPath {
@@ -133,7 +133,7 @@ class MapView: UIView {
             gridPath.setLineDash(pattern, count: 2, phase: 0.0)
             gridPath.stroke()
             
-            gridPath = getLinePath(CGPoint(x: 0, y: centerPoint.y +  -i*gridSize), endPoint: CGPoint(x: bounds.width, y: centerPoint.y + -i*gridSize))
+            gridPath = getLinePath(CGPoint(x: 0, y: centerPoint.y + -i*gridSize), endPoint: CGPoint(x: bounds.width, y: centerPoint.y + -i*gridSize))
             gridPath.setLineDash(pattern, count: 2, phase: 0.0)
             gridPath.stroke()
             i += 1

@@ -22,7 +22,7 @@ class ViewController: UIViewController {
     let publicDB = NSUserDefaults.standardUserDefaults()
     var accelerometerUpdateInterval: Double = 0.1
     var gyroUpdateInterval: Double = 0.1
-    var deviceMotionUpdateInterval: Double = 0.03
+    var deviceMotionUpdateInterval: Double = 0.01
     let accelerationThreshold = 0.1
     var staticStateJudgeThreshold = (accModulus: 1.0, gyroModulus: 35/M_PI, modulusDiff: 0.1)
     
@@ -49,7 +49,7 @@ class ViewController: UIViewController {
     var staticStateJudge = (modulAcc: false, modulGyro: false, modulDiffAcc: false) // true: static false: dynamic
     var arrayForStatic = [Double](count: 7, repeatedValue: -1)
     var index = 0
-    var modulusDiff = 0.0
+    var modulusDiff = -1.0
     
     // MARK: Three-Point Filter
     let numberOfPointsForThreePtFilter = 3
@@ -277,30 +277,33 @@ class ViewController: UIViewController {
         
                 // Static Judgement Condition 3
                 if index == arrayForStatic.count {
+                    accModulusAvg = 0
                     for i in 0..<(arrayForStatic.count - 1) {
                         arrayForStatic[i] = arrayForStatic[i + 1]
+                        accModulusAvg += arrayForStatic[i]
                     }
                     arrayForStatic[index - 1] = modulus(accSys.output.x, y: accSys.output.y, z: accSys.output.z)
-                    accModulusAvg += arrayForStatic[3]
-                    accModulusAvg /= 2
+                    accModulusAvg += arrayForStatic[index - 1]
+                    accModulusAvg /= Double(arrayForStatic.count)
                     modulusDiff = modulusDifference(arrayForStatic, avgModulus: accModulusAvg)
                 } else {
                     arrayForStatic[index] = modulus(accSys.output.x, y: accSys.output.y, z: accSys.output.z)
                     index += 1
                     if index == arrayForStatic.count {
-                        for i in 0...((arrayForStatic.count - 1)/2) {
-                            accModulusAvg += arrayForStatic[i]
+                        for element in arrayForStatic {
+                            accModulusAvg += element
                         }
-                        accModulusAvg /= Double((arrayForStatic.count - 1)/2 + 1)
+                        accModulusAvg /= Double(arrayForStatic.count)
                         modulusDiff = modulusDifference(arrayForStatic, avgModulus: accModulusAvg)
                     }
                 }
-                if fabs(modulusDiff) < staticStateJudgeThreshold.modulusDiff {
+        
+                if modulusDiff != -1 && fabs(modulusDiff) < staticStateJudgeThreshold.modulusDiff {
                     staticStateJudge.modulDiffAcc = true
                 } else {
                     staticStateJudge.modulDiffAcc = false
                 }
-                
+        
                 // Static Judgement Condition 1
                 if fabs(modulus(accSys.output.x, y: accSys.output.y, z: accSys.output.z) - gravityConstant) < staticStateJudgeThreshold.accModulus {
                     staticStateJudge.modulAcc = true
