@@ -183,14 +183,6 @@
                                     <constraint firstItem="r2S-Qr-hMK" firstAttribute="centerX" secondItem="Wea-Np-VX3" secondAttribute="centerX" id="uvT-oy-BMp"/>
                                     <constraint firstItem="Dzf-2o-Ryg" firstAttribute="leading" secondItem="Wea-Np-VX3" secondAttribute="leading" constant="31" id="y8x-PV-5CZ"/>
                                 </constraints>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="mapx">
-                                        <real key="value" value="0.0"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="mapy">
-                                        <real key="value" value="0.0"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
                                 <variation key="default">
                                     <mask key="constraints">
                                         <exclude reference="I8J-g9-ft9"/>

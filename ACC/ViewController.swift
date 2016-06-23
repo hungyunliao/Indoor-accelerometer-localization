@@ -22,7 +22,7 @@ class ViewController: UIViewController {
     let publicDB = NSUserDefaults.standardUserDefaults()
     var accelerometerUpdateInterval: Double = 0.1
     var gyroUpdateInterval: Double = 0.1
-    var deviceMotionUpdateInterval: Double = 0.01
+    var deviceMotionUpdateInterval: Double = 0.03
     let accelerationThreshold = 0.1
     var staticStateJudgeThreshold = (accModulus: 1.0, gyroModulus: 35/M_PI, modulusDiff: 0.1)
     
@@ -133,9 +133,13 @@ class ViewController: UIViewController {
     func outputXTrueNorthMotionData(motion: CMDeviceMotion) {
         
         
+//        if test < 100 {
+//            print("useracc: \(acc.x)")
+//        }
+        
+        
         /* 3-point Filter begins */
         if absSys.threePtFilterPointsDone < numberOfPointsForThreePtFilter {
-            
             let acc: CMAcceleration = motion.userAcceleration
             let rot = motion.attitude.rotationMatrix
             
@@ -198,6 +202,46 @@ class ViewController: UIViewController {
             absSys.output.x = 0
             absSys.output.y = 0
             absSys.output.z = 0
+            test += 1
+            
+//            /* Static Judgement Conditions- userAcceleration version */
+//            // Static Judgement Condition 3
+//            if index == arrayForStatic.count {
+//                accModulusAvg = 0
+//                for i in 0..<(arrayForStatic.count - 1) {
+//                    arrayForStatic[i] = arrayForStatic[i + 1]
+//                    accModulusAvg += arrayForStatic[i]
+//                }
+//                arrayForStatic[index - 1] = modulus(acc.x, y: acc.y, z: acc.z)
+//                accModulusAvg += arrayForStatic[index - 1]
+//                accModulusAvg /= Double(arrayForStatic.count)
+//                modulusDiff = modulusDifference(arrayForStatic, avgModulus: accModulusAvg)
+//            } else {
+//                arrayForStatic[index] = modulus(acc.x, y: acc.y, z: acc.z)
+//                index += 1
+//                if index == arrayForStatic.count {
+//                    for element in arrayForStatic {
+//                        accModulusAvg += element
+//                    }
+//                    accModulusAvg /= Double(arrayForStatic.count)
+//                    modulusDiff = modulusDifference(arrayForStatic, avgModulus: accModulusAvg)
+//                }
+//            }
+//            
+//            if modulusDiff != -1 && fabs(modulusDiff) < staticStateJudgeThreshold.modulusDiff {
+//                staticStateJudge.modulDiffAcc = true
+//            } else {
+//                staticStateJudge.modulDiffAcc = false
+//            }
+//            
+//            // Static Judgement Condition 1
+//            if fabs(modulus(acc.x, y: acc.y, z: acc.z) - gravityConstant) < staticStateJudgeThreshold.accModulus {
+//                staticStateJudge.modulAcc = true
+//            } else {
+//                staticStateJudge.modulAcc = false
+//            }
+
+            
         }
     }
     
@@ -270,47 +314,53 @@ class ViewController: UIViewController {
 //                /* Note1 */
 //                
 //                /* Note2-1 */
-                accSys.output.x = acceleration.x * gravityConstant
-                accSys.output.y = acceleration.y * gravityConstant
-                accSys.output.z = acceleration.z * gravityConstant
         
         
-                // Static Judgement Condition 3
-                if index == arrayForStatic.count {
-                    accModulusAvg = 0
-                    for i in 0..<(arrayForStatic.count - 1) {
-                        arrayForStatic[i] = arrayForStatic[i + 1]
-                        accModulusAvg += arrayForStatic[i]
-                    }
-                    arrayForStatic[index - 1] = modulus(accSys.output.x, y: accSys.output.y, z: accSys.output.z)
-                    accModulusAvg += arrayForStatic[index - 1]
-                    accModulusAvg /= Double(arrayForStatic.count)
-                    modulusDiff = modulusDifference(arrayForStatic, avgModulus: accModulusAvg)
-                } else {
-                    arrayForStatic[index] = modulus(accSys.output.x, y: accSys.output.y, z: accSys.output.z)
-                    index += 1
-                    if index == arrayForStatic.count {
-                        for element in arrayForStatic {
-                            accModulusAvg += element
-                        }
-                        accModulusAvg /= Double(arrayForStatic.count)
-                        modulusDiff = modulusDifference(arrayForStatic, avgModulus: accModulusAvg)
-                    }
-                }
+//        if test < 100 {
+//            print("accAcc \(acceleration.x)")
+//        }
         
-                if modulusDiff != -1 && fabs(modulusDiff) < staticStateJudgeThreshold.modulusDiff {
-                    staticStateJudge.modulDiffAcc = true
-                } else {
-                    staticStateJudge.modulDiffAcc = false
-                }
+//                accSys.output.x = acceleration.x * gravityConstant
+//                accSys.output.y = acceleration.y * gravityConstant
+//                accSys.output.z = acceleration.z * gravityConstant
+//        
+//        
+//                // Static Judgement Condition 3
+//                if index == arrayForStatic.count {
+//                    accModulusAvg = 0
+//                    for i in 0..<(arrayForStatic.count - 1) {
+//                        arrayForStatic[i] = arrayForStatic[i + 1]
+//                        accModulusAvg += arrayForStatic[i]
+//                    }
+//                    arrayForStatic[index - 1] = modulus(accSys.output.x, y: accSys.output.y, z: accSys.output.z)
+//                    accModulusAvg += arrayForStatic[index - 1]
+//                    accModulusAvg /= Double(arrayForStatic.count)
+//                    modulusDiff = modulusDifference(arrayForStatic, avgModulus: accModulusAvg)
+//                } else {
+//                    arrayForStatic[index] = modulus(accSys.output.x, y: accSys.output.y, z: accSys.output.z)
+//                    index += 1
+//                    if index == arrayForStatic.count {
+//                        for element in arrayForStatic {
+//                            accModulusAvg += element
+//                        }
+//                        accModulusAvg /= Double(arrayForStatic.count)
+//                        modulusDiff = modulusDifference(arrayForStatic, avgModulus: accModulusAvg)
+//                    }
+//                }
+//        
+//                if modulusDiff != -1 && fabs(modulusDiff) < staticStateJudgeThreshold.modulusDiff {
+//                    staticStateJudge.modulDiffAcc = true
+//                } else {
+//                    staticStateJudge.modulDiffAcc = false
+//                }
+//        
+//                // Static Judgement Condition 1
+//                if fabs(modulus(accSys.output.x, y: accSys.output.y, z: accSys.output.z) - gravityConstant) < staticStateJudgeThreshold.accModulus {
+//                    staticStateJudge.modulAcc = true
+//                } else {
+//                    staticStateJudge.modulAcc = false
+//                }
         
-                // Static Judgement Condition 1
-                if fabs(modulus(accSys.output.x, y: accSys.output.y, z: accSys.output.z) - gravityConstant) < staticStateJudgeThreshold.accModulus {
-                    staticStateJudge.modulAcc = true
-                } else {
-                    staticStateJudge.modulAcc = false
-                }
-                
 //                // Static Judgement Condition 1 && 2 && 3
 //                if staticStateJudge.modulAcc && staticStateJudge.modulGyro && staticStateJudge.modulDiffAcc { // when all of the three indicators (modulAcc, modulGyro, modulDiffAcc) are true
 //                    info?.text = "static state"
