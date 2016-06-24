@@ -211,45 +211,77 @@ class ViewController: UIViewController {
     
     func outputAccData(acceleration: CMAcceleration) {
         
-        accSys.output.x = acceleration.x * gravityConstant
-        accSys.output.y = acceleration.y * gravityConstant
-        accSys.output.z = acceleration.z * gravityConstant
+//        if !accSys.isCalibrated {
+//            
+//            info?.text = "Calibrating..." + String(accSys.calibrationTimesDone) + "/" + String(calibrationTimeAssigned)
+//            
+//            if accSys.calibrationTimesDone < calibrationTimeAssigned {
+//                
+//                arrayForCalculatingKalmanRX += [acceleration.x]
+//                arrayForCalculatingKalmanRY += [acceleration.y]
+//                arrayForCalculatingKalmanRZ += [acceleration.z]
+//                accSys.calibrationTimesDone += 1
+//
+//            } else {
+//                
+//                var kalmanInitialRX = 0.0
+//                var kalmanInitialRY = 0.0
+//                var kalmanInitialRZ = 0.0
+//                
+//                for index in arrayForCalculatingKalmanRX {
+//                    kalmanInitialRX += pow((index - accSys.base.x), 2)/Double(calibrationTimeAssigned)
+//                }
+//                for index in arrayForCalculatingKalmanRY {
+//                    kalmanInitialRY += pow((index - accSys.base.y), 2)/Double(calibrationTimeAssigned)
+//                }
+//                for index in arrayForCalculatingKalmanRZ {
+//                    kalmanInitialRZ += pow((index - accSys.base.z), 2)/Double(calibrationTimeAssigned)
+//                }
+//                accSys.isCalibrated = true
+//            }
+//            
+//        } else {
+
+                accSys.output.x = acceleration.x * gravityConstant
+                accSys.output.y = acceleration.y * gravityConstant
+                accSys.output.z = acceleration.z * gravityConstant
         
-        // Static Judgement Condition 3
-        if index == arrayForStatic.count {
-            accModulusAvg = 0
-            for i in 0..<(arrayForStatic.count - 1) {
-                arrayForStatic[i] = arrayForStatic[i + 1]
-                accModulusAvg += arrayForStatic[i]
-            }
-            arrayForStatic[index - 1] = modulus(accSys.output.x, y: accSys.output.y, z: accSys.output.z)
-            accModulusAvg += arrayForStatic[index - 1]
-            accModulusAvg /= Double(arrayForStatic.count)
-            modulusDiff = modulusDifference(arrayForStatic, avgModulus: accModulusAvg)
-        } else {
-            arrayForStatic[index] = modulus(accSys.output.x, y: accSys.output.y, z: accSys.output.z)
-            index += 1
-            if index == arrayForStatic.count {
-                for element in arrayForStatic {
-                    accModulusAvg += element
+        
+                // Static Judgement Condition 3
+                if index == arrayForStatic.count {
+                    accModulusAvg = 0
+                    for i in 0..<(arrayForStatic.count - 1) {
+                        arrayForStatic[i] = arrayForStatic[i + 1]
+                        accModulusAvg += arrayForStatic[i]
+                    }
+                    arrayForStatic[index - 1] = modulus(accSys.output.x, y: accSys.output.y, z: accSys.output.z)
+                    accModulusAvg += arrayForStatic[index - 1]
+                    accModulusAvg /= Double(arrayForStatic.count)
+                    modulusDiff = modulusDifference(arrayForStatic, avgModulus: accModulusAvg)
+                } else {
+                    arrayForStatic[index] = modulus(accSys.output.x, y: accSys.output.y, z: accSys.output.z)
+                    index += 1
+                    if index == arrayForStatic.count {
+                        for element in arrayForStatic {
+                            accModulusAvg += element
+                        }
+                        accModulusAvg /= Double(arrayForStatic.count)
+                        modulusDiff = modulusDifference(arrayForStatic, avgModulus: accModulusAvg)
+                    }
                 }
-                accModulusAvg /= Double(arrayForStatic.count)
-                modulusDiff = modulusDifference(arrayForStatic, avgModulus: accModulusAvg)
-            }
-        }
         
-        if modulusDiff != -1 && fabs(modulusDiff) < staticStateJudgeThreshold.modulusDiff {
-            staticStateJudge.modulDiffAcc = true
-        } else {
-            staticStateJudge.modulDiffAcc = false
-        }
+                if modulusDiff != -1 && fabs(modulusDiff) < staticStateJudgeThreshold.modulusDiff {
+                    staticStateJudge.modulDiffAcc = true
+                } else {
+                    staticStateJudge.modulDiffAcc = false
+                }
         
-        // Static Judgement Condition 1
-        if fabs(modulus(accSys.output.x, y: accSys.output.y, z: accSys.output.z) - gravityConstant) < staticStateJudgeThreshold.accModulus {
-            staticStateJudge.modulAcc = true
-        } else {
-            staticStateJudge.modulAcc = false
-        }
+                // Static Judgement Condition 1
+                if fabs(modulus(accSys.output.x, y: accSys.output.y, z: accSys.output.z) - gravityConstant) < staticStateJudgeThreshold.accModulus {
+                    staticStateJudge.modulAcc = true
+                } else {
+                    staticStateJudge.modulAcc = false
+                }
     }
     
     func outputRotData(rotation: CMRotationRate) {
@@ -263,4 +295,5 @@ class ViewController: UIViewController {
     }
     
 }
+
 
