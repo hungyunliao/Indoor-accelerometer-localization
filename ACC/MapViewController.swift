@@ -19,7 +19,7 @@ class MapViewController: UIViewController {
     @IBOutlet weak var mapView: MapView!
     
     @IBAction func cleanpath(sender: UIButton) {
-        mapView?.cleanMovement()
+        mapView?.cleanPath()
     }
     
     @IBOutlet weak var accX: UILabel!
