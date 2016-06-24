@@ -8,13 +8,17 @@
 
 import UIKit
 
-@IBDesignable
+
 class MapView: UIView {
     
     /* MARK: Private instances */
     // Not yet implement "Z" axis
-    private var mapX = [CGFloat]() { didSet { setNeedsDisplay() } }
-    private var mapY = [CGFloat]() { didSet { setNeedsDisplay() } }
+    private var previousMapX: CGFloat = 0 { didSet { setNeedsDisplay() } }
+    private var previousMapY: CGFloat = 0 { didSet { setNeedsDisplay() } }
+    private var mapX: CGFloat = 0 { didSet { setNeedsDisplay() } }
+    private var mapY: CGFloat = 0 { didSet { setNeedsDisplay() } }
+    private var lastPath = UIBezierPath()
+    private var isReset = false
     private var scale: CGFloat = 1.0
     
     private var resetXOffset: CGFloat = 0.0
@@ -50,21 +54,26 @@ class MapView: UIView {
         originY = CGFloat(y)
     }
     
-    func moveXTo(position: Double) {
-        mapX.append(CGFloat(position)*scale - resetXOffset)
-    }
-    
-    func moveYTo(position: Double) {
-        mapY.append(CGFloat(position)*scale - resetYOffset)
+    func movePointTo(x: Double, y: Double) {
+        if !isReset {
+            previousMapX = mapX
+            previousMapY = mapY
+        } else {
+            previousMapX = 0
+            previousMapY = 0
+            isReset = false
+        }
+        mapX = CGFloat(x)*scale - resetXOffset
+        mapY = CGFloat(y)*scale - resetYOffset
     }
     
     func cleanMovement() {
-        if !mapX.isEmpty && !mapY.isEmpty {
-            resetXOffset += mapX.last!
-            resetYOffset += mapY.last!
+        if mapX != 0 && mapY != 0 {
+            resetXOffset += mapX
+            resetYOffset += mapY
         }
-        mapX.removeAll()
-        mapY.removeAll()
+        isReset = true
+        lastPath.removeAllPoints()
     }
     
     override func drawRect(rect: CGRect) {
@@ -79,25 +88,24 @@ class MapView: UIView {
         UIColor.whiteColor().set()
         yAxis.stroke()
         
-        drawGrid(CGPoint(x: originX, y: originY), gridSize: CGFloat(30))
+        drawGrid(CGPoint(x: originX, y: originY), gridSize: CGFloat(10))
         
-        let path = UIBezierPath()
-        path.moveToPoint(CGPoint(x: originX, y: originY))
-        
-        if !mapX.isEmpty && !mapY.isEmpty {
-            
-            let pointArrayLength = min(mapX.count, mapY.count)
-            for i in 0..<pointArrayLength {
-                path.addLineToPoint(CGPoint(x: mapX[i] + bounds.midX, y: mapY[i] + bounds.midY))
-            }
-        }
-        
-        path.lineWidth = 3.0
-        
+        lastPath.moveToPoint(CGPoint(x: previousMapX + originX, y: previousMapY + originY))
+        lastPath.addLineToPoint(CGPoint(x: mapX + originX, y: mapY + originY))
+        lastPath.lineWidth = 3.0
         UIColor.yellowColor().set()
+        lastPath.stroke()
+
+        var circle = UIBezierPath()
+        circle = getCircle(atCenter: CGPoint(x: mapX + originX, y: mapY + originY), radius: CGFloat(5))
+        UIColor.cyanColor().set()
+        circle.fill()
         
-        path.stroke()
-        
+    }
+    
+    
+    private func getCircle(atCenter center: CGPoint, radius: CGFloat) -> UIBezierPath {
+        return UIBezierPath(arcCenter: center, radius: radius, startAngle: 0.0, endAngle: CGFloat(2*M_PI), clockwise: false)
     }
     
     private func getLinePath(startPoint: CGPoint, endPoint: CGPoint) -> UIBezierPath {
@@ -123,7 +131,7 @@ class MapView: UIView {
             gridPath.setLineDash(pattern, count: 2, phase: 0.0)
             gridPath.stroke()
             
-            gridPath = getLinePath(CGPoint(x: 0, y: centerPoint.y +  -i*gridSize), endPoint: CGPoint(x: bounds.width, y: centerPoint.y + -i*gridSize))
+            gridPath = getLinePath(CGPoint(x: 0, y: centerPoint.y + -i*gridSize), endPoint: CGPoint(x: bounds.width, y: centerPoint.y + -i*gridSize))
             gridPath.setLineDash(pattern, count: 2, phase: 0.0)
             gridPath.stroke()
             i += 1

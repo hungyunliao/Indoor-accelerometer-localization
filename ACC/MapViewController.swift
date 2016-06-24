@@ -19,9 +19,7 @@ class MapViewController: UIViewController {
     @IBOutlet weak var mapView: MapView!
     
     @IBAction func cleanpath(sender: UIButton) {
-        if mapView != nil {
-            mapView.cleanMovement()
-        }
+        mapView?.cleanMovement()
     }
     
     @IBOutlet weak var accX: UILabel!
@@ -34,7 +32,7 @@ class MapViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         mapView.backgroundColor = UIColor.blackColor()
-        mapView.setScale(100.0)
+        mapView.setScale(50.0)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(updatePosition(_:)), name:"PositionChanged", object: nil)
         //self.view.backgroundColor = UIColor.greenColor()
     }
@@ -45,14 +43,22 @@ class MapViewController: UIViewController {
     
     func updatePosition(notification: NSNotification){
         
-        if let getDisX = publicDB.stringForKey("x") {
-            mapView.moveXTo(Double(getDisX)!)
-            disX.text = "\(roundNum(Double(getDisX)!))"
-        }
+//        if let getDisX = publicDB.stringForKey("x") {
+//            mapView.moveXTo(Double(getDisX)!)
+//            disX.text = "\(roundNum(Double(getDisX)!))"
+//        }
+//        
+//        if let getDisY = publicDB.stringForKey("y") {
+//            mapView.moveYTo(Double(getDisY)!)
+//            disY.text = "\(roundNum(Double(getDisY)!))"
+//        }
         
-        if let getDisY = publicDB.stringForKey("y") {
-            mapView.moveYTo(Double(getDisY)!)
-            disX.text = "\(roundNum(Double(getDisY)!))"
+        if let getDisX = publicDB.stringForKey("x") {
+            if let getDisY = publicDB.stringForKey("y") {
+                mapView.movePointTo(Double(getDisX)!, y: Double(getDisY)!)
+                disX.text = "\(roundNum(Double(getDisX)!))"
+                disY.text = "\(roundNum(Double(getDisY)!))"
+            }
         }
         
         if let getAccX = publicDB.stringForKey("accX") {
