@@ -53,6 +53,9 @@ class ViewController: UIViewController {
     
     // MARK: Three-Point Filter
     let numberOfPointsForThreePtFilter = 3
+    var arrayX = [Double]()
+    var arrayY = [Double]()
+    var arrayZ = [Double]()
     
     // MARK: Outlets
     @IBOutlet var info: UILabel?
@@ -134,28 +137,44 @@ class ViewController: UIViewController {
         
         /* 3-point Filter begins */
         if absSys.threePtFilterPointsDone < numberOfPointsForThreePtFilter {
+            
             let acc: CMAcceleration = motion.userAcceleration
             let rot = motion.attitude.rotationMatrix
             
-            absSys.output.x += (acc.x*rot.m11 + acc.y*rot.m21 + acc.z*rot.m31)
-            absSys.output.y += (acc.x*rot.m12 + acc.y*rot.m22 + acc.z*rot.m32)
-            absSys.output.z += (acc.x*rot.m13 + acc.y*rot.m23 + acc.z*rot.m33)
+            arrayX.append(acc.x*rot.m11 + acc.y*rot.m21 + acc.z*rot.m31)
+            arrayY.append(acc.x*rot.m12 + acc.y*rot.m22 + acc.z*rot.m32)
+            arrayZ.append(acc.x*rot.m13 + acc.y*rot.m23 + acc.z*rot.m33)
+            
             absSys.threePtFilterPointsDone += 1
+            
         } else {
+            
+            for i in 0..<3 {
+                absSys.output.x += arrayX[i]
+                absSys.output.y += arrayY[i]
+                absSys.output.z += arrayZ[i]
+            }
+
             absSys.output.x = absSys.output.x/Double(numberOfPointsForThreePtFilter) * gravityConstant
             absSys.output.y = absSys.output.y/Double(numberOfPointsForThreePtFilter) * gravityConstant
             absSys.output.z = absSys.output.z/Double(numberOfPointsForThreePtFilter) * gravityConstant
-            absSys.threePtFilterPointsDone = 0
+
+            absSys.threePtFilterPointsDone = 2
             /* 3-point Filter ends */
             
             // Static Judgement Condition 1 && 2 && 3
             if staticStateJudge.modulAcc && staticStateJudge.modulGyro && staticStateJudge.modulDiffAcc {
+                
                 info?.text = "static state"
+                
                 absSys.velocity.x = 0
                 absSys.velocity.y = 0
                 absSys.velocity.z = 0
+                
             } else {
+                
                 info?.text = "dynamic state"
+                
                 if fabs(absSys.output.x) > accelerationThreshold {
                     absSys.velocity.x += absSys.output.x * deviceMotionUpdateInterval * Double(numberOfPointsForThreePtFilter)
                     absSys.distance.x += absSys.velocity.x * deviceMotionUpdateInterval * Double(numberOfPointsForThreePtFilter)
@@ -179,11 +198,16 @@ class ViewController: UIViewController {
                 publicDB.setValue(absSys.distance.y, forKey: "y")
                 // post the notification to the NotificationCenter to notify everyone who is on the observer list.
                 NSNotificationCenter.defaultCenter().postNotificationName("PositionChanged", object: nil)
+                
             }
             
             displayOnAccLabel(absSys.output)
             displayOnVelLabel(absSys.velocity)
             displayOnDisLabel(absSys.distance)
+            
+            arrayX.removeFirst()
+            arrayY.removeFirst()
+            arrayZ.removeFirst()
             
             absSys.output.x = 0
             absSys.output.y = 0
@@ -246,7 +270,6 @@ class ViewController: UIViewController {
                 accSys.output.y = acceleration.y * gravityConstant
                 accSys.output.z = acceleration.z * gravityConstant
         
-        
                 // Static Judgement Condition 3
                 if index == arrayForStatic.count {
                     accModulusAvg = 0
@@ -282,6 +305,7 @@ class ViewController: UIViewController {
                 } else {
                     staticStateJudge.modulAcc = false
                 }
+//        }
     }
     
     func outputRotData(rotation: CMRotationRate) {
