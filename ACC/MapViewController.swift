@@ -29,8 +29,20 @@ class MapViewController: UIViewController {
     @IBOutlet weak var disX: UILabel!
     @IBOutlet weak var disY: UILabel!
     
+    @IBOutlet weak var backgroundLayer: BackgroundLayer!
+    @IBOutlet weak var frontLayer: FrontLayer!
+   /*
+    var l: CALayer {
+        return backgroundLayer.layer
+    }
+    */
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        backgroundLayer.setUpBackgroundLayer()
+        backgroundLayer.backgroundColor = UIColor.blueColor()
+        
         mapView.backgroundColor = UIColor.blackColor()
         mapView.setScale(50.0)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(updatePosition(_:)), name:"PositionChanged", object: nil)
