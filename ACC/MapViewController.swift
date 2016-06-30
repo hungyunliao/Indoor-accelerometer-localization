@@ -32,7 +32,7 @@ class MapViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         mapView.backgroundColor = UIColor.blackColor()
-        mapView.setScale(50.0)
+        mapView.setScale(20.0)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(updatePosition(_:)), name:"PositionChanged", object: nil)
         //self.view.backgroundColor = UIColor.greenColor()
     }
