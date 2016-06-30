@@ -11,6 +11,7 @@ import CoreMotion
 
 protocol DataProcessorDelegate {
     func sendingNewData(person: DataProcessor, type: speedDataType, data: ThreeAxesSystemDouble)
+    func sendingNewStatus(person: DataProcessor, status: String)
 }
 
 enum speedDataType {
@@ -22,12 +23,15 @@ enum speedDataType {
 class DataProcessor {
 
     // MARK: delegate
-    var delegate: DataProcessorDelegate! = nil // MARK: Question: what's the difference between "?" and "!" here?
+    var delegate: DataProcessorDelegate? = nil // MARK: Question: what's the difference between "?" and "!" here?
     
     func newData(type: speedDataType, sensorData: ThreeAxesSystemDouble) {
         delegate?.sendingNewData(self, type: type, data: sensorData)
     }
     
+    func newStatus(status: String) {
+        delegate?.sendingNewStatus(self, status: status)
+    }
     
     // MARK: test param
     var test = 0
@@ -101,17 +105,20 @@ class DataProcessor {
                 self.outputXTrueNorthMotionData(motion!)
             }
             if error != nil {
-                print("error here \(error)")
+                print("\(error)")
             }
         })
     }
   
+    func reset() {
+        accSys.reset()
+        gyroSys.reset()
+        absSys.reset()
+    }
     
     // MARK: Functions
     func outputXTrueNorthMotionData(motion: CMDeviceMotion) {
-        
-        
-        
+      
         /* 3-point Filter begins */
         if absSys.threePtFilterPointsDone < numberOfPointsForThreePtFilter {
             
@@ -146,7 +153,7 @@ class DataProcessor {
             // Static Judgement Condition 1 && 2 && 3
             if staticStateJudge.modulAcc && staticStateJudge.modulGyro && staticStateJudge.modulDiffAcc {
                 
-                //info?.text = "static state"
+                newStatus("static state")
                 
                 absSys.velocity.x = 0
                 absSys.velocity.y = 0
@@ -154,7 +161,7 @@ class DataProcessor {
                 
             } else {
                 
-                //info?.text = "dynamic state"
+                newStatus("dynamic state")
                 
                 if fabs(absSys.accelerate.x) > accelerationThreshold {
                     absSys.velocity.x += absSys.accelerate.x * deviceMotionUpdateInterval * Double(numberOfPointsForThreePtFilter)

@@ -39,12 +39,20 @@ class ViewController: UIViewController, DataProcessorDelegate {
     @IBOutlet var disYGyro: UILabel?
     @IBOutlet var disZGyro: UILabel?
     
+    @IBAction func reset() {
+        dataSource.reset()
+    }
     
     // MARK: Override functions
     override func viewDidLoad() {
         super.viewDidLoad()
         dataSource.startsDetection()
         dataSource.delegate = self
+    }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
     }
     
     // MARK: Delegate
@@ -65,10 +73,10 @@ class ViewController: UIViewController, DataProcessorDelegate {
         }
     }
     
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    func sendingNewStatus(person: DataProcessor, status: String) {
+        info?.text = status
     }
+    
 }
 
 
