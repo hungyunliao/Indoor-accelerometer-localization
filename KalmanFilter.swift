@@ -158,26 +158,6 @@ func roundNum(number: Double) -> Double {
     return round(number * 10000) / 10000
 }
 
-
-/*
- * TinyEKF: Extended Kalman Filter for embedded processors
- *
- * Copyright (C) 2015 Simon D. Levy
- *
- * This code is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This code is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with ekf-> code.  If not, see <http:#www.gnu.org/licenses/>.
- */
-
 func choldc1(var a: [Double], var p: [Double], n: Int) -> Int {
     var i, j, k: Int
     var sum: Double
@@ -269,23 +249,6 @@ func zeros(var a: [Double], m: Int, n: Int) {
     }
 }
 
-/*
-#ifdef DEBUG
-static void dump(double * a, int m, int n, const char * fmt)
-{
-    int i,j;
-    
-    char f[100];
-    sprintf(f, "%s ", fmt);
-    for(i=0; i<m; ++i) {
-        for(j=0; j<n; ++j)
-        printf(f, a[i*n+j]);
-        printf("\n");
-    }
-}
-#endif
-*/
-
 /* C <- A * B */
 func mulmat(var a: [Double], var b: [Double], var c: [Double], arows: Int, acols: Int, bcols: Int) {
     var i, j, l: Int
@@ -369,12 +332,6 @@ func mat_addeye(var a: [Double], n: Int) {
     }
 }
 
-/* TinyEKF code ------------------------------------------------------------------- */
-
-/*
-#include "tiny_ekf.h"
-*/
-
 struct ekf_t{
     
     var x: [Double]    /* state vector */
@@ -403,114 +360,3 @@ struct ekf_t{
     var temp5: [Double]
     
 }
-
-//static void unpack(void * v, ekf_t * ekf, int n, int m)
-func unpack(var v: [Double], var ekf: ekf_t, n: Int, m: Int){
-    /* skip over n, m in data structure */
-    //char * cptr = (char *)v;
-    var cptr: [Double] = v
-    //cptr += 2*sizeof(int);
-    //...
-    //double * dptr = (double *)cptr;
-    var dptr: [Double] = cptr
-    ekf.x = dptr;
-    dptr += n;
-    ekf->P = dptr;
-    dptr += n*n;
-    ekf->Q = dptr;
-    dptr += n*n;
-    ekf->R = dptr;
-    dptr += m*m;
-    ekf->G = dptr;
-    dptr += n*m;
-    ekf->F = dptr;
-    dptr += n*n;
-    ekf->H = dptr;
-    dptr += m*n;
-    ekf->Ht = dptr;
-    dptr += n*m;
-    ekf->Ft = dptr;
-    dptr += n*n;
-    ekf->Pp = dptr;
-    dptr += n*n;
-    ekf->fx = dptr;
-    dptr += n;
-    ekf->hx = dptr;
-    dptr += m;
-    ekf->tmp1 = dptr;
-    dptr += n*m;
-    ekf->tmp2 = dptr;
-    dptr += m*n;
-    ekf->tmp3 = dptr;
-    dptr += m*m;
-    ekf->tmp4 = dptr;
-    dptr += m*m;
-    ekf->tmp5 = dptr;
-}
-
-//void ekf_init(void * v, int n, int m)
-func ekf_init(v: [Double], n: Int, m: Int)
-{
-    /* retrieve n, m and set them in incoming data structure */
-    int * ptr = (int *)v;
-    *ptr = n;
-    ptr++;
-    *ptr = m;
-    
-    /* unpack rest of incoming structure for initlization */
-    ekf_t ekf;
-    unpack(v, &ekf, n, m);
-    
-    /* zero-out matrices */
-    zeros(ekf.P, n, n);
-    zeros(ekf.Q, n, n);
-    zeros(ekf.R, m, m);
-    zeros(ekf.G, n, m);
-    zeros(ekf.F, n, n);
-    zeros(ekf.H, m, n);
-}
-
-//int ekf_step(void * v, double * z)
-func ekf_step(v: [Double], z: [Double])
-{
-    /* unpack incoming structure */
-    
-    int * ptr = (int *)v;
-    int n = *ptr;
-    ptr++;
-    int m = *ptr;
-    
-    var ekf: ekf_t
-    unpack(v, &ekf, n, m);
-    
-    /* P_k = F_{k-1} P_{k-1} F^T_{k-1} + Q_{k-1} */
-    mulmat(ekf.F, ekf.P, ekf.tmp1, n, n, n);
-    transpose(ekf.F, ekf.Ft, n, n);
-    mulmat(ekf.tmp1, ekf.Ft, ekf.Pp, n, n, n);
-    accum(ekf.Pp, ekf.Q, n, n);
-    
-    /* G_k = P_k H^T_k (H_k P_k H^T_k + R)^{-1} */
-    transpose(ekf.H, ekf.Ht, m, n);
-    mulmat(ekf.Pp, ekf.Ht, ekf.tmp1, n, n, m);
-    mulmat(ekf.H, ekf.Pp, ekf.tmp2, m, n, n);
-    mulmat(ekf.tmp2, ekf.Ht, ekf.tmp3, m, n, m);
-    accum(ekf.tmp3, ekf.R, m, m);
-    if (cholsl(ekf.tmp3, ekf.tmp4, ekf.tmp5, m)) return 1;
-    mulmat(ekf.tmp1, ekf.tmp4, ekf.G, n, m, m);
-    
-    /* \hat{x}_k = \hat{x_k} + G_k(z_k - h(\hat{x}_k)) */
-    sub(z, ekf.hx, ekf.tmp5, m);
-    mulvec(ekf.G, ekf.tmp5, ekf.tmp2, n, m);
-    add(ekf.fx, ekf.tmp2, ekf.x, n);
-    
-    /* P_k = (I - G_k H_k) P_k */
-    mulmat(ekf.G, ekf.H, ekf.tmp1, n, m, n);
-    negate(ekf.tmp1, n, n);
-    mat_addeye(ekf.tmp1, n);
-    mulmat(ekf.tmp1, ekf.Pp, ekf.P, n, n, n);
-    
-    /* success */
-    return 0;
-}
-
-
