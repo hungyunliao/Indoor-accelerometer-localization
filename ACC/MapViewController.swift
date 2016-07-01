@@ -31,17 +31,13 @@ class MapViewController: UIViewController {
     
     @IBOutlet weak var backgroundLayer: BackgroundLayer!
     @IBOutlet weak var frontLayer: FrontLayer!
-   /*
-    var l: CALayer {
-        return backgroundLayer.layer
-    }
-    */
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        backgroundLayer.setUpBackgroundLayer()
+        
         backgroundLayer.backgroundColor = UIColor.blueColor()
+        frontLayer.backgroundColor = UIColor.redColor()
+        //backgroundLayer.testfunc()
         
         mapView.backgroundColor = UIColor.blackColor()
         mapView.setScale(50.0)
