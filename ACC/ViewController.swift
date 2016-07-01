@@ -15,6 +15,7 @@ class ViewController: UIViewController, DataProcessorDelegate {
     
     // MARK: Model
     var dataSource: DataProcessor = DataProcessor()
+    let publicDB = NSUserDefaults.standardUserDefaults()
     
     // MARK: Outlets
     @IBOutlet var info: UILabel?
@@ -47,6 +48,15 @@ class ViewController: UIViewController, DataProcessorDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         dataSource.startsDetection()
+        dataSource.delegate = self
+    }
+    override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
+        NSNotificationCenter.defaultCenter().postNotificationName("dataSource", object: dataSource)
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
         dataSource.delegate = self
     }
     

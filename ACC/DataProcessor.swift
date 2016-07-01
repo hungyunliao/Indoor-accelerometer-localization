@@ -153,7 +153,7 @@ class DataProcessor {
             // Static Judgement Condition 1 && 2 && 3
             if staticStateJudge.modulAcc && staticStateJudge.modulGyro && staticStateJudge.modulDiffAcc {
                 
-                newStatus("static state")
+                newStatus("static state") // sending status to delegate
                 
                 absSys.velocity.x = 0
                 absSys.velocity.y = 0
@@ -161,7 +161,7 @@ class DataProcessor {
                 
             } else {
                 
-                newStatus("dynamic state")
+                newStatus("dynamic state") // sending status to delegate
                 
                 if fabs(absSys.accelerate.x) > accelerationThreshold {
                     absSys.velocity.x += absSys.accelerate.x * deviceMotionUpdateInterval * Double(numberOfPointsForThreePtFilter)

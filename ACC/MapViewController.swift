@@ -11,11 +11,10 @@ import UIKit
 
 class MapViewController: UIViewController, DataProcessorDelegate {
     
-    var dataSource: DataProcessor = DataProcessor()
+    // MARK: Model
+    var dataSource: DataProcessor?
     
-    var aax: Double = 0.0
-    var aay: Double = 0.0
-    
+    // MARK: PublicDB used to pass the object of DataProcessor
     var publicDB = NSUserDefaults.standardUserDefaults()
     
     @IBOutlet weak var mapView: MapView!
@@ -24,6 +23,7 @@ class MapViewController: UIViewController, DataProcessorDelegate {
         mapView?.cleanPath()
     }
     
+    // MARK: Outlets
     @IBOutlet weak var accX: UILabel!
     @IBOutlet weak var accY: UILabel!
     @IBOutlet weak var velX: UILabel!
@@ -31,14 +31,28 @@ class MapViewController: UIViewController, DataProcessorDelegate {
     @IBOutlet weak var disX: UILabel!
     @IBOutlet weak var disY: UILabel!
     
+    // MARK: Override functions
     override func viewDidLoad() {
         super.viewDidLoad()
         mapView.backgroundColor = UIColor.blackColor()
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(receiveDataSource(_:)), name:"dataSource", object: nil)
         mapView.setScale(20.0)
-        dataSource.startsDetection()
-        dataSource.delegate = self
     }
     
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+        dataSource?.startsDetection()
+        dataSource?.delegate = self
+    }
+    
+    // MARK: Functions
+    func receiveDataSource(notification: NSNotification) {
+        if let source = notification.object as? DataProcessor {
+            dataSource = source
+        }
+    }
+    
+    // MARK: Delegate
     func sendingNewData(person: DataProcessor, type: speedDataType, data: ThreeAxesSystemDouble) {
         switch type {
         case .accelerate:
