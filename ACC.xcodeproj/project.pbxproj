@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1389A54E1D2C3F66000B24FF /* MapViewGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1389A54D1D2C3F66000B24FF /* MapViewGrid.swift */; };
 		13AE20C41CF8B0C4004B0D6B /* KalmanFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13AE20C31CF8B0C4004B0D6B /* KalmanFilter.swift */; };
 		13B648EC1CF3B82B00CA656A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13B648EB1CF3B82B00CA656A /* AppDelegate.swift */; };
 		13B648EE1CF3B82B00CA656A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13B648ED1CF3B82B00CA656A /* ViewController.swift */; };
@@ -20,7 +19,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		1389A54D1D2C3F66000B24FF /* MapViewGrid.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapViewGrid.swift; sourceTree = "<group>"; };
 		13AE20C31CF8B0C4004B0D6B /* KalmanFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = KalmanFilter.swift; path = ../KalmanFilter.swift; sourceTree = "<group>"; };
 		13B648E81CF3B82B00CA656A /* ACC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ACC.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B648EB1CF3B82B00CA656A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -67,7 +65,6 @@
 			isa = PBXGroup;
 			children = (
 				13CCEB321D0890E9005556A8 /* MapView.swift */,
-				1389A54D1D2C3F66000B24FF /* MapViewGrid.swift */,
 				13CCEB2E1D088C97005556A8 /* MapViewController.swift */,
 				13AE20C31CF8B0C4004B0D6B /* KalmanFilter.swift */,
 				13B648EB1CF3B82B00CA656A /* AppDelegate.swift */,
@@ -153,7 +150,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				13AE20C41CF8B0C4004B0D6B /* KalmanFilter.swift in Sources */,
-				1389A54E1D2C3F66000B24FF /* MapViewGrid.swift in Sources */,
 				13B648EE1CF3B82B00CA656A /* ViewController.swift in Sources */,
 				13CCEB331D0890E9005556A8 /* MapView.swift in Sources */,
 				13B648EC1CF3B82B00CA656A /* AppDelegate.swift in Sources */,
