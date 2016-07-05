@@ -18,16 +18,16 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="9j9-Pi-Rmg">
-                                <rect key="frame" x="180" y="236" width="240" height="128"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <view contentMode="redraw" translatesAutoresizingMaskIntoConstraints="NO" id="9j9-Pi-Rmg" customClass="MapViewGrid" customModule="ACC" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="551"/>
+                                <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                             </view>
                             <view contentMode="redraw" translatesAutoresizingMaskIntoConstraints="NO" id="Wea-Np-VX3" customClass="MapView" customModule="ACC" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="551"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Vta-0J-Vkd">
                                         <rect key="frame" x="180" y="212" width="240" height="128"/>
-                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <color key="backgroundColor" white="1" alpha="0.0" colorSpace="calibratedWhite"/>
                                     </view>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="X" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Fel-qe-4nj">
                                         <rect key="frame" x="580" y="265" width="12" height="21"/>
@@ -179,10 +179,10 @@
                                     </stackView>
                                     <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hyf-MK-mZT">
                                         <rect key="frame" x="66" y="158" width="240" height="128"/>
-                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <color key="backgroundColor" white="1" alpha="0.0" colorSpace="calibratedWhite"/>
                                     </view>
                                 </subviews>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstItem="eJQ-cg-Vko" firstAttribute="top" secondItem="Wea-Np-VX3" secondAttribute="top" constant="32" id="05Q-p7-Vbc"/>
                                     <constraint firstItem="Fel-qe-4nj" firstAttribute="centerY" secondItem="Wea-Np-VX3" secondAttribute="centerY" id="6gf-TV-3eD"/>
@@ -206,15 +206,14 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="Wea-Np-VX3" secondAttribute="trailing" id="3ZZ-OR-dcu"/>
+                            <constraint firstItem="9j9-Pi-Rmg" firstAttribute="trailing" secondItem="Wea-Np-VX3" secondAttribute="trailing" id="6pN-jf-HmV"/>
                             <constraint firstItem="Wea-Np-VX3" firstAttribute="bottom" secondItem="uSX-YK-u8I" secondAttribute="top" id="AIC-sv-GeR"/>
                             <constraint firstItem="Wea-Np-VX3" firstAttribute="top" secondItem="Fcd-Xl-hJM" secondAttribute="top" id="APd-V8-Eh8"/>
                             <constraint firstItem="Wea-Np-VX3" firstAttribute="leading" secondItem="Fcd-Xl-hJM" secondAttribute="leading" id="GEH-Fh-2ky"/>
+                            <constraint firstItem="9j9-Pi-Rmg" firstAttribute="leading" secondItem="Wea-Np-VX3" secondAttribute="leading" id="YQy-CK-Epv"/>
+                            <constraint firstItem="9j9-Pi-Rmg" firstAttribute="bottom" secondItem="uSX-YK-u8I" secondAttribute="top" id="t57-CH-bQC"/>
+                            <constraint firstItem="9j9-Pi-Rmg" firstAttribute="top" secondItem="Wea-Np-VX3" secondAttribute="top" id="yeU-C7-XuJ"/>
                         </constraints>
-                        <variation key="default">
-                            <mask key="subviews">
-                                <exclude reference="9j9-Pi-Rmg"/>
-                            </mask>
-                        </variation>
                     </view>
                     <tabBarItem key="tabBarItem" title="Map" id="p21-07-ElE"/>
                     <connections>
