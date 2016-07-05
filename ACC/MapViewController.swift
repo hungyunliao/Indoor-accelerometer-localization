@@ -12,7 +12,7 @@ import UIKit
 class MapViewController: UIViewController, DataProcessorDelegate {
     
     // MARK: Model
-    var dataSource: DataProcessor?
+    var dataSource: DataProcessor? = nil
     
     // MARK: PublicDB used to pass the object of DataProcessor
     var publicDB = NSUserDefaults.standardUserDefaults()
@@ -41,7 +41,6 @@ class MapViewController: UIViewController, DataProcessorDelegate {
     
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
-        dataSource?.startsDetection()
         dataSource?.delegate = self
     }
     
@@ -49,6 +48,7 @@ class MapViewController: UIViewController, DataProcessorDelegate {
     func receiveDataSource(notification: NSNotification) {
         if let source = notification.object as? DataProcessor {
             dataSource = source
+            dataSource!.startsDetection()
         }
     }
     

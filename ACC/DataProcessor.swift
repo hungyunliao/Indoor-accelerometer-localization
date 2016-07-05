@@ -23,7 +23,7 @@ enum speedDataType {
 class DataProcessor {
 
     // MARK: delegate
-    var delegate: DataProcessorDelegate? = nil // MARK: Question: what's the difference between "?" and "!" here?
+    var delegate: DataProcessorDelegate? = nil
     
     func newData(type: speedDataType, sensorData: ThreeAxesSystemDouble) {
         delegate?.sendingNewData(self, type: type, data: sensorData)
@@ -175,17 +175,7 @@ class DataProcessor {
                     absSys.velocity.z += absSys.accelerate.z * deviceMotionUpdateInterval * Double(numberOfPointsForThreePtFilter)
                     absSys.distance.z += absSys.velocity.z * deviceMotionUpdateInterval * Double(numberOfPointsForThreePtFilter)
                 }
-                
-                publicDB.setValue(absSys.accelerate.x, forKey: "accX")
-                publicDB.setValue(absSys.accelerate.y, forKey: "accY")
-                publicDB.setValue(absSys.velocity.x, forKey: "velX")
-                publicDB.setValue(absSys.velocity.x, forKey: "velY")
-                
-                // save the changed position to the PUBLIC NSUserdefault object so that they can be accessed by other VIEWCONTROLLERs
-                publicDB.setValue(absSys.distance.x, forKey: "x")
-                publicDB.setValue(absSys.distance.y, forKey: "y")
-                // post the notification to the NotificationCenter to notify everyone who is on the observer list.
-                NSNotificationCenter.defaultCenter().postNotificationName("PositionChanged", object: nil)
+                //publicDB.setValue(absSys.accelerate.x, forKey: "accX")
                 
             }
             

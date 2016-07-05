@@ -13,6 +13,9 @@ import CoreMotion
 
 class ViewController: UIViewController, DataProcessorDelegate {
     
+    // Retreive the managedObjectContext from AppDelegate
+    //let managedObjectContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext
+    
     // MARK: Model
     var dataSource: DataProcessor = DataProcessor()
     let publicDB = NSUserDefaults.standardUserDefaults()
@@ -48,15 +51,18 @@ class ViewController: UIViewController, DataProcessorDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         dataSource.startsDetection()
-        dataSource.delegate = self
+
+        // Print it to the console
+        //print(managedObjectContext)
     }
+    
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
         NSNotificationCenter.defaultCenter().postNotificationName("dataSource", object: dataSource)
     }
     
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
         dataSource.delegate = self
     }
     
