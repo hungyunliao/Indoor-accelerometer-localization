@@ -30,7 +30,7 @@ struct System {
     var threePtFilterPointsDone = 0
     
     var base = ThreeAxesSystemDouble()
-    var output = ThreeAxesSystemDouble()
+    var accelerate = ThreeAxesSystemDouble()
     var kValue = ThreeAxesSystemDouble()
     var velocity = ThreeAxesSystemDouble()
     var distance = ThreeAxesSystemDouble()
@@ -47,9 +47,9 @@ struct System {
         base.y = 0.0
         base.z = 0.0
         
-        output.x = 0.0
-        output.y = 0.0
-        output.z = 0.0
+        accelerate.x = 0.0
+        accelerate.y = 0.0
+        accelerate.z = 0.0
         
         kValue.x = 0.0
         kValue.y = 0.0
