@@ -30,9 +30,6 @@ class MapViewController: UIViewController, DataProcessorDelegate {
     @IBOutlet weak var velY: UILabel!
     @IBOutlet weak var disX: UILabel!
     @IBOutlet weak var disY: UILabel!
-    
-    @IBOutlet weak var backgroundLayer: BackgroundLayer!
-    @IBOutlet weak var frontLayer: FrontLayer!
    
     // MARK: Override functions
     override func viewDidLoad() {

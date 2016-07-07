@@ -8,17 +8,6 @@
 
 import UIKit
 
-class BackgroundLayer: UIView {
-
-    func testfunc() {
-        
-    }
-    
-}
-
-class FrontLayer: UIView {
-    
-}
 
 class MapView: UIView {
     
