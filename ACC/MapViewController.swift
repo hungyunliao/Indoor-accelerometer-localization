@@ -9,11 +9,12 @@
 import UIKit
 
 
-class MapViewController: UIViewController {
+class MapViewController: UIViewController, DataProcessorDelegate {
     
-    var aax: Double = 0.0
-    var aay: Double = 0.0
+    // MARK: Model
+    var dataSource: DataProcessor? = nil
     
+    // MARK: PublicDB used to pass the object of DataProcessor
     var publicDB = NSUserDefaults.standardUserDefaults()
     
     @IBOutlet weak var mapView: MapView!
@@ -22,6 +23,7 @@ class MapViewController: UIViewController {
         mapView?.cleanPath()
     }
     
+    // MARK: Outlets
     @IBOutlet weak var accX: UILabel!
     @IBOutlet weak var accY: UILabel!
     @IBOutlet weak var velX: UILabel!
@@ -31,67 +33,45 @@ class MapViewController: UIViewController {
     
     @IBOutlet weak var backgroundLayer: BackgroundLayer!
     @IBOutlet weak var frontLayer: FrontLayer!
-    
+   
+    // MARK: Override functions
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-//        backgroundLayer.backgroundColor = UIColor.blueColor()
-//        frontLayer.backgroundColor = UIColor.redColor()
-        //backgroundLayer.testfunc()
-        
-        //mapView.backgroundColor = UIColor.blackColor()
-        mapView.setScale(50.0)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(updatePosition(_:)), name:"PositionChanged", object: nil)
-        //self.view.backgroundColor = UIColor.greenColor()
-    }
-    deinit {
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: NSUserDefaultsDidChangeNotification, object: nil)
-        NSNotificationCenter.defaultCenter().removeObserver(self)
+        mapView.backgroundColor = UIColor.blackColor()
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(receiveDataSource(_:)), name:"dataSource", object: nil)
+        mapView.setScale(20.0)
     }
     
-    func updatePosition(notification: NSNotification){
-        
-//        if let getDisX = publicDB.stringForKey("x") {
-//            mapView.moveXTo(Double(getDisX)!)
-//            disX.text = "\(roundNum(Double(getDisX)!))"
-//        }
-//        
-//        if let getDisY = publicDB.stringForKey("y") {
-//            mapView.moveYTo(Double(getDisY)!)
-//            disY.text = "\(roundNum(Double(getDisY)!))"
-//        }
-        
-        if let getDisX = publicDB.stringForKey("x") {
-            if let getDisY = publicDB.stringForKey("y") {
-                mapView.movePointTo(Double(getDisX)!, y: Double(getDisY)!)
-                disX.text = "\(roundNum(Double(getDisX)!))"
-                disY.text = "\(roundNum(Double(getDisY)!))"
-            }
-        }
-        
-        if let getAccX = publicDB.stringForKey("accX") {
-            accX.text = "\(roundNum(Double(getAccX)!))"
-        }
-        if let getAccY = publicDB.stringForKey("accY") {
-            accY.text = "\(roundNum(Double(getAccY)!))"
-        }
-        if let getVelX = publicDB.stringForKey("velX") {
-            velX.text = "\(roundNum(Double(getVelX)!))"
-        }
-        if let getVelY = publicDB.stringForKey("velY") {
-            velY.text = "\(roundNum(Double(getVelY)!))"
-        }
-        
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+        dataSource?.delegate = self
     }
     
-    /*
-     // MARK: - Navigation
-     
-     // In a storyboard-based application, you will often want to do a little preparation before navigation
-     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-     // Get the new view controller using segue.destinationViewController.
-     // Pass the selected object to the new view controller.
-     }
-     */
+    // MARK: Functions
+    func receiveDataSource(notification: NSNotification) {
+        if let source = notification.object as? DataProcessor {
+            dataSource = source
+            dataSource!.startsDetection()
+        }
+    }
     
+    // MARK: Delegate
+    func sendingNewData(person: DataProcessor, type: speedDataType, data: ThreeAxesSystemDouble) {
+        switch type {
+        case .accelerate:
+            accX.text = "\(roundNum(Double(data.x)))"
+            accY.text = "\(roundNum(Double(data.y)))"
+        case .velocity:
+            velX.text = "\(roundNum(Double(data.x)))"
+            velY.text = "\(roundNum(Double(data.y)))"
+        case .distance:
+            mapView.movePointTo(Double(data.x), y: Double(data.y))
+            disX.text = "\(roundNum(Double(data.x)))"
+            disY.text = "\(roundNum(Double(data.y)))"
+        }
+    }
+    
+    func sendingNewStatus(person: DataProcessor, status: String) {
+        // intentionally left blank to conform to the protocol
+    }
 }
