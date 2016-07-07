@@ -198,6 +198,37 @@ class DataProcessor {
         accSys.accelerate.z = acceleration.z * gravityConstant
         
         // Static Judgement Condition 3
+        modulusDiffCalculation()
+        
+        if modulusDiff != -1 && fabs(modulusDiff) < staticStateJudgeThreshold.modulusDiff {
+            staticStateJudge.modulDiffAcc = true
+        } else {
+            staticStateJudge.modulDiffAcc = false
+        }
+        
+        
+        // Static Judgement Condition 1
+        if fabs(modulus(accSys.accelerate.x, y: accSys.accelerate.y, z: accSys.accelerate.z) - gravityConstant) < staticStateJudgeThreshold.accModulus {
+            staticStateJudge.modulAcc = true
+        } else {
+            staticStateJudge.modulAcc = false
+        }
+    }
+    
+    func outputRotData(rotation: CMRotationRate) {
+        
+        // Static Judgement Condition 2
+        if modulus(gyroSys.accelerate.x, y: gyroSys.accelerate.y, z: gyroSys.accelerate.z) < staticStateJudgeThreshold.gyroModulus {
+            staticStateJudge.modulGyro = true
+        } else {
+            staticStateJudge.modulGyro = false
+        }
+    }
+    
+    
+    
+    func modulusDiffCalculation() {
+        
         if index == arrayForStatic.count {
             accModulusAvg = 0
             for i in 0..<(arrayForStatic.count - 1) {
@@ -218,29 +249,6 @@ class DataProcessor {
                 accModulusAvg /= Double(arrayForStatic.count)
                 modulusDiff = modulusDifference(arrayForStatic, avgModulus: accModulusAvg)
             }
-        }
-        
-        if modulusDiff != -1 && fabs(modulusDiff) < staticStateJudgeThreshold.modulusDiff {
-            staticStateJudge.modulDiffAcc = true
-        } else {
-            staticStateJudge.modulDiffAcc = false
-        }
-        
-        // Static Judgement Condition 1
-        if fabs(modulus(accSys.accelerate.x, y: accSys.accelerate.y, z: accSys.accelerate.z) - gravityConstant) < staticStateJudgeThreshold.accModulus {
-            staticStateJudge.modulAcc = true
-        } else {
-            staticStateJudge.modulAcc = false
-        }
-    }
-    
-    func outputRotData(rotation: CMRotationRate) {
-        
-        // Static Judgement Condition 2
-        if modulus(gyroSys.accelerate.x, y: gyroSys.accelerate.y, z: gyroSys.accelerate.z) < staticStateJudgeThreshold.gyroModulus {
-            staticStateJudge.modulGyro = true
-        } else {
-            staticStateJudge.modulGyro = false
         }
     }
 
