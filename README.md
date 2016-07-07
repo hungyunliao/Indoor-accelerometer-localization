@@ -7,4 +7,4 @@ Project at Focus Universal (iOS- swift)
 - Display Velocity Data in Realtime.
 - Display Distance Data in Realtime.
 - Display Direction Data via Megnetic Sensor in Realtime.
-- Visualize Movement in Realtime.
+- Visualize 2D Movement in Realtime.
