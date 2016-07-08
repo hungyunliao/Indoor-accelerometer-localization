@@ -61,8 +61,10 @@ class MapViewController: UIViewController, DataProcessorDelegate {
             velX.text = "\(roundNum(Double(data.x)))"
             velY.text = "\(roundNum(Double(data.y)))"
         case .distance:
+            //print("in MapViewController")
             //mapView.movePointTo(Double(data.x), y: Double(data.y))
             mapView.methodForControllerToCall(Double(data.x), y: Double(data.y))
+            //print("in MapViewController2")
             disX.text = "\(roundNum(Double(data.x)))"
             disY.text = "\(roundNum(Double(data.y)))"
         }

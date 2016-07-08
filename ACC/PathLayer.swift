@@ -19,7 +19,6 @@ class PathLayer: CAShapeLayer {
     
     init(frame: CGRect) {
         super.init()
-        self.backgroundColor = UIColor.clearColor().CGColor
         self.strokeColor = pathColor.CGColor
         self.lineWidth = 1.0
         self.lineDashPattern = [4, 2]
@@ -34,8 +33,11 @@ class PathLayer: CAShapeLayer {
     override var frame: CGRect {
         didSet {
             updatePath(bounds)
+            updateRoutePath()
         }
     }
+    
+    
     
     /* MARK: Private instances */
     // Not yet implement "Z" axis
@@ -118,20 +120,19 @@ class PathLayer: CAShapeLayer {
     }
     
     private func updateRoutePath() {
-//        let xAxis = getLinePath(CGPoint(x: 0, y: bounds.midY), endPoint: CGPoint(x: bounds.width, y: bounds.midY))
-//        self.path = xAxis.CGPath
-        
+        let xAxis = getLinePath(CGPoint(x: 0, y: bounds.midY), endPoint: CGPoint(x: bounds.width, y: bounds.midY))
+        self.path = xAxis.CGPath
+//
 //        let yAxis = getLinePath(CGPoint(x: bounds.midX, y: 20), endPoint: CGPoint(x: bounds.midX, y: bounds.height))
 //        self.path = yAxis.CGPath
 //        
-//        routePath.moveToPoint(CGPoint(x: previousMapX + originX, y: previousMapY + originY))
-//        routePath.addLineToPoint(CGPoint(x: currentMapX + originX, y: currentMapY + originY))
-//        self.path = routePath.CGPath
+        routePath.moveToPoint(CGPoint(x: previousMapX + originX, y: previousMapY + originY))
+        routePath.addLineToPoint(CGPoint(x: currentMapX + originX, y: currentMapY + originY))
+        self.path = routePath.CGPath
         
-//        var circle = UIBezierPath()
-//        circle = getCircle(atCenter: CGPoint(x: currentMapX + originX, y: currentMapY + originY), radius: CGFloat(5))
-//        UIColor.cyanColor().CGColor
-//        circle.fill()
+        var circle = UIBezierPath()
+        circle = getCircle(atCenter: CGPoint(x: currentMapX + originX, y: currentMapY + originY), radius: CGFloat(5))
+        self.path = circle.CGPath
         
         self.setNeedsDisplay()
     }

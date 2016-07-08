@@ -11,17 +11,19 @@ import UIKit
 @IBDesignable
 class MapDisplayView: UIView {
     private let gridLayer: GridLayer
-    //private let gridLayer2: PathLayer
+    private let gridLayer2: PathLayer
     
     override init(frame: CGRect) {
         gridLayer = GridLayer(frame: frame)
-//        gridLayer2 = PathLayer(frame: frame)
-//        gridLayer2.pathColor = UIColor.yellowColor()
+        gridLayer.backgroundColor = UIColor.clearColor().CGColor
+        gridLayer2 = PathLayer(frame: frame)
+        gridLayer2.backgroundColor = UIColor.clearColor().CGColor
+        gridLayer2.pathColor = UIColor.yellowColor()
         super.init(frame: frame)
         
         
         self.layer.addSublayer(gridLayer)
-//        self.layer.addSublayer(gridLayer2)
+        self.layer.addSublayer(gridLayer2)
     }
     
     internal convenience required init?(coder aDecoder: NSCoder) {
@@ -31,13 +33,13 @@ class MapDisplayView: UIView {
     override func awakeFromNib() {
         super.awakeFromNib()
         self.layer.addSublayer(gridLayer)
-//        self.layer.addSublayer(gridLayer2)
+        self.layer.addSublayer(gridLayer2)
     }
     
     override var frame: CGRect {
         didSet {
             gridLayer.frame = frame
-//            gridLayer2.frame = frame
+            gridLayer2.frame = frame
         }
     }
     
@@ -49,6 +51,7 @@ class MapDisplayView: UIView {
      3. View calls layers to change
      */
     func methodForControllerToCall(x: Double, y: Double) {
-//        gridLayer2.movePointTo(x, y: y)
+        print("in methodForControllerToCall")
+        gridLayer2.movePointTo(x, y: y)
     }
 }
