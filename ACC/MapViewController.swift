@@ -17,10 +17,10 @@ class MapViewController: UIViewController, DataProcessorDelegate {
     // MARK: PublicDB used to pass the object of DataProcessor
     var publicDB = NSUserDefaults.standardUserDefaults()
     
-    @IBOutlet weak var mapView: MapView!
+    @IBOutlet weak var mapView: MapDisplayView!
     
     @IBAction func cleanpath(sender: UIButton) {
-        mapView?.cleanPath()
+        //mapView?.cleanPath()
     }
     
     // MARK: Outlets
@@ -34,9 +34,8 @@ class MapViewController: UIViewController, DataProcessorDelegate {
     // MARK: Override functions
     override func viewDidLoad() {
         super.viewDidLoad()
-        mapView.backgroundColor = UIColor.blackColor()
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(receiveDataSource(_:)), name:"dataSource", object: nil)
-        mapView.setScale(20.0)
+        //mapView.setScale(20.0)
     }
     
     override func viewDidAppear(animated: Bool) {
@@ -62,7 +61,8 @@ class MapViewController: UIViewController, DataProcessorDelegate {
             velX.text = "\(roundNum(Double(data.x)))"
             velY.text = "\(roundNum(Double(data.y)))"
         case .distance:
-            mapView.movePointTo(Double(data.x), y: Double(data.y))
+            //mapView.movePointTo(Double(data.x), y: Double(data.y))
+            mapView.methodForControllerToCall(Double(data.x), y: Double(data.y))
             disX.text = "\(roundNum(Double(data.x)))"
             disY.text = "\(roundNum(Double(data.y)))"
         }

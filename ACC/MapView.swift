@@ -88,8 +88,6 @@ class MapView: UIView {
         UIColor.whiteColor().set()
         yAxis.stroke()
         
-        //drawGrid(CGPoint(x: originX, y: originY), gridSize: CGFloat(10))
-        
         path.moveToPoint(CGPoint(x: previousMapX + originX, y: previousMapY + originY))
         path.addLineToPoint(CGPoint(x: currentMapX + originX, y: currentMapY + originY))
         path.lineWidth = 3.0
@@ -148,11 +146,11 @@ class MapViewGrid: UIView {
     }
 }
 
-private func getCircle(atCenter center: CGPoint, radius: CGFloat) -> UIBezierPath {
+func getCircle(atCenter center: CGPoint, radius: CGFloat) -> UIBezierPath {
     return UIBezierPath(arcCenter: center, radius: radius, startAngle: 0.0, endAngle: CGFloat(2*M_PI), clockwise: false)
 }
 
-private func getLinePath(startPoint: CGPoint, endPoint: CGPoint) -> UIBezierPath {
+func getLinePath(startPoint: CGPoint, endPoint: CGPoint) -> UIBezierPath {
     
     let linePath = UIBezierPath()
     linePath.moveToPoint(startPoint)
