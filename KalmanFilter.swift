@@ -7,7 +7,8 @@
 //
 
 import Foundation
-
+import CoreMotion
+import Accelerate
 
 // MARK: operator define
 infix operator ^ {}
@@ -16,18 +17,28 @@ func ^ (radix: Double, power: Double) -> Double {
 }
 
 /*
-    Initializating Kalman object in C:
-        KalmanFilter kalman(15, 50)
-        Double x[3] = {1, 2, 3}
-        Double y[3] = {1, 2, 3}
-        Double lrCoef[2] = {0, 0}
-*/
+ Initializating Kalman object in C:
+ KalmanFilter kalman(15, 50)
+ Double x[3] = {1, 2, 3}
+ Double y[3] = {1, 2, 3}
+ Double lrCoef[2] = {0, 0}
+ */
+
+class Utility {
+    enum SmoothMethod {
+        case raw
+        case ThreePoint
+        case Kalman
+    }
+    
+    
+}
 
 struct System {
     var isCalibrated = true
     var calibrationTimesDone = 0
     var staticStateJudgeTimer = 0.0
-    var threePtFilterPointsDone = 0
+    var threePtFilterPointsDone = 1
     
     var base = ThreeAxesSystemDouble()
     var output = ThreeAxesSystemDouble()
@@ -133,6 +144,64 @@ func SimpleLinearRegression (x: [Double], y: [Double]) -> (Double, Double) {
     return linearCoef
 }
 
+
+var arrayX = [Double]()
+var arrayY = [Double]()
+var arrayZ = [Double]()
+var threePtFilterPointsDone = 1
+
+func ThreePointFilter(var absSys: System, acc: CMAcceleration, rot: CMRotationMatrix, gravityConstant : Double) -> (Double, Double, Double) {
+    let numberOfPointsForThreePtFilter = 3
+    //var threePtFilterPointsDone = 0
+    print(threePtFilterPointsDone)
+    if threePtFilterPointsDone < numberOfPointsForThreePtFilter {
+        
+        arrayX.append(acc.x*rot.m11 + acc.y*rot.m21 + acc.z*rot.m31)
+        arrayY.append(acc.x*rot.m12 + acc.y*rot.m22 + acc.z*rot.m32)
+        arrayZ.append(acc.x*rot.m13 + acc.y*rot.m23 + acc.z*rot.m33)
+        //print(arrayX[0])
+        
+        for i in 0..<threePtFilterPointsDone {
+            print(arrayX[i])
+            absSys.output.x += arrayX[i]
+            absSys.output.y += arrayY[i]
+            absSys.output.z += arrayZ[i]
+        }
+        
+        absSys.output.x = absSys.output.x * gravityConstant / Double(threePtFilterPointsDone)
+        absSys.output.y = absSys.output.y * gravityConstant / Double(threePtFilterPointsDone)
+        absSys.output.z = absSys.output.z * gravityConstant / Double(threePtFilterPointsDone)
+        print(absSys.output.x)
+        threePtFilterPointsDone += 1
+        
+    } else {
+        
+        arrayX.append(acc.x*rot.m11 + acc.y*rot.m21 + acc.z*rot.m31)
+        arrayY.append(acc.x*rot.m12 + acc.y*rot.m22 + acc.z*rot.m32)
+        arrayZ.append(acc.x*rot.m13 + acc.y*rot.m23 + acc.z*rot.m33)
+        
+        for i in 0..<numberOfPointsForThreePtFilter {
+            absSys.output.x += arrayX[i]
+            absSys.output.y += arrayY[i]
+            absSys.output.z += arrayZ[i]
+        }
+        
+        absSys.output.x = absSys.output.x * gravityConstant / Double(threePtFilterPointsDone)
+        absSys.output.y = absSys.output.y * gravityConstant / Double(threePtFilterPointsDone)
+        absSys.output.z = absSys.output.z * gravityConstant / Double(threePtFilterPointsDone)
+        
+        arrayX.removeFirst()
+        arrayY.removeFirst()
+        arrayZ.removeFirst()
+    }
+    return (absSys.output.x, absSys.output.y, absSys.output.z)
+}
+
+func RawFilter(data: Double) -> Double {
+    
+    return data
+}
+
 // this STDEV function is from github: https://gist.github.com/jonelf/9ae2a2133e21e255e692
 func standardDeviation(arr : [Double]) -> Double
 {
@@ -158,205 +227,73 @@ func roundNum(number: Double) -> Double {
     return round(number * 10000) / 10000
 }
 
-func choldc1(var a: [Double], var p: [Double], n: Int) -> Int {
-    var i, j, k: Int
-    var sum: Double
+
+let a:[[[Int]]] = [[[Int]]](count:3, repeatedValue:[[Int]](count:3, repeatedValue:[Int](count:3, repeatedValue:1)))
+
+struct Matrix {
+    let rows: Int, columns: Int
+    var grid: [Double]
+    var shape: (Int, Int)
     
-    for (i = 0; i < n; i++) {
-        for (j = i; j < n; j++) {
-            sum = a[i*n+j];
-            for (k = i - 1; k >= 0; k--) {
-                sum -= a[i*n+k] * a[j*n+k]
-            }
-            if (i == j) {
-                if (sum <= 0) {
-                    return 1 /* error */
-                }
-                p[i] = sqrt(sum);
-            }
-            else {
-                a[j*n+i] = sum / p[i];
-            }
+    init(rows: Int, columns: Int) {
+        self.rows = rows
+        self.columns = columns
+        self.shape = (rows, columns)
+        grid = Array(count: rows * columns, repeatedValue: 0.0)
+    }
+    func indexIsValid(row: Int, column: Int) -> Bool {
+        return row >= 0 && row < rows && column >= 0 && column < columns
+    }
+    subscript(row: Int, column: Int) -> Double {
+        get {
+            return grid[(row * columns) + column]
+        }
+        set {
+            grid[(row * columns) + column] = newValue
         }
     }
-    
-    return 0; /* success */
-}
-
-func choldcsl(var A: [Double], var a: [Double], var p: [Double], n: Int) -> Int {
-    var i, j, k: Int
-    var sum: Double
-    
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < n; j++) {
-            a[i*n+j] = A[i*n+j]
-        }
+    func negate(x: Matrix) -> Matrix {
+        var results = x
+        vDSP_vnegD(x.grid, 1, &(results.grid), 1, UInt(x.grid.count))
+        return results
     }
-    /*
-    if (choldc1(a, p, n)) {
-        return 1
+    func add(x: Matrix, y: Matrix) -> Matrix {
+        var results = x
+        vDSP_vaddD(x.grid, 1, y.grid, 1, &(results.grid), 1, UInt(x.grid.count))
+        return results
     }
- */
-    for (i = 0; i < n; i++) {
-        a[i*n+i] = 1 / p[i];
-        for (j = i + 1; j < n; j++) {
-            sum = 0;
-            for (k = i; k < j; k++) {
-                sum -= a[j*n+k] * a[k*n+i];
-            }
-            a[j*n+i] = sum / p[j];
-        }
+    func mul(x: Matrix, y: Matrix) -> Matrix {
+        var results = x
+        vDSP_vmulD(x.grid, 1, y.grid, 1, &(results.grid), 1, vDSP_Length(x.grid.count))
+        return results
     }
-    return 0; /* success */
-}
-
-func cholsl(var A: [Double], var a: [Double], var p: [Double], n: Int) -> Int {
-    var i, j, k: Int
-    /*
-    if (choldcsl(A,a,p,n)) {
-        return 1
+    func dot(x: Matrix, y: Matrix) -> Matrix {
+        var results = x //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! size change
+        vDSP_dotprD(x.grid, 1, y.grid, 1, &(results.grid), UInt(x.grid.count))
+        return results
     }
- */
-    for (i = 0; i < n; i++) {
-        for (j = i + 1; j < n; j++) {
-            a[i*n+j] = 0.0;
-        }
+    func transpose(x: Matrix) -> Matrix {
+        var results = x
+        vDSP_mtransD(x.grid, 1, &(results.grid), 1, vDSP_Length(results.rows), vDSP_Length(results.columns))
+        return results
     }
-    for (i = 0; i < n; i++) {
-        a[i*n+i] *= a[i*n+i];
-        for (k = i + 1; k < n; k++) {
-            a[i*n+i] += a[k*n+i] * a[k*n+i];
-        }
-        for (j = i + 1; j < n; j++) {
-            for (k = j; k < n; k++) {
-                a[i*n+j] += a[k*n+i] * a[k*n+j];
-            }
-        }
+    func inverse(x: Matrix) -> Matrix {
+        var results = x
+        /*
+         dgetrf_(UnsafeMutablePointer<__CLPK_integer>, <#T##UnsafeMutablePointer<__CLPK_integer>#>, <#T##UnsafeMutablePointer<__CLPK_doublereal>#>, <#T##UnsafeMutablePointer<__CLPK_integer>#>, <#T##UnsafeMutablePointer<__CLPK_integer>#>, <#T##UnsafeMutablePointer<__CLPK_integer>#>)
+         */
+        return results
     }
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < i; j++) {
-            a[i*n+j] = a[j*n+i];
-        }
+    func invert(matrix : [Double]) -> [Double] {
+        var inMatrix = matrix
+        var N = __CLPK_integer(sqrt(Double(matrix.count)))
+        var pivots = [__CLPK_integer](count: Int(N), repeatedValue: 0)
+        var workspace = [Double](count: Int(N), repeatedValue: 0.0)
+        var error : __CLPK_integer = 0
+        dgetrf_(&N, &N, &inMatrix, &N, &pivots, &error)
+        dgetri_(&N, &inMatrix, &N, &pivots, &workspace, &N, &error)
+        return inMatrix
     }
-    return 0; /* success */
-}
-
-func zeros(var a: [Double], m: Int, n: Int) {
-    var j: Int
     
-    for (j=0; j<m*n; ++j) {
-        a[j] = 0
-    }
-}
-
-/* C <- A * B */
-func mulmat(var a: [Double], var b: [Double], var c: [Double], arows: Int, acols: Int, bcols: Int) {
-    var i, j, l: Int
-    
-    for(i=0; i<arows; ++i) {
-        for(j=0; j<bcols; ++j) {
-            c[i*bcols+j] = 0;
-            for(l=0; l<acols; ++l) {
-                c[i*bcols+j] += a[i*acols+l] * b[l*bcols+j]
-            }
-        }
-    }
-}
-
-func mulvec(var a: [Double], var x: [Double], var y: [Double], m: Int, n: Int) {
-    var i, j: Int
-    
-    for(i=0; i<m; ++i) {
-        y[i] = 0;
-        for(j=0; j<n; ++j){
-            y[i] += x[j] * a[i*n+j]
-        }
-    }
-}
-
-func transpose(var a: [Double], var at: [Double], m: Int, n: Int) {
-    var i, j: Int
-    
-    for(i=0; i<m; ++i) {
-        for(j=0; j<n; ++j) {
-            at[j*m+i] = a[i*n+j];
-        }
-    }
-}
-
-/* A <- A + B */
-func accum(var a: [Double], var b: [Double], m: Int, n: Int) {
-    var i, j: Int
-    
-    for(i=0; i<m; ++i) {
-        for(j=0; j<n; ++j) {
-            a[i*n+j] += b[i*n+j]
-        }
-    }
-}
-
-/* C <- A + B */
-func add(var a: [Double], var b: [Double], var c: [Double], n: Int) {
-    var j: Int
-    
-    for(j=0; j<n; ++j) {
-        c[j] = a[j] + b[j]
-    }
-}
-
-
-/* C <- A - B */
-func sub(var a: [Double], var b: [Double], var c: [Double], n: Int) {
-    var j: Int
-    
-    for(j=0; j<n; ++j) {
-        c[j] = a[j] - b[j]
-    }
-}
-
-func negate(var a: [Double], m: Int, n: Int) {
-    var i, j: Int
-    
-    for(i=0; i<m; ++i) {
-        for(j=0; j<n; ++j) {
-            a[i*n+j] = -a[i*n+j]
-        }
-    }
-}
-
-func mat_addeye(var a: [Double], n: Int) {
-    var i: Int
-    
-    for (i=0; i<n; ++i) {
-        a[i*n+i] += 1
-    }
-}
-
-struct ekf_t{
-    
-    var x: [Double]    /* state vector */
-    
-    var P: [Double]  /* prediction error covariance */
-    var Q: [Double]  /* process noise covariance */
-    var R: [Double]  /* measurement error covariance */
-    
-    var G: [Double]  /* Kalman gain; a.k.a. K */
-    
-    var F: [Double]  /* Jacobian of process model */
-    var H: [Double]  /* Jacobian of measurement model */
-    
-    var Ht: [Double] /* transpose of measurement Jacobian */
-    var Ft: [Double] /* transpose of process Jacobian */
-    var Pp: [Double] /* P, post-prediction, pre-update */
-    
-    var fx: [Double]  /* output of user defined f() state-transition function */
-    var hx: [Double]  /* output of user defined h() measurement function */
-    
-    /* temporary storage */
-    var temp1: [Double]
-    var temp2: [Double]
-    var temp3: [Double]
-    var temp4: [Double]
-    var temp5: [Double]
-    
+    //inverse
 }

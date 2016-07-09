@@ -8,22 +8,6 @@
 
 import UIKit
 
-class BackgroundLayer: UIView {
-    
-    func setUpBackgroundLayer() {
-        //backgroundColor = UIColor.blueColor()
-        //var borderWidth = 100.0
-        //borderColor = UIColor.redColor()
-        //var shadowOpacity = 0.7
-        //var shadowRadius = 10.0
-    }
-    
-}
-
-class FrontLayer: UIView {
-    
-}
-
 class MapView: UIView {
     
     /* MARK: Private instances */

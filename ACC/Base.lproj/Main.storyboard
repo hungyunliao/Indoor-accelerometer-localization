@@ -18,10 +18,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="9j9-Pi-Rmg">
-                                <rect key="frame" x="180" y="236" width="240" height="128"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                            </view>
                             <view contentMode="redraw" translatesAutoresizingMaskIntoConstraints="NO" id="Wea-Np-VX3" customClass="MapView" customModule="ACC" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="551"/>
                                 <subviews>
@@ -173,16 +169,6 @@
                                             <constraint firstAttribute="width" constant="150" id="K8Y-vR-BDV"/>
                                         </constraints>
                                     </stackView>
-                                    <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hyf-MK-mZT">
-                                        <rect key="frame" x="66" y="158" width="240" height="128"/>
-                                        <subviews>
-                                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Vta-0J-Vkd">
-                                                <rect key="frame" x="97" y="49" width="240" height="128"/>
-                                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                            </view>
-                                        </subviews>
-                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                    </view>
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
@@ -212,20 +198,13 @@
                             <constraint firstItem="Wea-Np-VX3" firstAttribute="top" secondItem="Fcd-Xl-hJM" secondAttribute="top" id="APd-V8-Eh8"/>
                             <constraint firstItem="Wea-Np-VX3" firstAttribute="leading" secondItem="Fcd-Xl-hJM" secondAttribute="leading" id="GEH-Fh-2ky"/>
                         </constraints>
-                        <variation key="default">
-                            <mask key="subviews">
-                                <exclude reference="9j9-Pi-Rmg"/>
-                            </mask>
-                        </variation>
                     </view>
                     <tabBarItem key="tabBarItem" title="Map" id="p21-07-ElE"/>
                     <connections>
                         <outlet property="accX" destination="msj-bc-ql9" id="dok-Lp-zDw"/>
                         <outlet property="accY" destination="R8j-L2-Ew1" id="WNm-ot-8zv"/>
-                        <outlet property="backgroundLayer" destination="hyf-MK-mZT" id="cLp-Fc-2Ob"/>
                         <outlet property="disX" destination="T2d-v9-RRX" id="tK5-4f-ohM"/>
                         <outlet property="disY" destination="w8H-lK-oDJ" id="z3E-iV-Qa3"/>
-                        <outlet property="frontLayer" destination="Vta-0J-Vkd" id="R4o-fc-8bx"/>
                         <outlet property="mapView" destination="Wea-Np-VX3" id="zXJ-2p-p2j"/>
                         <outlet property="velX" destination="cXe-d3-W8X" id="n9a-FA-YnA"/>
                         <outlet property="velY" destination="hPW-am-frj" id="0x9-FU-JwZ"/>

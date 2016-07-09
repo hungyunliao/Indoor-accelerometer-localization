@@ -92,6 +92,52 @@ class ViewController: UIViewController {
         
         self.reset()
         
+        var X = Matrix(rows: 9, columns: 1)
+        X[0,0] = 0.0
+        X[1,0] = 0.0
+        X[2,0] = 0.0
+        X[3,0] = 0.0
+        X[4,0] = 0.0
+        X[5,0] = 0.0
+        X[6,0] = 0.0
+        X[7,0] = 0.0
+        X[8,0] = 0.0
+        
+        var F = Matrix(rows: 9, columns: 9)
+        F[0,0] = 1.0
+        F[1,1] = 1.0
+        F[2,2] = 1.0
+        F[0,3] = 1.0
+        F[1,4] = 1.0
+        F[2,5] = 1.0
+        F[0,6] = 1/2*deviceMotionUpdateInterval^2
+        F[1,7] = 1/2*deviceMotionUpdateInterval^2
+        F[2,8] = 1/2*deviceMotionUpdateInterval^2
+        F[3,3] = 1.0
+        F[4,4] = 1.0
+        F[5,5] = 1.0
+        F[3,6] = deviceMotionUpdateInterval
+        F[4,7] = deviceMotionUpdateInterval
+        F[5,8] = deviceMotionUpdateInterval
+        F[6,6] = 1.0
+        F[7,7] = 1.0
+        F[8,8] = 1.0
+        
+        var H = Matrix(rows: 3, columns: 9)
+        H[0,0] = 1.0
+        H[1,1] = 1.0
+        H[2,2] = 1.0
+        
+        
+        /*
+         for y in 0..<F.columns {
+         for x in 0..<F.rows {
+         print(String(F[x,y]))
+         }
+         print("")
+         }
+         */
+        
         // Set Motion Manager Properties
         motionManager.accelerometerUpdateInterval = accelerometerUpdateInterval
         motionManager.gyroUpdateInterval = gyroUpdateInterval
@@ -135,84 +181,64 @@ class ViewController: UIViewController {
     // MARK: Functions
     func outputXTrueNorthMotionData(motion: CMDeviceMotion) {
         
-        /* 3-point Filter begins */
-        if absSys.threePtFilterPointsDone < numberOfPointsForThreePtFilter {
+        let acc: CMAcceleration = motion.userAcceleration
+        let rot = motion.attitude.rotationMatrix
+        
+        (absSys.output.x, absSys.output.y, absSys.output.z) = ThreePointFilter(absSys, acc: acc, rot: rot, gravityConstant: gravityConstant)
+        
+        determineVelocity()
+        
+        absSys.output.x = 0
+        absSys.output.y = 0
+        absSys.output.z = 0
+    }
+    
+    func determineVelocity() {
+        
+        // Static Judgement Condition 1 && 2 && 3
+        if staticStateJudge.modulAcc && staticStateJudge.modulGyro && staticStateJudge.modulDiffAcc {
             
-            let acc: CMAcceleration = motion.userAcceleration
-            let rot = motion.attitude.rotationMatrix
+            info?.text = "static state"
             
-            arrayX.append(acc.x*rot.m11 + acc.y*rot.m21 + acc.z*rot.m31)
-            arrayY.append(acc.x*rot.m12 + acc.y*rot.m22 + acc.z*rot.m32)
-            arrayZ.append(acc.x*rot.m13 + acc.y*rot.m23 + acc.z*rot.m33)
-            
-            absSys.threePtFilterPointsDone += 1
+            absSys.velocity.x = 0
+            absSys.velocity.y = 0
+            absSys.velocity.z = 0
             
         } else {
             
-            for i in 0..<3 {
-                absSys.output.x += arrayX[i]
-                absSys.output.y += arrayY[i]
-                absSys.output.z += arrayZ[i]
+            info?.text = "dynamic state"
+            
+            if fabs(absSys.output.x) > accelerationThreshold {
+                absSys.velocity.x += absSys.output.x * deviceMotionUpdateInterval
+                absSys.distance.x += absSys.velocity.x * deviceMotionUpdateInterval
             }
-
-            absSys.output.x = absSys.output.x/Double(numberOfPointsForThreePtFilter) * gravityConstant
-            absSys.output.y = absSys.output.y/Double(numberOfPointsForThreePtFilter) * gravityConstant
-            absSys.output.z = absSys.output.z/Double(numberOfPointsForThreePtFilter) * gravityConstant
-
-            absSys.threePtFilterPointsDone = 2
-            /* 3-point Filter ends */
-            
-            // Static Judgement Condition 1 && 2 && 3
-            if staticStateJudge.modulAcc && staticStateJudge.modulGyro && staticStateJudge.modulDiffAcc {
-                
-                info?.text = "static state"
-                
-                absSys.velocity.x = 0
-                absSys.velocity.y = 0
-                absSys.velocity.z = 0
-                
-            } else {
-                
-                info?.text = "dynamic state"
-                
-                if fabs(absSys.output.x) > accelerationThreshold {
-                    absSys.velocity.x += absSys.output.x * deviceMotionUpdateInterval * Double(numberOfPointsForThreePtFilter)
-                    absSys.distance.x += absSys.velocity.x * deviceMotionUpdateInterval * Double(numberOfPointsForThreePtFilter)
-                }
-                if fabs(absSys.output.y) > accelerationThreshold {
-                    absSys.velocity.y += absSys.output.y * deviceMotionUpdateInterval * Double(numberOfPointsForThreePtFilter)
-                    absSys.distance.y += absSys.velocity.y * deviceMotionUpdateInterval * Double(numberOfPointsForThreePtFilter)
-                }
-                if fabs(absSys.output.z) > accelerationThreshold {
-                    absSys.velocity.z += absSys.output.z * deviceMotionUpdateInterval * Double(numberOfPointsForThreePtFilter)
-                    absSys.distance.z += absSys.velocity.z * deviceMotionUpdateInterval * Double(numberOfPointsForThreePtFilter)
-                }
-                
-                publicDB.setValue(absSys.output.x, forKey: "accX")
-                publicDB.setValue(absSys.output.y, forKey: "accY")
-                publicDB.setValue(absSys.velocity.x, forKey: "velX")
-                publicDB.setValue(absSys.velocity.x, forKey: "velY")
-                
-                // save the changed position to the PUBLIC NSUserdefault object so that they can be accessed by other VIEWCONTROLLERs
-                publicDB.setValue(absSys.distance.x, forKey: "x")
-                publicDB.setValue(absSys.distance.y, forKey: "y")
-                // post the notification to the NotificationCenter to notify everyone who is on the observer list.
-                NSNotificationCenter.defaultCenter().postNotificationName("PositionChanged", object: nil)
-                
+            if fabs(absSys.output.y) > accelerationThreshold {
+                absSys.velocity.y += absSys.output.y * deviceMotionUpdateInterval
+                absSys.distance.y += absSys.velocity.y * deviceMotionUpdateInterval
             }
-            
-            displayOnAccLabel(absSys.output)
-            displayOnVelLabel(absSys.velocity)
-            displayOnDisLabel(absSys.distance)
-            
-            arrayX.removeFirst()
-            arrayY.removeFirst()
-            arrayZ.removeFirst()
-            
-            absSys.output.x = 0
-            absSys.output.y = 0
-            absSys.output.z = 0
+            if fabs(absSys.output.z) > accelerationThreshold {
+                absSys.velocity.z += absSys.output.z * deviceMotionUpdateInterval
+                absSys.distance.z += absSys.velocity.z * deviceMotionUpdateInterval
+            }
+            passValueToView()
         }
+        
+        displayOnAccLabel(absSys.output)
+        displayOnVelLabel(absSys.velocity)
+        displayOnDisLabel(absSys.distance)
+    }
+    
+    func passValueToView() {
+        publicDB.setValue(absSys.output.x, forKey: "accX")
+        publicDB.setValue(absSys.output.y, forKey: "accY")
+        publicDB.setValue(absSys.velocity.x, forKey: "velX")
+        publicDB.setValue(absSys.velocity.x, forKey: "velY")
+        
+        // save the changed position to the PUBLIC NSUserdefault object so that they can be accessed by other VIEWCONTROLLERs
+        publicDB.setValue(absSys.distance.x, forKey: "x")
+        publicDB.setValue(absSys.distance.y, forKey: "y")
+        // post the notification to the NotificationCenter to notify everyone who is on the observer list.
+        NSNotificationCenter.defaultCenter().postNotificationName("PositionChanged", object: nil)
     }
     
     private func displayOnAccLabel(outputValue: ThreeAxesSystemDouble) {
@@ -235,77 +261,77 @@ class ViewController: UIViewController {
     
     func outputAccData(acceleration: CMAcceleration) {
         
-//        if !accSys.isCalibrated {
-//            
-//            info?.text = "Calibrating..." + String(accSys.calibrationTimesDone) + "/" + String(calibrationTimeAssigned)
-//            
-//            if accSys.calibrationTimesDone < calibrationTimeAssigned {
-//                
-//                arrayForCalculatingKalmanRX += [acceleration.x]
-//                arrayForCalculatingKalmanRY += [acceleration.y]
-//                arrayForCalculatingKalmanRZ += [acceleration.z]
-//                accSys.calibrationTimesDone += 1
-//
-//            } else {
-//                
-//                var kalmanInitialRX = 0.0
-//                var kalmanInitialRY = 0.0
-//                var kalmanInitialRZ = 0.0
-//                
-//                for index in arrayForCalculatingKalmanRX {
-//                    kalmanInitialRX += pow((index - accSys.base.x), 2)/Double(calibrationTimeAssigned)
-//                }
-//                for index in arrayForCalculatingKalmanRY {
-//                    kalmanInitialRY += pow((index - accSys.base.y), 2)/Double(calibrationTimeAssigned)
-//                }
-//                for index in arrayForCalculatingKalmanRZ {
-//                    kalmanInitialRZ += pow((index - accSys.base.z), 2)/Double(calibrationTimeAssigned)
-//                }
-//                accSys.isCalibrated = true
-//            }
-//            
-//        } else {
-
-                accSys.output.x = acceleration.x * gravityConstant
-                accSys.output.y = acceleration.y * gravityConstant
-                accSys.output.z = acceleration.z * gravityConstant
+        //        if !accSys.isCalibrated {
+        //
+        //            info?.text = "Calibrating..." + String(accSys.calibrationTimesDone) + "/" + String(calibrationTimeAssigned)
+        //
+        //            if accSys.calibrationTimesDone < calibrationTimeAssigned {
+        //
+        //                arrayForCalculatingKalmanRX += [acceleration.x]
+        //                arrayForCalculatingKalmanRY += [acceleration.y]
+        //                arrayForCalculatingKalmanRZ += [acceleration.z]
+        //                accSys.calibrationTimesDone += 1
+        //
+        //            } else {
+        //
+        //                var kalmanInitialRX = 0.0
+        //                var kalmanInitialRY = 0.0
+        //                var kalmanInitialRZ = 0.0
+        //
+        //                for index in arrayForCalculatingKalmanRX {
+        //                    kalmanInitialRX += pow((index - accSys.base.x), 2)/Double(calibrationTimeAssigned)
+        //                }
+        //                for index in arrayForCalculatingKalmanRY {
+        //                    kalmanInitialRY += pow((index - accSys.base.y), 2)/Double(calibrationTimeAssigned)
+        //                }
+        //                for index in arrayForCalculatingKalmanRZ {
+        //                    kalmanInitialRZ += pow((index - accSys.base.z), 2)/Double(calibrationTimeAssigned)
+        //                }
+        //                accSys.isCalibrated = true
+        //            }
+        //
+        //        } else {
         
-                // Static Judgement Condition 3
-                if index == arrayForStatic.count {
-                    accModulusAvg = 0
-                    for i in 0..<(arrayForStatic.count - 1) {
-                        arrayForStatic[i] = arrayForStatic[i + 1]
-                        accModulusAvg += arrayForStatic[i]
-                    }
-                    arrayForStatic[index - 1] = modulus(accSys.output.x, y: accSys.output.y, z: accSys.output.z)
-                    accModulusAvg += arrayForStatic[index - 1]
-                    accModulusAvg /= Double(arrayForStatic.count)
-                    modulusDiff = modulusDifference(arrayForStatic, avgModulus: accModulusAvg)
-                } else {
-                    arrayForStatic[index] = modulus(accSys.output.x, y: accSys.output.y, z: accSys.output.z)
-                    index += 1
-                    if index == arrayForStatic.count {
-                        for element in arrayForStatic {
-                            accModulusAvg += element
-                        }
-                        accModulusAvg /= Double(arrayForStatic.count)
-                        modulusDiff = modulusDifference(arrayForStatic, avgModulus: accModulusAvg)
-                    }
-                }
+        accSys.output.x = acceleration.x * gravityConstant
+        accSys.output.y = acceleration.y * gravityConstant
+        accSys.output.z = acceleration.z * gravityConstant
         
-                if modulusDiff != -1 && fabs(modulusDiff) < staticStateJudgeThreshold.modulusDiff {
-                    staticStateJudge.modulDiffAcc = true
-                } else {
-                    staticStateJudge.modulDiffAcc = false
+        // Static Judgement Condition 3
+        if index == arrayForStatic.count {
+            accModulusAvg = 0
+            for i in 0..<(arrayForStatic.count - 1) {
+                arrayForStatic[i] = arrayForStatic[i + 1]
+                accModulusAvg += arrayForStatic[i]
+            }
+            arrayForStatic[index - 1] = modulus(accSys.output.x, y: accSys.output.y, z: accSys.output.z)
+            accModulusAvg += arrayForStatic[index - 1]
+            accModulusAvg /= Double(arrayForStatic.count)
+            modulusDiff = modulusDifference(arrayForStatic, avgModulus: accModulusAvg)
+        } else {
+            arrayForStatic[index] = modulus(accSys.output.x, y: accSys.output.y, z: accSys.output.z)
+            index += 1
+            if index == arrayForStatic.count {
+                for element in arrayForStatic {
+                    accModulusAvg += element
                 }
+                accModulusAvg /= Double(arrayForStatic.count)
+                modulusDiff = modulusDifference(arrayForStatic, avgModulus: accModulusAvg)
+            }
+        }
         
-                // Static Judgement Condition 1
-                if fabs(modulus(accSys.output.x, y: accSys.output.y, z: accSys.output.z) - gravityConstant) < staticStateJudgeThreshold.accModulus {
-                    staticStateJudge.modulAcc = true
-                } else {
-                    staticStateJudge.modulAcc = false
-                }
-//        }
+        if modulusDiff != -1 && fabs(modulusDiff) < staticStateJudgeThreshold.modulusDiff {
+            staticStateJudge.modulDiffAcc = true
+        } else {
+            staticStateJudge.modulDiffAcc = false
+        }
+        
+        // Static Judgement Condition 1
+        if fabs(modulus(accSys.output.x, y: accSys.output.y, z: accSys.output.z) - gravityConstant) < staticStateJudgeThreshold.accModulus {
+            staticStateJudge.modulAcc = true
+        } else {
+            staticStateJudge.modulAcc = false
+        }
+        //        }
     }
     
     func outputRotData(rotation: CMRotationRate) {
