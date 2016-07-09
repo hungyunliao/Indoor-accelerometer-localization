@@ -120,19 +120,22 @@ class PathLayer: CAShapeLayer {
     }
     
     private func updateRoutePath() {
+        let drawing = UIBezierPath()
+        
         let xAxis = getLinePath(CGPoint(x: 0, y: bounds.midY), endPoint: CGPoint(x: bounds.width, y: bounds.midY))
-        self.path = xAxis.CGPath
-//
-//        let yAxis = getLinePath(CGPoint(x: bounds.midX, y: 20), endPoint: CGPoint(x: bounds.midX, y: bounds.height))
-//        self.path = yAxis.CGPath
-//        
+        let yAxis = getLinePath(CGPoint(x: bounds.midX, y: 20), endPoint: CGPoint(x: bounds.midX, y: bounds.height))
+
         routePath.moveToPoint(CGPoint(x: previousMapX + originX, y: previousMapY + originY))
         routePath.addLineToPoint(CGPoint(x: currentMapX + originX, y: currentMapY + originY))
-        self.path = routePath.CGPath
         
         var circle = UIBezierPath()
         circle = getCircle(atCenter: CGPoint(x: currentMapX + originX, y: currentMapY + originY), radius: CGFloat(5))
-        self.path = circle.CGPath
+        
+        drawing.appendPath(xAxis)
+        drawing.appendPath(yAxis)
+        drawing.appendPath(routePath)
+        drawing.appendPath(circle)
+        self.path = drawing.CGPath
         
         self.setNeedsDisplay()
     }

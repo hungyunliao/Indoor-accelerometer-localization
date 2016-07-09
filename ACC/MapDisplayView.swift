@@ -10,21 +10,22 @@ import UIKit
 
 @IBDesignable
 class MapDisplayView: UIView {
-    private let gridLayer: GridLayer
-    private let gridLayer2: PathLayer
+    private var gridLayer: GridLayer
+    private var pathLayer: PathLayer
     
     override init(frame: CGRect) {
         gridLayer = GridLayer(frame: frame)
         gridLayer.backgroundColor = UIColor.clearColor().CGColor
-        gridLayer2 = PathLayer(frame: frame)
-        gridLayer2.backgroundColor = UIColor.clearColor().CGColor
-        gridLayer2.pathColor = UIColor.yellowColor()
+        pathLayer = PathLayer(frame: frame)
+        pathLayer.backgroundColor = UIColor.clearColor().CGColor
+        pathLayer.pathColor = UIColor.yellowColor()
         super.init(frame: frame)
-        
-        
+        //gridLayer.frame = CGRectMake(0, 0, 100, 100)
         self.layer.addSublayer(gridLayer)
-        self.layer.addSublayer(gridLayer2)
+        self.layer.addSublayer(pathLayer)
     }
+    
+    
     
     internal convenience required init?(coder aDecoder: NSCoder) {
         self.init(frame: CGRectZero)
@@ -33,25 +34,24 @@ class MapDisplayView: UIView {
     override func awakeFromNib() {
         super.awakeFromNib()
         self.layer.addSublayer(gridLayer)
-        self.layer.addSublayer(gridLayer2)
+        self.layer.addSublayer(pathLayer)
     }
     
     override var frame: CGRect {
         didSet {
             gridLayer.frame = frame
-            gridLayer2.frame = frame
+            pathLayer.frame = frame
         }
     }
     
     
     /*
      relationships:
-     1. ViewController: receieves data
+     1. ViewController: receieves data as a delegate
      2. ViewController calls View to change
      3. View calls layers to change
      */
     func methodForControllerToCall(x: Double, y: Double) {
-        print("in methodForControllerToCall")
-        gridLayer2.movePointTo(x, y: y)
+        pathLayer.movePointTo(x, y: y)
     }
 }

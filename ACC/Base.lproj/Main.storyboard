@@ -14,10 +14,14 @@
                         <viewControllerLayoutGuide type="top" id="fvq-XD-dGA"/>
                         <viewControllerLayoutGuide type="bottom" id="uSX-YK-u8I"/>
                     </layoutGuides>
-                    <view key="view" contentMode="redraw" id="Fcd-Xl-hJM" customClass="MapDisplayView" customModule="ACC" customModuleProvider="target">
+                    <view key="view" contentMode="redraw" id="Fcd-Xl-hJM">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <view contentMode="redraw" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ikt-yS-bhX" customClass="MapDisplayView" customModule="ACC" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="551"/>
+                                <color key="backgroundColor" white="1" alpha="0.0" colorSpace="calibratedWhite"/>
+                            </view>
                             <view contentMode="redraw" translatesAutoresizingMaskIntoConstraints="NO" id="Wea-Np-VX3" customClass="MapView" customModule="ACC" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="551"/>
                                 <subviews>
@@ -170,7 +174,7 @@
                                         </constraints>
                                     </stackView>
                                 </subviews>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="backgroundColor" white="1" alpha="0.0" colorSpace="calibratedWhite"/>
                                 <constraints>
                                     <constraint firstItem="eJQ-cg-Vko" firstAttribute="top" secondItem="Wea-Np-VX3" secondAttribute="top" constant="32" id="05Q-p7-Vbc"/>
                                     <constraint firstItem="Fel-qe-4nj" firstAttribute="centerY" secondItem="Wea-Np-VX3" secondAttribute="centerY" id="6gf-TV-3eD"/>
@@ -205,7 +209,8 @@
                         <outlet property="accY" destination="R8j-L2-Ew1" id="WNm-ot-8zv"/>
                         <outlet property="disX" destination="T2d-v9-RRX" id="tK5-4f-ohM"/>
                         <outlet property="disY" destination="w8H-lK-oDJ" id="z3E-iV-Qa3"/>
-                        <outlet property="mapView" destination="Wea-Np-VX3" id="zXJ-2p-p2j"/>
+                        <outlet property="mapDisplayView" destination="Ikt-yS-bhX" id="dHX-sw-TJn"/>
+                        <outlet property="mapView" destination="Wea-Np-VX3" id="s9M-DR-eXM"/>
                         <outlet property="velX" destination="cXe-d3-W8X" id="n9a-FA-YnA"/>
                         <outlet property="velY" destination="hPW-am-frj" id="0x9-FU-JwZ"/>
                     </connections>
