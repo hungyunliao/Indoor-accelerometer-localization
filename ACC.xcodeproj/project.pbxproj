@@ -11,6 +11,7 @@
 		1389A5261D2C2685000B24FF /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 1389A5241D2C2685000B24FF /* Model.xcdatamodeld */; };
 		13AE20C41CF8B0C4004B0D6B /* KalmanFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13AE20C31CF8B0C4004B0D6B /* KalmanFilter.swift */; };
 		13B24EF41D2F265A00C0476D /* PathLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13B24EF31D2F265A00C0476D /* PathLayer.swift */; };
+		13B24EF61D33765000C0476D /* TextLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13B24EF51D33765000C0476D /* TextLayer.swift */; };
 		13B648EC1CF3B82B00CA656A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13B648EB1CF3B82B00CA656A /* AppDelegate.swift */; };
 		13B648EE1CF3B82B00CA656A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13B648ED1CF3B82B00CA656A /* ViewController.swift */; };
 		13B648F11CF3B82B00CA656A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 13B648EF1CF3B82B00CA656A /* Main.storyboard */; };
@@ -28,6 +29,7 @@
 		1389A5251D2C2685000B24FF /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		13AE20C31CF8B0C4004B0D6B /* KalmanFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = KalmanFilter.swift; path = ../KalmanFilter.swift; sourceTree = "<group>"; };
 		13B24EF31D2F265A00C0476D /* PathLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PathLayer.swift; sourceTree = "<group>"; };
+		13B24EF51D33765000C0476D /* TextLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextLayer.swift; sourceTree = "<group>"; };
 		13B648E81CF3B82B00CA656A /* ACC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ACC.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B648EB1CF3B82B00CA656A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		13B648ED1CF3B82B00CA656A /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -103,6 +105,7 @@
 			children = (
 				9AAD7FD11D2D71FB000719DA /* GridLayer.swift */,
 				13B24EF31D2F265A00C0476D /* PathLayer.swift */,
+				13B24EF51D33765000C0476D /* TextLayer.swift */,
 				9AAD7FD41D2D7E3B000719DA /* MapDisplayView.swift */,
 			);
 			name = MapView;
@@ -189,6 +192,7 @@
 				13CCEB331D0890E9005556A8 /* MapView.swift in Sources */,
 				13B648EC1CF3B82B00CA656A /* AppDelegate.swift in Sources */,
 				13B24EF41D2F265A00C0476D /* PathLayer.swift in Sources */,
+				13B24EF61D33765000C0476D /* TextLayer.swift in Sources */,
 				13CCEB2F1D088C97005556A8 /* MapViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

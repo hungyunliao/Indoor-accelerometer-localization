@@ -52,8 +52,32 @@ class GridLayer: CAShapeLayer {
         let gridSize = CGFloat(10)
         
         let gridPath = UIBezierPath()
+        let scalePath = UIBezierPath()
+        
+        let scaleLayer: CAShapeLayer = CAShapeLayer()
+        scaleLayer.strokeColor = UIColor.blackColor().CGColor
+        scaleLayer.lineWidth = 1.5
+        
+        let axisLayer = CAShapeLayer()
+        let axisPath = UIBezierPath()
+        axisLayer.lineWidth = 2
+        axisLayer.strokeColor = UIColor.blackColor().CGColor
+        
         
         for i in 0...Int(bounds.height) {
+            if i == 0 {
+                axisPath.moveToPoint(CGPoint(x: CGFloat(0), y: centerPoint.y + CGFloat(i) * gridSize))
+                axisPath.addLineToPoint(CGPoint(x: bounds.width, y: centerPoint.y + CGFloat(i) * gridSize))
+                continue
+            }
+            if Double(i)%2 == 0 {
+                scalePath.moveToPoint(CGPoint(x: bounds.width/2, y: centerPoint.y + CGFloat(i) * gridSize))
+                scalePath.addLineToPoint(CGPoint(x: bounds.width/2 + 5, y: centerPoint.y + CGFloat(i) * gridSize))
+                
+                scalePath.moveToPoint(CGPoint(x: bounds.width/2, y: centerPoint.y - CGFloat(i) * gridSize))
+                scalePath.addLineToPoint(CGPoint(x: bounds.width/2 + 5, y: centerPoint.y - CGFloat(i) * gridSize))
+            }
+            
             gridPath.moveToPoint(CGPoint(x: CGFloat(0), y: centerPoint.y + CGFloat(i) * gridSize))
             gridPath.addLineToPoint(CGPoint(x: bounds.width, y: centerPoint.y + CGFloat(i) * gridSize))
             
@@ -62,13 +86,33 @@ class GridLayer: CAShapeLayer {
         }
         
         for i in 0...Int(bounds.width) {
+            if i == 0 {
+                axisPath.moveToPoint(CGPoint(x: centerPoint.x +  CGFloat(i) * gridSize, y: CGFloat(0)))
+                axisPath.addLineToPoint(CGPoint(x: centerPoint.x + CGFloat(i) * gridSize, y: bounds.height))
+                continue
+            }
+            if Double(i)%2 == 0 {
+                scalePath.moveToPoint(CGPoint(x: centerPoint.x +  CGFloat(i) * gridSize, y: bounds.height/2 - 5))
+                scalePath.addLineToPoint(CGPoint(x: centerPoint.x + CGFloat(i) * gridSize, y: bounds.height/2))
+                
+                scalePath.moveToPoint(CGPoint(x: centerPoint.x -  CGFloat(i) * gridSize, y: bounds.height/2 - 5))
+                scalePath.addLineToPoint(CGPoint(x: centerPoint.x - CGFloat(i) * gridSize, y: bounds.height/2))
+            }
+            
             gridPath.moveToPoint(CGPoint(x: centerPoint.x +  CGFloat(i) * gridSize, y: CGFloat(0)))
             gridPath.addLineToPoint(CGPoint(x: centerPoint.x + CGFloat(i) * gridSize, y: bounds.height))
+            
             
             gridPath.moveToPoint(CGPoint(x: centerPoint.x -  CGFloat(i) * gridSize, y: CGFloat(0)))
             gridPath.addLineToPoint(CGPoint(x: centerPoint.x - CGFloat(i) * gridSize, y: bounds.height))
         }
+        
+        scaleLayer.path = scalePath.CGPath
+        axisLayer.path = axisPath.CGPath
+        
         self.path = gridPath.CGPath
+        self.addSublayer(scaleLayer)
+        self.addSublayer(axisLayer)
         self.setNeedsDisplay()
     }
 }
