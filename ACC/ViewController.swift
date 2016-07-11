@@ -159,7 +159,7 @@ class ViewController: UIViewController {
             }
         })
         
-        motionManager.startDeviceMotionUpdatesUsingReferenceFrame(CMAttitudeReferenceFrame.XTrueNorthZVertical, toQueue: NSOperationQueue.currentQueue()!, withHandler: { (motion,  error) in
+        motionManager.startDeviceMotionUpdatesUsingReferenceFrame(CMAttitudeReferenceFrame.XArbitraryCorrectedZVertical, toQueue: NSOperationQueue.currentQueue()!, withHandler: { (motion,  error) in
             if motion != nil {
                 self.outputXTrueNorthMotionData(motion!)
             }
@@ -182,9 +182,18 @@ class ViewController: UIViewController {
     func outputXTrueNorthMotionData(motion: CMDeviceMotion) {
         
         let acc: CMAcceleration = motion.userAcceleration
+        //print(acc)
         let rot = motion.attitude.rotationMatrix
+        var x = 0.0
+        var y = 0.0
+        var z = 0.0
         
-        (absSys.output.x, absSys.output.y, absSys.output.z) = ThreePointFilter(absSys, acc: acc, rot: rot, gravityConstant: gravityConstant)
+        x = (acc.x*rot.m11 + acc.y*rot.m21 + acc.z*rot.m31) * gravityConstant
+        y = (acc.x*rot.m12 + acc.y*rot.m22 + acc.z*rot.m32) * gravityConstant
+        z = (acc.x*rot.m13 + acc.y*rot.m23 + acc.z*rot.m33) * gravityConstant
+        
+        (absSys.output.x, absSys.output.y, absSys.output.z) = ThreePointFilter(x, y: y, z: z)
+        (absSys.output.x, absSys.output.y, absSys.output.z) = RawFilter(x, y: y, z: z)
         
         determineVelocity()
         
