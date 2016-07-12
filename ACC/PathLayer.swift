@@ -10,7 +10,7 @@ import UIKit
 
 class PathLayer: CAShapeLayer {
     /// Indicate the color of the grid line.
-    @IBInspectable var pathColor:UIColor = UIColor.blackColor() {
+    @IBInspectable var pathColor:UIColor = UIColor.blueColor() {
         didSet {
             self.strokeColor = pathColor.CGColor
             self.setNeedsDisplay()
@@ -20,10 +20,8 @@ class PathLayer: CAShapeLayer {
     init(frame: CGRect) {
         super.init()
         self.strokeColor = pathColor.CGColor
+        self.fillColor = pathColor.CGColor
         self.backgroundColor = UIColor.clearColor().CGColor
-        self.lineWidth = 1.0
-        self.lineDashPattern = [4, 2]
-        self.lineDashPhase = 0.0
         self.frame = frame
     }
     
@@ -84,6 +82,7 @@ class PathLayer: CAShapeLayer {
     }
     
     func movePointTo(x: Double, y: Double) {
+        
         if !isReset {
             previousMapX = currentMapX
             previousMapY = currentMapY
@@ -125,21 +124,17 @@ class PathLayer: CAShapeLayer {
     private func updateRoutePath() {
         let drawing = UIBezierPath()
         test += 1
-//        let xAxis = getLinePath(CGPoint(x: 0, y: bounds.midY), endPoint: CGPoint(x: bounds.width, y: bounds.midY))
-//        let yAxis = getLinePath(CGPoint(x: bounds.midX, y: 20), endPoint: CGPoint(x: bounds.midX, y: bounds.height))
 
         routePath.moveToPoint(CGPoint(x: previousMapX + originX, y: previousMapY + originY))
-        print("\(test) previous x = \(previousMapX + originX)")
-        print("\(test) previous y = \(previousMapY + originY)")
+        print("previous= \(previousMapX + originX)")
+        print("previous= \(previousMapY + originY)")
         routePath.addLineToPoint(CGPoint(x: currentMapX + originX, y: currentMapY + originY))
-        print("\(test) current x = \(currentMapX + originX)")
-        print("\(test) current y = \(currentMapY + originY)")
+        print("current= \(currentMapX + originX)")
+        print("current= \(currentMapY + originY)")
         
         var circle = UIBezierPath()
         circle = getCircle(atCenter: CGPoint(x: currentMapX + originX, y: currentMapY + originY), radius: CGFloat(5))
         
-//        drawing.appendPath(xAxis)
-//        drawing.appendPath(yAxis)
         drawing.appendPath(routePath)
         drawing.appendPath(circle)
         self.path = drawing.CGPath

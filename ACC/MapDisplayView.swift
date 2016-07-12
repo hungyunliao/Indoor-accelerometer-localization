@@ -10,6 +10,7 @@ import UIKit
 
 @IBDesignable
 class MapDisplayView: UIView {
+    private var pinchScale: CGFloat = 1
     private var gridLayer: GridLayer
     private var pathLayer: PathLayer
     private var textLayer: TextLayer
@@ -22,8 +23,6 @@ class MapDisplayView: UIView {
         self.layer.addSublayer(gridLayer)
         self.layer.addSublayer(pathLayer)
         self.layer.addSublayer(textLayer)
-        //self.layerGradient(UIColor.blackColor().CGColor, bottomColor: UIColor.whiteColor().CGColor)
-        //self.backgroundColor = UIColor.redColor()
     }
     
     
@@ -62,5 +61,16 @@ class MapDisplayView: UIView {
     func setScale(scale: Double) {
         textLayer.scaleValue = scale
         pathLayer.setScale(scale)
+    }
+    
+    func changeScale(recognizer: UIPinchGestureRecognizer) {
+        switch recognizer.state {
+        case .Changed, .Ended:
+            pinchScale *= recognizer.scale
+            setScale(Double(pinchScale))
+            recognizer.scale = 1
+        default:
+            break
+        }
     }
 }

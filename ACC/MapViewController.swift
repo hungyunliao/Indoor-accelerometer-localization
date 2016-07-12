@@ -17,7 +17,13 @@ class MapViewController: UIViewController, DataProcessorDelegate {
     // MARK: PublicDB used to pass the object of DataProcessor
     var publicDB = NSUserDefaults.standardUserDefaults()
     
-    @IBOutlet weak var mapDisplayView: MapDisplayView!
+    @IBOutlet weak var mapDisplayView: MapDisplayView! {
+        didSet {
+            mapDisplayView.addGestureRecognizer(UIPinchGestureRecognizer(
+                target: mapDisplayView, action: #selector(MapDisplayView.changeScale(_:))
+                ))
+        }
+    }
     @IBAction func cleanpath(sender: UIButton) {
         mapDisplayView?.cleanPath()
     }

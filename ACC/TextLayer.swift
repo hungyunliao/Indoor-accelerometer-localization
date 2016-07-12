@@ -49,6 +49,8 @@ class TextLayer: CATextLayer {
     
     private func updateUI() {
         
+        self.sublayers?.removeAll()
+        
         for i in 0..<Int(bounds.width) {
             let rightText: CATextLayer = CATextLayer()
             rightText.fontSize = 10
