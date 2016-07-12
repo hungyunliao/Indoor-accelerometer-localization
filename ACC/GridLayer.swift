@@ -11,7 +11,7 @@ import UIKit
 class GridLayer: CAShapeLayer {
     
     /// Indicate the color of the grid line.
-    @IBInspectable var gridColor:UIColor = UIColor.cyanColor() {
+    @IBInspectable var gridColor:UIColor = UIColor.blackColor().colorWithAlphaComponent(0.2) {
         didSet {
             self.strokeColor = gridColor.CGColor
             self.setNeedsDisplay()
@@ -21,6 +21,7 @@ class GridLayer: CAShapeLayer {
     init(frame: CGRect) {
         super.init()
         self.strokeColor = gridColor.CGColor
+        self.backgroundColor = UIColor.clearColor().CGColor
         self.lineWidth = 1.0
         self.lineDashPattern = [4, 2]
         self.lineDashPhase = 0.0

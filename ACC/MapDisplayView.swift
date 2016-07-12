@@ -12,24 +12,19 @@ import UIKit
 class MapDisplayView: UIView {
     private var gridLayer: GridLayer
     private var pathLayer: PathLayer
-    private var text: TextLayer
+    private var textLayer: TextLayer
     
     override init(frame: CGRect) {
         gridLayer = GridLayer(frame: frame)
-        gridLayer.backgroundColor = UIColor.clearColor().CGColor
         pathLayer = PathLayer(frame: frame)
-        pathLayer.backgroundColor = UIColor.clearColor().CGColor
-        text = TextLayer(frame: frame)
-//        let fontName: CFStringRef = "HelveticaNeue"
-//        text.font = CTFontCreateWithName(fontName, 1, nil)
-        text.startValue = 0
+        textLayer = TextLayer(frame: frame)
         super.init(frame: frame)
-        //gridLayer.frame = CGRectMake(0, 0, 100, 100)
         self.layer.addSublayer(gridLayer)
         self.layer.addSublayer(pathLayer)
-        self.layer.addSublayer(text)
+        self.layer.addSublayer(textLayer)
+        //self.layerGradient(UIColor.blackColor().CGColor, bottomColor: UIColor.whiteColor().CGColor)
+        //self.backgroundColor = UIColor.redColor()
     }
-    
     
     
     internal convenience required init?(coder aDecoder: NSCoder) {
@@ -40,15 +35,14 @@ class MapDisplayView: UIView {
         super.awakeFromNib()
         self.layer.addSublayer(gridLayer)
         self.layer.addSublayer(pathLayer)
-        self.layer.addSublayer(text)
+        self.layer.addSublayer(textLayer)
     }
     
     override var frame: CGRect {
         didSet {
-            print("in frame in MapDisplay \(frame.size)")
             gridLayer.frame = frame
             pathLayer.frame = frame
-            text.frame = CGRectMake(0, gridLayer.frame.height/2, gridLayer.frame.width, gridLayer.frame.height)
+            textLayer.frame = CGRectMake(0, gridLayer.frame.height/2, gridLayer.frame.width, gridLayer.frame.height)
         }
     }
     
@@ -59,7 +53,14 @@ class MapDisplayView: UIView {
      2. ViewController calls View to change
      3. View calls layers to change
      */
-    func methodForControllerToCall(x: Double, y: Double) {
+    func movePointTo(x: Double, y: Double) {
         pathLayer.movePointTo(x, y: y)
+    }
+    func cleanPath() {
+        pathLayer.cleanPath()
+    }
+    func setScale(scale: Double) {
+        textLayer.scaleValue = scale
+        pathLayer.setScale(scale)
     }
 }

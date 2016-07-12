@@ -177,12 +177,13 @@ class DataProcessor {
                 }
                 //publicDB.setValue(absSys.accelerate.x, forKey: "accX")
                 
+                newData(speedDataType.distance, sensorData: absSys.distance)
+                
             }
             
             // sending data to delegate
             newData(speedDataType.accelerate, sensorData: absSys.accelerate)
             newData(speedDataType.velocity, sensorData: absSys.velocity)
-            newData(speedDataType.distance, sensorData: absSys.distance)
             
             absSys.accelerate.x = 0
             absSys.accelerate.y = 0

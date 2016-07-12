@@ -20,6 +20,7 @@ class PathLayer: CAShapeLayer {
     init(frame: CGRect) {
         super.init()
         self.strokeColor = pathColor.CGColor
+        self.backgroundColor = UIColor.clearColor().CGColor
         self.lineWidth = 1.0
         self.lineDashPattern = [4, 2]
         self.lineDashPhase = 0.0
@@ -119,14 +120,20 @@ class PathLayer: CAShapeLayer {
         self.setNeedsDisplay()
     }
     
+    var test: Int = 0
+    
     private func updateRoutePath() {
         let drawing = UIBezierPath()
-        
+        test += 1
 //        let xAxis = getLinePath(CGPoint(x: 0, y: bounds.midY), endPoint: CGPoint(x: bounds.width, y: bounds.midY))
 //        let yAxis = getLinePath(CGPoint(x: bounds.midX, y: 20), endPoint: CGPoint(x: bounds.midX, y: bounds.height))
 
         routePath.moveToPoint(CGPoint(x: previousMapX + originX, y: previousMapY + originY))
+        print("\(test) previous x = \(previousMapX + originX)")
+        print("\(test) previous y = \(previousMapY + originY)")
         routePath.addLineToPoint(CGPoint(x: currentMapX + originX, y: currentMapY + originY))
+        print("\(test) current x = \(currentMapX + originX)")
+        print("\(test) current y = \(currentMapY + originY)")
         
         var circle = UIBezierPath()
         circle = getCircle(atCenter: CGPoint(x: currentMapX + originX, y: currentMapY + originY), radius: CGFloat(5))
