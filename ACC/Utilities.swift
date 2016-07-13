@@ -9,6 +9,11 @@
 import Foundation
 import Accelerate
 
+class Utilities {
+
+    // exchange x and y;
+}
+
 struct Matrix {
     let rows: Int, columns: Int
     var grid: [Double]

@@ -8,8 +8,6 @@
 
 import UIKit
 import CoreMotion
-//import CoreLocation
-//import MapKit
 
 class ViewController: UIViewController {
     
@@ -23,9 +21,9 @@ class ViewController: UIViewController {
     var accelerometerUpdateInterval: Double = 0.01
     var gyroUpdateInterval: Double = 0.01
     var deviceMotionUpdateInterval: Double = 0.03
-    let accelerationThreshold = 0.9
-    var staticStateJudgeThreshold = (accModulus: 1.0, gyroModulus: 35/M_PI, modulusDiff: 0.1)
-    
+    let accelerationThreshold = 0.0001
+    //var staticStateJudgeThreshold = (accModulus: 1.0, gyroModulus: 35/M_PI, modulusDiff: 0.1)
+    var staticStateJudgeThreshold = (accModulus: 0.5, gyroModulus: 20/M_PI, modulusDiff: 0.05)
     
     var calibrationTimeAssigned: Int = 100
     
@@ -38,7 +36,7 @@ class ViewController: UIViewController {
     
     // MARK: Kalman Filter
     var arrayOfPoints: [Double] = [1, 2, 3]
-    var linearCoef = (slope: 0.0, intercept: 0.0)
+    //var linearCoef = (slope: 0.0, intercept: 0.0)
     
     // MARK: Refined Kalman Filter
     var arrayForCalculatingKalmanRX = [Double]()
@@ -50,12 +48,6 @@ class ViewController: UIViewController {
     var arrayForStatic = [Double](count: 7, repeatedValue: -1)
     var index = 0
     var modulusDiff = -1.0
-    
-    // MARK: Three-Point Filter
-    let numberOfPointsForThreePtFilter = 3
-    var arrayX = [Double]()
-    var arrayY = [Double]()
-    var arrayZ = [Double]()
     
     // MARK: Outlets
     @IBOutlet var info: UILabel?
@@ -92,52 +84,6 @@ class ViewController: UIViewController {
         
         self.reset()
         
-        var X = Matrix(rows: 9, columns: 1)
-        X[0,0] = 0.0
-        X[1,0] = 0.0
-        X[2,0] = 0.0
-        X[3,0] = 0.0
-        X[4,0] = 0.0
-        X[5,0] = 0.0
-        X[6,0] = 0.0
-        X[7,0] = 0.0
-        X[8,0] = 0.0
-        
-        var F = Matrix(rows: 9, columns: 9)
-        F[0,0] = 1.0
-        F[1,1] = 1.0
-        F[2,2] = 1.0
-        F[0,3] = 1.0
-        F[1,4] = 1.0
-        F[2,5] = 1.0
-        F[0,6] = 1/2*deviceMotionUpdateInterval^2
-        F[1,7] = 1/2*deviceMotionUpdateInterval^2
-        F[2,8] = 1/2*deviceMotionUpdateInterval^2
-        F[3,3] = 1.0
-        F[4,4] = 1.0
-        F[5,5] = 1.0
-        F[3,6] = deviceMotionUpdateInterval
-        F[4,7] = deviceMotionUpdateInterval
-        F[5,8] = deviceMotionUpdateInterval
-        F[6,6] = 1.0
-        F[7,7] = 1.0
-        F[8,8] = 1.0
-        
-        var H = Matrix(rows: 3, columns: 9)
-        H[0,0] = 1.0
-        H[1,1] = 1.0
-        H[2,2] = 1.0
-        
-        
-        /*
-         for y in 0..<F.columns {
-         for x in 0..<F.rows {
-         print(String(F[x,y]))
-         }
-         print("")
-         }
-         */
-        
         // Set Motion Manager Properties
         motionManager.accelerometerUpdateInterval = accelerometerUpdateInterval
         motionManager.gyroUpdateInterval = gyroUpdateInterval
@@ -151,7 +97,6 @@ class ViewController: UIViewController {
                 print("\(NSError)")
             }
         })
-        
         motionManager.startGyroUpdatesToQueue(NSOperationQueue.currentQueue()!, withHandler: { (gyroData: CMGyroData?, NSError) -> Void in
             self.outputRotData(gyroData!.rotationRate)
             if NSError != nil {
@@ -159,7 +104,7 @@ class ViewController: UIViewController {
             }
         })
         
-        motionManager.startDeviceMotionUpdatesUsingReferenceFrame(CMAttitudeReferenceFrame.XArbitraryCorrectedZVertical, toQueue: NSOperationQueue.currentQueue()!, withHandler: { (motion,  error) in
+        motionManager.startDeviceMotionUpdatesUsingReferenceFrame(CMAttitudeReferenceFrame.XTrueNorthZVertical, toQueue: NSOperationQueue.currentQueue()!, withHandler: { (motion,  error) in
             if motion != nil {
                 self.outputXTrueNorthMotionData(motion!)
             }
@@ -168,15 +113,13 @@ class ViewController: UIViewController {
             }
         })
         
-        linearCoef = SimpleLinearRegression(arrayOfPoints, y: arrayOfPoints) // For Kalman. Initializing the coef before the recording functions running
-        
+        //linearCoef = SimpleLinearRegression(arrayOfPoints, y: arrayOfPoints) // For Kalman. Initializing the coef before the recording functions running
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
     
     // MARK: Functions
     func outputXTrueNorthMotionData(motion: CMDeviceMotion) {
@@ -191,9 +134,26 @@ class ViewController: UIViewController {
         x = (acc.x*rot.m11 + acc.y*rot.m21 + acc.z*rot.m31) * gravityConstant
         y = (acc.x*rot.m12 + acc.y*rot.m22 + acc.z*rot.m32) * gravityConstant
         z = (acc.x*rot.m13 + acc.y*rot.m23 + acc.z*rot.m33) * gravityConstant
+
+        enum Option {
+            case Raw
+            case ThreePoint
+            case Kalman
+        }
         
-        (absSys.output.x, absSys.output.y, absSys.output.z) = ThreePointFilter(x, y: y, z: z)
-        (absSys.output.x, absSys.output.y, absSys.output.z) = RawFilter(x, y: y, z: z)
+        let filterChoice = Option.Raw
+        var test:Filter
+        
+        switch filterChoice {
+        case .Raw:
+            test = RawFilter()
+        case .ThreePoint:
+            test = ThreePointFilter()
+        case .Kalman:
+            test = KalmanFilter()
+        }
+        
+        (absSys.output.x, absSys.output.y, absSys.output.z) = test.filter(x, y: y, z: z)
         
         determineVelocity()
         
@@ -203,6 +163,15 @@ class ViewController: UIViewController {
     }
     
     func determineVelocity() {
+        
+        /*
+         print(fabs(modulus(accSys.output.x, y: accSys.output.y, z: accSys.output.z) - gravityConstant),
+         modulus(gyroSys.output.x, y: gyroSys.output.y, z: gyroSys.output.z),
+         fabs(modulusDiff),
+         staticStateJudge.modulAcc,
+         staticStateJudge.modulGyro,
+         staticStateJudge.modulDiffAcc)
+         */
         
         // Static Judgement Condition 1 && 2 && 3
         if staticStateJudge.modulAcc && staticStateJudge.modulGyro && staticStateJudge.modulDiffAcc {
@@ -355,4 +324,62 @@ class ViewController: UIViewController {
     
 }
 
+// this STDEV function is from github: https://gist.github.com/jonelf/9ae2a2133e21e255e692
+func standardDeviation(arr : [Double]) -> Double
+{
+    let length = Double(arr.count)
+    let avg = arr.reduce(0, combine: {$0 + $1}) / length
+    let sumOfSquaredAvgDiff = arr.map { pow($0 - avg, 2.0)}.reduce(0, combine: {$0 + $1})
+    return sqrt(sumOfSquaredAvgDiff / length)
+}
 
+// MARK: operator define
+infix operator ^ {}
+func ^ (radix: Double, power: Double) -> Double {
+    return pow(radix, power)
+}
+
+func modulus(x: Double, y: Double, z: Double) -> Double {
+    return sqrt((x ^ 2) + (y ^ 2) + (z ^ 2))
+}
+
+func modulusDifference(arr: [Double], avgModulus: Double) -> Double {
+    var sum = 0.0
+    for i in 0..<arr.count {
+        sum += ((arr[i] - avgModulus) ^ 2)
+    }
+    return sum / Double(arr.count)
+}
+
+func roundNum(number: Double) -> Double {
+    return round(number * 10000) / 10000
+}
+
+func SimpleLinearRegression (x: [Double], y: [Double]) -> (Double, Double) {
+    
+    // x and y should be arrays of points.
+    
+    var xbar = 0.0
+    var ybar = 0.0
+    var xybar = 0.0
+    var xsqbar = 0.0
+    let arrayLength = x.count
+    var linearCoef = (slope: 0.0, intercept: 0.0)
+    
+    for i in 0..<arrayLength {
+        xbar += x[i]
+        ybar += y[i]
+        xybar += x[i] * y[i]
+        xsqbar += x[i] * x[i]
+    }
+    
+    xbar /= Double(arrayLength)
+    ybar /= Double(arrayLength)
+    xybar /= Double(arrayLength)
+    xsqbar /= Double(arrayLength)
+    
+    linearCoef.slope = (xybar - xbar*ybar) / (xsqbar - xbar*xbar)
+    linearCoef.intercept = ybar - linearCoef.slope*xbar
+    
+    return linearCoef
+}

@@ -9,53 +9,76 @@
 import Foundation
 import CoreMotion
 
-var arrayX = [Double]()
-var arrayY = [Double]()
-var arrayZ = [Double]()
 var threePtFilterPointsDone = 1
+let numberOfPointsForThreePtFilter = 3
 
-func ThreePointFilter(var x: Double, var y: Double, var z: Double) -> (Double, Double, Double) {
-    let numberOfPointsForThreePtFilter = 3
-    //var threePtFilterPointsDone = 0
-    //print(threePtFilterPointsDone)
-    if threePtFilterPointsDone < numberOfPointsForThreePtFilter {
+protocol Type {
+    
+    func +(lhs: Self, rhs: Self) -> Self
+    func *(lhs: Self, rhs: Self) -> Self
+}
+
+extension Int: Type {}
+extension Double: Type {}
+extension Float: Type {}
+
+func add<Element : Type>(lhs: Element, rhs: Element) -> Element {
+    let lhs = lhs
+    let rhs = rhs
+    return lhs + rhs
+}
+
+class ThreePointFilter : Filter{
+    
+    func initFilter(deviceMotionUpdateInterval: Double) {
+
+    }
+    /*
+    var arrayX = [T]()
+    var arrayY = [T]()
+    var arrayZ = [T]()
+    */
+    func filter<T>(x: T, y: T, z: T) -> (T, T, T) {
+    //func filter(x: Double, y: Double, z: Double) -> (Double, Double, Double) {
+        var x = x, y = y, z = z
+        print(x.dynamicType)
+        var arrayX = [T]()
+        var arrayY = [T]()
+        var arrayZ = [T]()
         
         arrayX.append(x)
         arrayY.append(y)
         arrayZ.append(z)
+        
         //print(arrayX[0])
         
-        for i in 0..<threePtFilterPointsDone {
-            //print(arrayX[i])
-            x += arrayX[i]
-            y += arrayY[i]
-            z += arrayZ[i]
+        if threePtFilterPointsDone < numberOfPointsForThreePtFilter {
+            
+            threePtFilterPointsDone += 1
+            
+        } else {
+            
+            for i in 0..<numberOfPointsForThreePtFilter {
+                /*
+                x = x + arrayX[i]
+                y = y + arrayY[i]
+                z = z + arrayZ[i]
+ */
+                print(add(2.562, rhs: 3.8))
+                //print(add(x, rhs: arrayX[i]))
+            }
+            /*
+            x = x / threePtFilterPointsDone
+            y = y / threePtFilterPointsDone
+            z = z / threePtFilterPointsDone
+            */
+            /*
+            arrayX.removeFirst()
+            arrayY.removeFirst()
+            arrayZ.removeFirst()
+ */
         }
-        
-        x = x / Double(threePtFilterPointsDone)
-        y = y / Double(threePtFilterPointsDone)
-        z = z / Double(threePtFilterPointsDone)
-        threePtFilterPointsDone += 1
-        
-    } else {
-        
-        arrayX.append(x)
-        arrayY.append(y)
-        arrayZ.append(z)
-        
-        for i in 0..<numberOfPointsForThreePtFilter {
-            x += arrayX[i]
-            y += arrayY[i]
-            z += arrayZ[i]
-        }
-        
-        x = x / Double(threePtFilterPointsDone)
-        y = y / Double(threePtFilterPointsDone)
-        z = z / Double(threePtFilterPointsDone)
-        
-        arrayX.removeFirst()
-        arrayY.removeFirst()
-        arrayZ.removeFirst()
+        return (x, y, z)
     }
-    return (x, y, z)
+
 }

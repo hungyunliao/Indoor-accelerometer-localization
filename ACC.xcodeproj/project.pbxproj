@@ -19,6 +19,7 @@
 		9C6397C61D34012000966761 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C6397C51D34012000966761 /* Utilities.swift */; };
 		9C6397C81D34015100966761 /* RawFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C6397C71D34015100966761 /* RawFilter.swift */; };
 		9C6397CA1D34016700966761 /* ThreePointFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C6397C91D34016700966761 /* ThreePointFilter.swift */; };
+		9C6397CC1D346C4000966761 /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C6397CB1D346C4000966761 /* Filter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +37,7 @@
 		9C6397C51D34012000966761 /* Utilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		9C6397C71D34015100966761 /* RawFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RawFilter.swift; sourceTree = "<group>"; };
 		9C6397C91D34016700966761 /* ThreePointFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThreePointFilter.swift; sourceTree = "<group>"; };
+		9C6397CB1D346C4000966761 /* Filter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Filter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +75,7 @@
 				13CCEB321D0890E9005556A8 /* MapView.swift */,
 				13CCEB2E1D088C97005556A8 /* MapViewController.swift */,
 				9C6397C51D34012000966761 /* Utilities.swift */,
+				9C6397CB1D346C4000966761 /* Filter.swift */,
 				9C6397C71D34015100966761 /* RawFilter.swift */,
 				9C6397C91D34016700966761 /* ThreePointFilter.swift */,
 				13AE20C31CF8B0C4004B0D6B /* KalmanFilter.swift */,
@@ -165,6 +168,7 @@
 				13B648EE1CF3B82B00CA656A /* ViewController.swift in Sources */,
 				13CCEB331D0890E9005556A8 /* MapView.swift in Sources */,
 				13B648EC1CF3B82B00CA656A /* AppDelegate.swift in Sources */,
+				9C6397CC1D346C4000966761 /* Filter.swift in Sources */,
 				13CCEB2F1D088C97005556A8 /* MapViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

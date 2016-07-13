@@ -8,7 +8,14 @@
 
 import Foundation
 
-func RawFilter(x :Double, y: Double, z: Double) -> (Double, Double, Double) {
+class RawFilter: Filter {
     
-    return (x, y, z)
+    func initFilter(deviceMotionUpdateInterval: Double) {
+    }
+    
+    func filter<T>(x: T, y: T, z: T) -> (T, T, T) {
+        return (x, y, z)
+    }
+    
 }
+
