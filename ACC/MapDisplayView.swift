@@ -41,7 +41,8 @@ class MapDisplayView: UIView {
         didSet {
             gridLayer.frame = frame
             pathLayer.frame = frame
-            textLayer.frame = CGRectMake(0, frame.height/2, frame.width, frame.height)
+            //textLayer.frame = CGRectMake(0, frame.height/2, frame.width, frame.height)
+            textLayer.frame = frame
         }
     }
     
@@ -89,6 +90,8 @@ class MapDisplayView: UIView {
     
     func setOrigin(x: Double, y: Double) {
         pathLayer.setOrigin(x, y: y)
+        gridLayer.setOrigin(x, y: y)
+        textLayer.setOrigin(x, y: y)
     }
 
 }

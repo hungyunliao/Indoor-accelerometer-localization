@@ -13,6 +13,7 @@ class MapViewController: UIViewController, DataProcessorDelegate {
     
     // MARK: Model
     var dataSource: DataProcessor? = nil
+    var origin = ThreeAxesSystem<Double>(x: 0, y: 0, z: 0)
     
     // MARK: PublicDB used to pass the object of DataProcessor
     var publicDB = NSUserDefaults.standardUserDefaults()
@@ -22,8 +23,47 @@ class MapViewController: UIViewController, DataProcessorDelegate {
             mapDisplayView.addGestureRecognizer(UIPinchGestureRecognizer(
                 target: mapDisplayView, action: #selector(MapDisplayView.changeScale(_:))
                 ))
+            
+            let rightSwipeGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(MapViewController.moveScreenToRight))
+            rightSwipeGestureRecognizer.direction = .Right
+            mapDisplayView.addGestureRecognizer(rightSwipeGestureRecognizer)
+            
+            let upSwipeGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(MapViewController.moveScreenToUp))
+            upSwipeGestureRecognizer.direction = .Up
+            mapDisplayView.addGestureRecognizer(upSwipeGestureRecognizer)
+            
+            let downSwipeGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(MapViewController.moveScreenToDown))
+            downSwipeGestureRecognizer.direction = .Down
+            mapDisplayView.addGestureRecognizer(downSwipeGestureRecognizer)
+            
+            let leftSwipeGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(MapViewController.moveScreenToLeft))
+            leftSwipeGestureRecognizer.direction = .Left
+            mapDisplayView.addGestureRecognizer(leftSwipeGestureRecognizer)
+            
+            
         }
     }
+    
+    func moveScreenToRight() {
+        origin.x += 20
+        mapDisplayView.setOrigin(origin.x, y: origin.y)
+    }
+    
+    func moveScreenToUp() {
+        origin.y -= 20
+        mapDisplayView.setOrigin(origin.x, y: origin.y)
+    }
+    
+    func moveScreenToDown() {
+        origin.y += 20
+        mapDisplayView.setOrigin(origin.x, y: origin.y)
+    }
+    
+    func moveScreenToLeft() {
+        origin.x -= 20
+        mapDisplayView.setOrigin(origin.x, y: origin.y)
+    }
+    
     @IBAction func cleanpath(sender: UIButton) {
         mapDisplayView?.cleanPath()
     }
@@ -40,10 +80,13 @@ class MapViewController: UIViewController, DataProcessorDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(receiveDataSource(_:)), name:"dataSource", object: nil)
+        
         // MapDisplayView API setup
         mapDisplayView.setScale(1.0)
         mapDisplayView.frame = view.frame
-        mapDisplayView.setOrigin(Double(mapDisplayView.frame.midX), y: Double(mapDisplayView.frame.midY))
+        origin.x = Double(mapDisplayView.frame.midX)
+        origin.y = Double(mapDisplayView.frame.midY)
+        mapDisplayView.setOrigin(origin.x, y: origin.y)
         mapDisplayView.layerGradient(UIColor.whiteColor().CGColor, bottomColor: UIColor.cyanColor().colorWithAlphaComponent(0.5).CGColor)
         
     }

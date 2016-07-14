@@ -18,6 +18,8 @@ class GridLayer: CAShapeLayer {
         }
     }
     
+    var origin = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z: 0)
+    
     init(frame: CGRect) {
         super.init()
         self.strokeColor = gridColor.CGColor
@@ -44,12 +46,22 @@ class GridLayer: CAShapeLayer {
      - Parameter rect: The rectangle area to draw the grids in it.
      
      */
+    
+    func setOrigin(x: Double, y: Double) {
+        origin.x = CGFloat(x)
+        origin.y = CGFloat(y)
+        updateGridPath(bounds)
+    }
+    
     private func updateGridPath(rect: CGRect) {
         // Draw nothing when the rect is too small
         if CGRectGetWidth(rect) < 1 || CGRectGetHeight(rect) < 1 {
             return
         }
-        let centerPoint = CGPointMake(CGRectGetMidX(rect), CGRectGetMidY(rect))
+        
+        self.sublayers?.removeAll()
+        
+        let centerPoint = CGPointMake(origin.x, origin.y)
         
         // draw the grid
         let gridPath = UIBezierPath()
@@ -75,11 +87,11 @@ class GridLayer: CAShapeLayer {
                 continue
             }
             if Double(i)%2 == 0 {
-                scalePath.moveToPoint(CGPoint(x: bounds.width/2, y: centerPoint.y + CGFloat(i) * gridSize))
-                scalePath.addLineToPoint(CGPoint(x: bounds.width/2 + 5, y: centerPoint.y + CGFloat(i) * gridSize))
+                scalePath.moveToPoint(CGPoint(x: centerPoint.x, y: centerPoint.y + CGFloat(i) * gridSize))
+                scalePath.addLineToPoint(CGPoint(x: centerPoint.x + 5, y: centerPoint.y + CGFloat(i) * gridSize))
                 
-                scalePath.moveToPoint(CGPoint(x: bounds.width/2, y: centerPoint.y - CGFloat(i) * gridSize))
-                scalePath.addLineToPoint(CGPoint(x: bounds.width/2 + 5, y: centerPoint.y - CGFloat(i) * gridSize))
+                scalePath.moveToPoint(CGPoint(x: centerPoint.x, y: centerPoint.y - CGFloat(i) * gridSize))
+                scalePath.addLineToPoint(CGPoint(x: centerPoint.x + 5, y: centerPoint.y - CGFloat(i) * gridSize))
             }
             
             gridPath.moveToPoint(CGPoint(x: CGFloat(0), y: centerPoint.y + CGFloat(i) * gridSize))
@@ -96,11 +108,11 @@ class GridLayer: CAShapeLayer {
                 continue
             }
             if Double(i)%2 == 0 {
-                scalePath.moveToPoint(CGPoint(x: centerPoint.x +  CGFloat(i) * gridSize, y: bounds.height/2 - 5))
-                scalePath.addLineToPoint(CGPoint(x: centerPoint.x + CGFloat(i) * gridSize, y: bounds.height/2))
+                scalePath.moveToPoint(CGPoint(x: centerPoint.x +  CGFloat(i) * gridSize, y: centerPoint.y - 5))
+                scalePath.addLineToPoint(CGPoint(x: centerPoint.x + CGFloat(i) * gridSize, y: centerPoint.y))
                 
-                scalePath.moveToPoint(CGPoint(x: centerPoint.x -  CGFloat(i) * gridSize, y: bounds.height/2 - 5))
-                scalePath.addLineToPoint(CGPoint(x: centerPoint.x - CGFloat(i) * gridSize, y: bounds.height/2))
+                scalePath.moveToPoint(CGPoint(x: centerPoint.x -  CGFloat(i) * gridSize, y: centerPoint.y - 5))
+                scalePath.addLineToPoint(CGPoint(x: centerPoint.x - CGFloat(i) * gridSize, y: centerPoint.y))
             }
             
             gridPath.moveToPoint(CGPoint(x: centerPoint.x +  CGFloat(i) * gridSize, y: CGFloat(0)))

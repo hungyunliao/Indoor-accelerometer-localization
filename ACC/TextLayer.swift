@@ -18,6 +18,8 @@ class TextLayer: CATextLayer {
         }
     }
     
+    var origin = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z: 0)
+    
     var scaleValue: Double {
         didSet {
             updateUI()
@@ -47,6 +49,12 @@ class TextLayer: CATextLayer {
         }
     }
     
+    func setOrigin(x: Double, y: Double) {
+        origin.x = CGFloat(x)
+        origin.y = CGFloat(y)
+        updateUI()
+    }
+    
     private func showIntIfCan(aDouble: Double) -> String {
         return aDouble%1 != 0 ? "\(aDouble)" : "\(Int(aDouble))"
     }
@@ -55,52 +63,45 @@ class TextLayer: CATextLayer {
         
         self.sublayers?.removeAll()
         
+        let centerPoint = CGPointMake(origin.x, origin.y)
+        
         for i in 0..<Int(bounds.width) {
+            
             let shift: CGFloat
             if i%2 == 0 {
                 shift = 0
             } else {
                 shift = -15
             }
-            let rightText: CATextLayer = CATextLayer()
-            rightText.fontSize = 10
-            rightText.frame = CGRectMake(-3 + self.frame.width/2 + CGFloat(i)*20, shift, 30, 30)
-            rightText.string = showIntIfCan(Double(i) * scaleValue)
-            rightText.foregroundColor = UIColor.blackColor().CGColor
-            self.addSublayer(rightText)
             
-            if i == 0 {
-                continue
-            }
+            let positiveXNums = drawTextLayer(CGRectMake(-3 + centerPoint.x + CGFloat(i)*20, centerPoint.y + shift, 30, 30), printText: showIntIfCan(Double(i) * scaleValue))
+            self.addSublayer(positiveXNums)
             
-            let leftText: CATextLayer = CATextLayer()
-            leftText.fontSize = 10
-            leftText.frame = CGRectMake(-3 + self.frame.width/2 + CGFloat(-i)*20, shift, 30, 30)
-            leftText.string = showIntIfCan(Double(-i) * scaleValue)
-            leftText.foregroundColor = UIColor.blackColor().CGColor
-            self.addSublayer(leftText)
+            if i == 0 { continue }
+            
+            let negativeXNums = drawTextLayer(CGRectMake(-3 + centerPoint.x + CGFloat(-i)*20, centerPoint.y + shift, 30, 30), printText: showIntIfCan(Double(-i) * scaleValue))
+            self.addSublayer(negativeXNums)
         }
         
         for i in 0..<Int(bounds.height) {
             
-            if i == 0 {
-                continue
-            }
+            if i == 0 { continue }
             
-            let upText: CATextLayer = CATextLayer()
-            upText.fontSize = 10
-            upText.frame = CGRectMake(-20 + self.frame.width/2, -8 + CGFloat(-i)*20 , 30, 30)
-            upText.string = showIntIfCan(Double(i) * scaleValue)
-            upText.foregroundColor = UIColor.blackColor().CGColor
-            self.addSublayer(upText)
+            let positiveYNums = drawTextLayer(CGRectMake(-20 + centerPoint.x, -8 + centerPoint.y + CGFloat(-i)*20 , 30, 30), printText: showIntIfCan(Double(i) * scaleValue))
+            self.addSublayer(positiveYNums)
             
-            let downText: CATextLayer = CATextLayer()
-            downText.fontSize = 10
-            downText.frame = CGRectMake(-25 + self.frame.width/2, -8 + CGFloat(i)*20 , 30, 30)
-            downText.string = showIntIfCan(Double(-i) * scaleValue)
-            downText.foregroundColor = UIColor.blackColor().CGColor
-            self.addSublayer(downText)
+            let negativeYNums = drawTextLayer(CGRectMake(-25 + centerPoint.x, -8 + centerPoint.y + CGFloat(i)*20 , 30, 30), printText: showIntIfCan(Double(-i) * scaleValue))
+            self.addSublayer(negativeYNums)
         }
+    }
+    
+    private func drawTextLayer(frame: CGRect, printText: String) -> CATextLayer {
+        let text: CATextLayer = CATextLayer()
+        text.fontSize = 10
+        text.frame = frame
+        text.string = printText
+        text.foregroundColor = UIColor.blackColor().CGColor
+        return text
     }
     
     private func updateBounds(rect: CGRect) {

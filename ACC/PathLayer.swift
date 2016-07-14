@@ -49,19 +49,19 @@ class PathLayer: CAShapeLayer {
     // Not yet implement "Z" axis
     private var routePath = UIBezierPath()
     private var pathPoints = [ThreeAxesSystem<CGFloat>]() // an array that keeps the original path points which are used to re-draw the routePath when the scale is changed.
-    private var origin = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z:0)
+    private var previousOrigin = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z:0)
+    private var currentOrigin = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z:0)
     private var previousPoint = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z: 0)
     private var currentPoint = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z: 0)
     private var resetOffset = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z:0)
     
-    private var isCleanPath = false
     private var isResetScale = false
-    private var scale: CGFloat = 1.0
+    private var accumulatedScale: CGFloat = 1.0
     
     
     /* MARK: Public APIs */
     func setScale(scale: Double) {
-        self.scale *= CGFloat(scale)
+        accumulatedScale *= CGFloat(scale)
         resetOffset.x *= CGFloat(scale)
         resetOffset.y *= CGFloat(scale)
         
@@ -80,9 +80,26 @@ class PathLayer: CAShapeLayer {
     }
     
     func setOrigin(x: Double, y: Double) {
-        cleanPath()
-        origin.x = CGFloat(x)
-        origin.y = CGFloat(y)
+        
+        previousOrigin.x = currentOrigin.x
+        previousOrigin.y = currentOrigin.y
+        
+        if !pathPoints.isEmpty {
+            for i in 0..<pathPoints.count {
+                pathPoints[i].x -= (currentOrigin.x - previousOrigin.x)
+                pathPoints[i].y -= (currentOrigin.x - previousOrigin.x)
+            }
+            
+            currentPoint.x = pathPoints[pathPoints.count-1].x
+            currentPoint.y = pathPoints[pathPoints.count-1].y
+            isResetScale = true
+        }
+
+        resetOffset.x += (currentOrigin.x - previousOrigin.x)
+        resetOffset.y += (currentOrigin.y - previousOrigin.y)
+        
+        currentOrigin.x = CGFloat(x)
+        currentOrigin.y = CGFloat(y)
         updateRoutePath()
     }
     
@@ -91,8 +108,8 @@ class PathLayer: CAShapeLayer {
         previousPoint.x = currentPoint.x
         previousPoint.y = currentPoint.y
 
-        currentPoint.x = CGFloat(x)*scale - resetOffset.x
-        currentPoint.y = CGFloat(y)*scale - resetOffset.y
+        currentPoint.x = CGFloat(x)*accumulatedScale - resetOffset.x
+        currentPoint.y = CGFloat(y)*accumulatedScale - resetOffset.y
         
         pathPoints.append(ThreeAxesSystem<CGFloat>(x: currentPoint.x, y: currentPoint.y, z: 0)) // z has not yet been implemented
         updateRoutePath()
@@ -129,18 +146,18 @@ class PathLayer: CAShapeLayer {
         if isResetScale {
             routePath.removeAllPoints()
             for i in 0..<(pathPoints.count - 1) {
-                routePath.moveToPoint(CGPoint(x: pathPoints[i].x + origin.x, y: pathPoints[i].y + origin.y))
-                routePath.addLineToPoint(CGPoint(x: pathPoints[i+1].x + origin.x, y: pathPoints[i+1].y + origin.y))
+                routePath.moveToPoint(CGPoint(x: pathPoints[i].x + currentOrigin.x, y: pathPoints[i].y + currentOrigin.y))
+                routePath.addLineToPoint(CGPoint(x: pathPoints[i+1].x + currentOrigin.x, y: pathPoints[i+1].y + currentOrigin.y))
             }
             isResetScale = false
             
         } else {
-            routePath.moveToPoint(CGPoint(x: previousPoint.x + origin.x, y: previousPoint.y + origin.y))
-            routePath.addLineToPoint(CGPoint(x: currentPoint.x + origin.x, y: currentPoint.y + origin.y))
+            routePath.moveToPoint(CGPoint(x: previousPoint.x + currentOrigin.x, y: previousPoint.y + currentOrigin.y))
+            routePath.addLineToPoint(CGPoint(x: currentPoint.x + currentOrigin.x, y: currentPoint.y + currentOrigin.y))
         }
         
         var circle = UIBezierPath()
-        circle = getCircle(atCenter: CGPoint(x: currentPoint.x + origin.x, y: currentPoint.y + origin.y), radius: CGFloat(5))
+        circle = getCircle(atCenter: CGPoint(x: currentPoint.x + currentOrigin.x, y: currentPoint.y + currentOrigin.y), radius: CGFloat(5))
         
         drawing.appendPath(routePath)
         drawing.appendPath(circle)
