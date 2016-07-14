@@ -52,10 +52,16 @@ class TextLayer: CATextLayer {
         self.sublayers?.removeAll()
         
         for i in 0..<Int(bounds.width) {
+            let shift: CGFloat
+            if i%2 == 0 {
+                shift = 0
+            } else {
+                shift = -18
+            }
             let rightText: CATextLayer = CATextLayer()
             rightText.fontSize = 10
-            rightText.frame = CGRectMake(-3 + self.frame.width/2 + CGFloat(i)*20, 0, 20, 20)
-            rightText.string = "\(i * Int(scaleValue))"
+            rightText.frame = CGRectMake(-3 + self.frame.width/2 + CGFloat(i)*20, shift, 30, 30)
+            rightText.string = "\(Double(i) * scaleValue)"
             rightText.foregroundColor = UIColor.blackColor().CGColor
             self.addSublayer(rightText)
             
@@ -65,8 +71,8 @@ class TextLayer: CATextLayer {
             
             let leftText: CATextLayer = CATextLayer()
             leftText.fontSize = 10
-            leftText.frame = CGRectMake(-3 + self.frame.width/2 + CGFloat(-i)*20, 0, 20, 20)
-            leftText.string = "\(-i * Int(scaleValue))"
+            leftText.frame = CGRectMake(-3 + self.frame.width/2 + CGFloat(-i)*20, shift, 30, 30)
+            leftText.string = "\(Double(-i) * scaleValue)"
             leftText.foregroundColor = UIColor.blackColor().CGColor
             self.addSublayer(leftText)
         }
@@ -79,15 +85,15 @@ class TextLayer: CATextLayer {
             
             let upText: CATextLayer = CATextLayer()
             upText.fontSize = 10
-            upText.frame = CGRectMake(-13 + self.frame.width/2, -8 + CGFloat(-i)*20 , 20, 20)
-            upText.string = "\(i * Int(scaleValue))"
+            upText.frame = CGRectMake(-13 + self.frame.width/2, -8 + CGFloat(-i)*20 , 30, 30)
+            upText.string = "\(Double(i) * scaleValue)"
             upText.foregroundColor = UIColor.blackColor().CGColor
             self.addSublayer(upText)
             
             let downText: CATextLayer = CATextLayer()
             downText.fontSize = 10
-            downText.frame = CGRectMake(-17 + self.frame.width/2, -8 + CGFloat(i)*20 , 20, 20)
-            downText.string = "\(-i * Int(scaleValue))"
+            downText.frame = CGRectMake(-17 + self.frame.width/2, -8 + CGFloat(i)*20 , 30, 30)
+            downText.string = "\(Double(-i) * scaleValue)"
             downText.foregroundColor = UIColor.blackColor().CGColor
             self.addSublayer(downText)
         }

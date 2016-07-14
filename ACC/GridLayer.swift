@@ -50,19 +50,22 @@ class GridLayer: CAShapeLayer {
             return
         }
         let centerPoint = CGPointMake(CGRectGetMidX(rect), CGRectGetMidY(rect))
+        
+        // draw the grid
+        let gridPath = UIBezierPath()
         let gridSize = CGFloat(10)
         
-        let gridPath = UIBezierPath()
+        // draw the scales
         let scalePath = UIBezierPath()
-        
-        let scaleLayer: CAShapeLayer = CAShapeLayer()
+        let scaleLayer = CAShapeLayer()
         scaleLayer.strokeColor = UIColor.blackColor().CGColor
         scaleLayer.lineWidth = 1.5
         
-        let axisLayer = CAShapeLayer()
+        // draw X, Y axises
         let axisPath = UIBezierPath()
-        axisLayer.lineWidth = 2
+        let axisLayer = CAShapeLayer()
         axisLayer.strokeColor = UIColor.blackColor().CGColor
+        axisLayer.lineWidth = 2
         
         
         for i in 0...Int(bounds.height) {

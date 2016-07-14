@@ -40,77 +40,67 @@ class PathLayer: CAShapeLayer {
     
     /* MARK: Private instances */
     // Not yet implement "Z" axis
-    private var previousMapX: CGFloat = 0 { didSet { updateRoutePath() } }
-    private var previousMapY: CGFloat = 0 { didSet { updateRoutePath() } }
-    private var currentMapX: CGFloat = 0 { didSet { updateRoutePath() } }
-    private var currentMapY: CGFloat = 0 { didSet { updateRoutePath() } }
+    private var pathPoints = [ThreeAxesSystem<CGFloat>]()
+    private var previousPoint = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z: 0) { didSet { updateRoutePath() } }
+    private var currentPoint = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z: 0) { didSet { updateRoutePath() } }
     private var routePath = UIBezierPath()
     private var isReset = false
+    private var isResetScale = false
     private var scale: CGFloat = 1.0
     
-    private var resetXOffset: CGFloat = 0.0
-    private var resetYOffset: CGFloat = 0.0
+    private var resetOffset = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z:0)
     
-    private var originX: CGFloat {
-        get {
-            return bounds.midX
-        }
-        set {
-            self.originX = newValue
-        }
-    }
-    
-    private var originY: CGFloat {
-        get {
-            return bounds.midY
-        }
-        set {
-            self.originY = newValue
-        }
-    }
-    
+    private var origin = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z:0)
     
     /* MARK: Public APIs */
     func setScale(scale: Double) {
         self.scale = CGFloat(scale)
+        if !pathPoints.isEmpty {
+            for i in 0..<pathPoints.count {
+                pathPoints[i].x *= self.scale
+                pathPoints[i].y *= self.scale
+                pathPoints[i].z *= self.scale
+            }
+            
+            currentPoint.x = pathPoints[pathPoints.count-1].x
+            currentPoint.y = pathPoints[pathPoints.count-1].y
+            isResetScale = true
+        }
+        updateRoutePath()
     }
     
     func setOrigin(x: Double, y: Double) {
         cleanPath()
-        originX = CGFloat(x)
-        originY = CGFloat(y)
+        origin.x = CGFloat(x)
+        origin.y = CGFloat(y)
     }
     
     func movePointTo(x: Double, y: Double) {
         
         if !isReset {
-            previousMapX = currentMapX
-            previousMapY = currentMapY
+            previousPoint.x = currentPoint.x
+            previousPoint.y = currentPoint.y
         } else {
-            previousMapX = 0
-            previousMapY = 0
+            previousPoint.x = 0
+            previousPoint.y = 0
             isReset = false
         }
-        currentMapX = CGFloat(x)*scale - resetXOffset
-        currentMapY = CGFloat(y)*scale - resetYOffset
+        currentPoint.x = CGFloat(x)*scale - resetOffset.x
+        currentPoint.y = CGFloat(y)*scale - resetOffset.y
+        
+        pathPoints.append(ThreeAxesSystem<CGFloat>(x: currentPoint.x, y: currentPoint.y, z: 0)) // z has not yet been implemented
     }
     
     func cleanPath() {
-        if currentMapX != 0 && currentMapY != 0 {
-            resetXOffset += currentMapX
-            resetYOffset += currentMapY
+        if currentPoint.x != 0 && currentPoint.y != 0 {
+            resetOffset.x += currentPoint.x
+            resetOffset.y += currentPoint.y
         }
         isReset = true
         routePath.removeAllPoints()
+        pathPoints.removeAll()
     }
     
-    
-    /**
-     Draw Grids in given rectangle
-     
-     - Parameter rect: The rectangle area to draw the grids in it.
-     
-     */
     private func updatePath(rect: CGRect) {
         // Draw nothing when the rect is too small
         if CGRectGetWidth(rect) < 1 || CGRectGetHeight(rect) < 1 {
@@ -122,18 +112,24 @@ class PathLayer: CAShapeLayer {
     var test: Int = 0
     
     private func updateRoutePath() {
+        
         let drawing = UIBezierPath()
-        test += 1
-
-        routePath.moveToPoint(CGPoint(x: previousMapX + originX, y: previousMapY + originY))
-        print("previous= \(previousMapX + originX)")
-        print("previous= \(previousMapY + originY)")
-        routePath.addLineToPoint(CGPoint(x: currentMapX + originX, y: currentMapY + originY))
-        print("current= \(currentMapX + originX)")
-        print("current= \(currentMapY + originY)")
+        
+        if isResetScale {
+            routePath.removeAllPoints()
+            for i in 0..<(pathPoints.count - 1) {
+                routePath.moveToPoint(CGPoint(x: pathPoints[i].x + origin.x, y: pathPoints[i].y + origin.y))
+                routePath.addLineToPoint(CGPoint(x: pathPoints[i+1].x + origin.x, y: pathPoints[i+1].y + origin.y))
+            }
+            isResetScale = false
+            
+        } else {
+            routePath.moveToPoint(CGPoint(x: previousPoint.x + origin.x, y: previousPoint.y + origin.y))
+            routePath.addLineToPoint(CGPoint(x: currentPoint.x + origin.x, y: currentPoint.y + origin.y))
+        }
         
         var circle = UIBezierPath()
-        circle = getCircle(atCenter: CGPoint(x: currentMapX + originX, y: currentMapY + originY), radius: CGFloat(5))
+        circle = getCircle(atCenter: CGPoint(x: currentPoint.x + origin.x, y: currentPoint.y + origin.y), radius: CGFloat(5))
         
         drawing.appendPath(routePath)
         drawing.appendPath(circle)
@@ -142,3 +138,4 @@ class PathLayer: CAShapeLayer {
         self.setNeedsDisplay()
     }
 }
+

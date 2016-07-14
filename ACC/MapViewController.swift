@@ -42,6 +42,7 @@ class MapViewController: UIViewController, DataProcessorDelegate {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(receiveDataSource(_:)), name:"dataSource", object: nil)
         mapDisplayView.setScale(1.0)
         mapDisplayView.frame = view.frame
+        mapDisplayView.setOrigin(Double(mapDisplayView.frame.midX), y: Double(mapDisplayView.frame.midY))
         mapDisplayView.layerGradient(UIColor.whiteColor().CGColor, bottomColor: UIColor.cyanColor().colorWithAlphaComponent(0.5).CGColor)
         
     }
