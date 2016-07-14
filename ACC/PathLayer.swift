@@ -17,10 +17,17 @@ class PathLayer: CAShapeLayer {
         }
     }
     
+    var circleColor: UIColor = UIColor.init(red: 0, green: 71/255.0, blue: 102/255.0, alpha: 0.8) {
+        didSet {
+            self.fillColor = circleColor.CGColor
+            self.setNeedsDisplay()
+        }
+    }
+    
     init(frame: CGRect) {
         super.init()
         self.strokeColor = pathColor.CGColor
-        self.fillColor = pathColor.CGColor
+        self.fillColor = circleColor.CGColor
         self.backgroundColor = UIColor.clearColor().CGColor
         self.frame = frame
     }
@@ -47,7 +54,7 @@ class PathLayer: CAShapeLayer {
     private var currentPoint = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z: 0)
     private var resetOffset = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z:0)
     
-    private var isReset = false
+    private var isCleanPath = false
     private var isResetScale = false
     private var scale: CGFloat = 1.0
     
@@ -55,6 +62,8 @@ class PathLayer: CAShapeLayer {
     /* MARK: Public APIs */
     func setScale(scale: Double) {
         self.scale *= CGFloat(scale)
+        resetOffset.x *= CGFloat(scale)
+        resetOffset.y *= CGFloat(scale)
         
         if !pathPoints.isEmpty {
             for i in 0..<pathPoints.count {
@@ -79,14 +88,9 @@ class PathLayer: CAShapeLayer {
     
     func movePointTo(x: Double, y: Double) {
         
-        if !isReset {
-            previousPoint.x = currentPoint.x
-            previousPoint.y = currentPoint.y
-        } else {
-            previousPoint.x = 0
-            previousPoint.y = 0
-            isReset = false
-        }
+        previousPoint.x = currentPoint.x
+        previousPoint.y = currentPoint.y
+
         currentPoint.x = CGFloat(x)*scale - resetOffset.x
         currentPoint.y = CGFloat(y)*scale - resetOffset.y
         
@@ -95,11 +99,16 @@ class PathLayer: CAShapeLayer {
     }
     
     func cleanPath() {
-        if currentPoint.x != 0 && currentPoint.y != 0 {
+        
+        if !pathPoints.isEmpty {
             resetOffset.x += currentPoint.x
             resetOffset.y += currentPoint.y
         }
-        isReset = true
+        currentPoint.x = 0
+        currentPoint.y = 0
+        previousPoint.x = 0
+        previousPoint.y = 0
+        
         routePath.removeAllPoints()
         pathPoints.removeAll()
         updateRoutePath()

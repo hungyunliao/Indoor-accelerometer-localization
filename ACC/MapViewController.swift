@@ -40,6 +40,7 @@ class MapViewController: UIViewController, DataProcessorDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(receiveDataSource(_:)), name:"dataSource", object: nil)
+        // MapDisplayView API setup
         mapDisplayView.setScale(1.0)
         mapDisplayView.frame = view.frame
         mapDisplayView.setOrigin(Double(mapDisplayView.frame.midX), y: Double(mapDisplayView.frame.midY))
