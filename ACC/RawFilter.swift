@@ -13,7 +13,8 @@ class RawFilter: Filter {
     func initFilter(deviceMotionUpdateInterval: Double) {
     }
     
-    func filter<T>(x: T, y: T, z: T) -> (T, T, T) {
+    //func filter<T>(x: T, y: T, z: T) -> (T, T, T) {
+    func filter(x: Double, y: Double, z: Double) -> (Double, Double, Double) {
         return (x, y, z)
     }
     

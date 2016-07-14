@@ -49,6 +49,21 @@ class ViewController: UIViewController {
     var index = 0
     var modulusDiff = -1.0
     
+    // MARK: Filter decision
+    enum Option {
+        case Raw
+        case ThreePoint
+        case Kalman
+    }
+    let filterChoice = Option.ThreePoint
+    
+    // MARK: Performance measure
+    var performanceDataArrayX = [Double]()
+    var performanceDataArrayY = [Double]()
+    var performanceDataArrayZ = [Double]()
+    var count = 1
+    var performanceDataSize = 100
+    
     // MARK: Outlets
     @IBOutlet var info: UILabel?
     
@@ -112,7 +127,7 @@ class ViewController: UIViewController {
                 print("error here \(error)")
             }
         })
-        
+
         //linearCoef = SimpleLinearRegression(arrayOfPoints, y: arrayOfPoints) // For Kalman. Initializing the coef before the recording functions running
     }
     
@@ -120,13 +135,14 @@ class ViewController: UIViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
+
     // MARK: Functions
     func outputXTrueNorthMotionData(motion: CMDeviceMotion) {
         
         let acc: CMAcceleration = motion.userAcceleration
         //print(acc)
         let rot = motion.attitude.rotationMatrix
+        
         var x = 0.0
         var y = 0.0
         var z = 0.0
@@ -134,14 +150,18 @@ class ViewController: UIViewController {
         x = (acc.x*rot.m11 + acc.y*rot.m21 + acc.z*rot.m31) * gravityConstant
         y = (acc.x*rot.m12 + acc.y*rot.m22 + acc.z*rot.m32) * gravityConstant
         z = (acc.x*rot.m13 + acc.y*rot.m23 + acc.z*rot.m33) * gravityConstant
-
-        enum Option {
-            case Raw
-            case ThreePoint
-            case Kalman
+        
+        if count <= performanceDataSize {
+            performanceDataArrayX.append(x)
+            performanceDataArrayY.append(y)
+            performanceDataArrayZ.append(z)
+            if count == performanceDataSize {
+                //print(performanceDataArrayX)
+                performance(performanceDataArrayX, arrY: performanceDataArrayY, arrZ: performanceDataArrayZ, performanceDataSize: performanceDataSize)
+            }
+            count += 1
         }
         
-        let filterChoice = Option.Raw
         var test:Filter
         
         switch filterChoice {
@@ -313,7 +333,6 @@ class ViewController: UIViewController {
     }
     
     func outputRotData(rotation: CMRotationRate) {
-        
         // Static Judgement Condition 2
         if modulus(gyroSys.output.x, y: gyroSys.output.y, z: gyroSys.output.z) < staticStateJudgeThreshold.gyroModulus {
             staticStateJudge.modulGyro = true
@@ -322,15 +341,6 @@ class ViewController: UIViewController {
         }
     }
     
-}
-
-// this STDEV function is from github: https://gist.github.com/jonelf/9ae2a2133e21e255e692
-func standardDeviation(arr : [Double]) -> Double
-{
-    let length = Double(arr.count)
-    let avg = arr.reduce(0, combine: {$0 + $1}) / length
-    let sumOfSquaredAvgDiff = arr.map { pow($0 - avg, 2.0)}.reduce(0, combine: {$0 + $1})
-    return sqrt(sumOfSquaredAvgDiff / length)
 }
 
 // MARK: operator define
@@ -353,6 +363,44 @@ func modulusDifference(arr: [Double], avgModulus: Double) -> Double {
 
 func roundNum(number: Double) -> Double {
     return round(number * 10000) / 10000
+}
+
+func performance (arrX : [Double], arrY : [Double], arrZ : [Double], performanceDataSize: Int) {
+    //let typeOfFilter = "Raw"
+    var test:Filter
+    var resultX = 0.0
+    var resultY = 0.0
+    var resultZ = 0.0
+    var outX = Array(count: performanceDataSize, repeatedValue:0.0)
+    var outY = Array(count: performanceDataSize, repeatedValue:0.0)
+    var outZ = Array(count: performanceDataSize, repeatedValue:0.0)
+    
+    test = RawFilter()
+    for index in 0..<performanceDataSize {
+        (outX[index], outY[index], outZ[index]) = test.filter(arrX[index], y: arrY[index], z: arrZ[index])
+    }
+    resultX = standardDeviation(outX)
+    resultY = standardDeviation(outY)
+    resultZ = standardDeviation(outZ)
+    print("Raw       :", resultX, resultY, resultZ)
+    
+    test = ThreePointFilter()
+    for index in 0..<performanceDataSize {
+        (outX[index], outY[index], outZ[index]) = test.filter(arrX[index], y: arrY[index], z: arrZ[index])
+    }
+    resultX = standardDeviation(outX)
+    resultY = standardDeviation(outY)
+    resultZ = standardDeviation(outZ)
+    print("ThreePoint:", resultX, resultY, resultZ)
+}
+
+// this STDEV function is from github: https://gist.github.com/jonelf/9ae2a2133e21e255e692
+func standardDeviation(arr : [Double]) -> Double
+{
+    let length = Double(arr.count)
+    let avg = arr.reduce(0, combine: {$0 + $1}) / length
+    let sumOfSquaredAvgDiff = arr.map { pow($0 - avg, 2.0)}.reduce(0, combine: {$0 + $1})
+    return sqrt(sumOfSquaredAvgDiff / length)
 }
 
 func SimpleLinearRegression (x: [Double], y: [Double]) -> (Double, Double) {

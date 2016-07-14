@@ -12,6 +12,7 @@ import CoreMotion
 var threePtFilterPointsDone = 1
 let numberOfPointsForThreePtFilter = 3
 
+/*
 protocol Type {
     
     func +(lhs: Self, rhs: Self) -> Self
@@ -27,24 +28,27 @@ func add<Element : Type>(lhs: Element, rhs: Element) -> Element {
     let rhs = rhs
     return lhs + rhs
 }
+ */
+var arrayX = [Double]()
+var arrayY = [Double]()
+var arrayZ = [Double]()
+//
 
 class ThreePointFilter : Filter{
     
     func initFilter(deviceMotionUpdateInterval: Double) {
-
     }
+
     /*
     var arrayX = [T]()
     var arrayY = [T]()
     var arrayZ = [T]()
     */
-    func filter<T>(x: T, y: T, z: T) -> (T, T, T) {
-    //func filter(x: Double, y: Double, z: Double) -> (Double, Double, Double) {
+    //func filter<T>(x: T, y: T, z: T) -> (T, T, T) {
+    func filter(x: Double, y: Double, z: Double) -> (Double, Double, Double) {
         var x = x, y = y, z = z
-        print(x.dynamicType)
-        var arrayX = [T]()
-        var arrayY = [T]()
-        var arrayZ = [T]()
+        
+        //print(x.dynamicType)
         
         arrayX.append(x)
         arrayY.append(y)
@@ -59,24 +63,23 @@ class ThreePointFilter : Filter{
         } else {
             
             for i in 0..<numberOfPointsForThreePtFilter {
-                /*
+                
                 x = x + arrayX[i]
                 y = y + arrayY[i]
                 z = z + arrayZ[i]
- */
-                print(add(2.562, rhs: 3.8))
+ 
+                //print(add(2.562, rhs: 3.8))
                 //print(add(x, rhs: arrayX[i]))
             }
-            /*
-            x = x / threePtFilterPointsDone
-            y = y / threePtFilterPointsDone
-            z = z / threePtFilterPointsDone
-            */
-            /*
+            
+            x = x / Double(threePtFilterPointsDone)
+            y = y / Double(threePtFilterPointsDone)
+            z = z / Double(threePtFilterPointsDone)
+            
             arrayX.removeFirst()
             arrayY.removeFirst()
             arrayZ.removeFirst()
- */
+
         }
         return (x, y, z)
     }
