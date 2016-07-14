@@ -66,10 +66,11 @@ class MapDisplayView: UIView {
     func changeScale(recognizer: UIPinchGestureRecognizer) {
         switch recognizer.state {
         case .Ended:
-            // restrict the minimum scale to 0.5 instead of 0, otherwise the scale will always be 0 afterwards.
+            
             pinchScale *= recognizer.scale
             pinchScale = toZeroPointFiveMultiples(pinchScale) // let pinchScale always be the multiples of 0.5 to keep the textLayer clean.
-            if pinchScale == 0 {
+            
+            if pinchScale == 0 { // restrict the minimum scale to 0.5 instead of 0, otherwise the scale will always be 0 afterwards.
                 pinchScale = 0.5
             }
             
@@ -78,6 +79,7 @@ class MapDisplayView: UIView {
             if textLayer.scaleValue != 0.5 || pinchScale != 0.5 {
                 pathLayer.setScale(Double(1/times))
             }
+            
             textLayer.scaleValue = Double(pinchScale)
             recognizer.scale = 1
         default:
@@ -88,6 +90,7 @@ class MapDisplayView: UIView {
     func setOrigin(x: Double, y: Double) {
         pathLayer.setOrigin(x, y: y)
     }
+
 }
 
 func toZeroPointFiveMultiples(x: CGFloat) -> CGFloat { // decrease 'x' to the closest *.5  ex: 1.73 -> 1.5, 3.21 -> 3.0, 0.33 -> 0

@@ -40,17 +40,17 @@ class PathLayer: CAShapeLayer {
     
     /* MARK: Private instances */
     // Not yet implement "Z" axis
-    private var pathPoints = [ThreeAxesSystem<CGFloat>]()
-    private var previousPoint = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z: 0) { didSet { updateRoutePath() } }
-    private var currentPoint = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z: 0) { didSet { updateRoutePath() } }
     private var routePath = UIBezierPath()
+    private var pathPoints = [ThreeAxesSystem<CGFloat>]() // an array that keeps the original path points which are used to re-draw the routePath when the scale is changed.
+    private var origin = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z:0)
+    private var previousPoint = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z: 0)
+    private var currentPoint = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z: 0)
+    private var resetOffset = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z:0)
+    
     private var isReset = false
     private var isResetScale = false
     private var scale: CGFloat = 1.0
     
-    private var resetOffset = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z:0)
-    
-    private var origin = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z:0)
     
     /* MARK: Public APIs */
     func setScale(scale: Double) {
@@ -73,6 +73,7 @@ class PathLayer: CAShapeLayer {
         cleanPath()
         origin.x = CGFloat(x)
         origin.y = CGFloat(y)
+        updateRoutePath()
     }
     
     func movePointTo(x: Double, y: Double) {
@@ -89,6 +90,7 @@ class PathLayer: CAShapeLayer {
         currentPoint.y = CGFloat(y)*scale - resetOffset.y
         
         pathPoints.append(ThreeAxesSystem<CGFloat>(x: currentPoint.x, y: currentPoint.y, z: 0)) // z has not yet been implemented
+        updateRoutePath()
     }
     
     func cleanPath() {
@@ -99,6 +101,7 @@ class PathLayer: CAShapeLayer {
         isReset = true
         routePath.removeAllPoints()
         pathPoints.removeAll()
+        updateRoutePath()
     }
     
     private func updatePath(rect: CGRect) {
@@ -108,8 +111,6 @@ class PathLayer: CAShapeLayer {
         }
         self.setNeedsDisplay()
     }
-    
-    var test: Int = 0
     
     private func updateRoutePath() {
         
