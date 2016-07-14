@@ -54,12 +54,13 @@ class PathLayer: CAShapeLayer {
     
     /* MARK: Public APIs */
     func setScale(scale: Double) {
-        self.scale = CGFloat(scale)
+        self.scale *= CGFloat(scale)
+        
         if !pathPoints.isEmpty {
             for i in 0..<pathPoints.count {
-                pathPoints[i].x *= self.scale
-                pathPoints[i].y *= self.scale
-                pathPoints[i].z *= self.scale
+                pathPoints[i].x *= CGFloat(scale)
+                pathPoints[i].y *= CGFloat(scale)
+                pathPoints[i].z *= CGFloat(scale)
             }
             
             currentPoint.x = pathPoints[pathPoints.count-1].x
