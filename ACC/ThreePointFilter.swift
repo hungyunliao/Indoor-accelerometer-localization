@@ -46,7 +46,7 @@ class ThreePointFilter : Filter{
     */
     //func filter<T>(x: T, y: T, z: T) -> (T, T, T) {
     func filter(x: Double, y: Double, z: Double) -> (Double, Double, Double) {
-        var x = x, y = y, z = z
+        var avg = ThreeAxesSystem<Double>(x: 0, y: 0, z: 0)
         
         //print(x.dynamicType)
         
@@ -60,28 +60,32 @@ class ThreePointFilter : Filter{
             
             threePtFilterPointsDone += 1
             
+            avg.x = x
+            avg.y = y
+            avg.z = z
+            
         } else {
             
             for i in 0..<numberOfPointsForThreePtFilter {
                 
-                x = x + arrayX[i]
-                y = y + arrayY[i]
-                z = z + arrayZ[i]
+                avg.x += arrayX[i]
+                avg.y += arrayY[i]
+                avg.z += arrayZ[i]
  
                 //print(add(2.562, rhs: 3.8))
                 //print(add(x, rhs: arrayX[i]))
             }
             
-            x = x / Double(threePtFilterPointsDone)
-            y = y / Double(threePtFilterPointsDone)
-            z = z / Double(threePtFilterPointsDone)
+            avg.x /= Double(numberOfPointsForThreePtFilter)
+            avg.y /= Double(numberOfPointsForThreePtFilter)
+            avg.z /= Double(numberOfPointsForThreePtFilter)
             
             arrayX.removeFirst()
             arrayY.removeFirst()
             arrayZ.removeFirst()
 
         }
-        return (x, y, z)
+        return (avg.x, avg.y, avg.z)
     }
 
 }

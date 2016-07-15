@@ -137,13 +137,9 @@ class DataProcessor {
         //print(acc)
         let rot = motion.attitude.rotationMatrix
         
-        var x = 0.0
-        var y = 0.0
-        var z = 0.0
-        
-        x = (acc.x*rot.m11 + acc.y*rot.m21 + acc.z*rot.m31) * gravityConstant
-        y = (acc.x*rot.m12 + acc.y*rot.m22 + acc.z*rot.m32) * gravityConstant
-        z = (acc.x*rot.m13 + acc.y*rot.m23 + acc.z*rot.m33) * gravityConstant
+        let x = (acc.x*rot.m11 + acc.y*rot.m21 + acc.z*rot.m31) * gravityConstant
+        let y = (acc.x*rot.m12 + acc.y*rot.m22 + acc.z*rot.m32) * gravityConstant
+        let z = (acc.x*rot.m13 + acc.y*rot.m23 + acc.z*rot.m33) * gravityConstant
         
         if count <= performanceDataSize {
             performanceDataArrayX.append(x)
