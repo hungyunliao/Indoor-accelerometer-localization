@@ -88,7 +88,22 @@ class MapViewController: UIViewController, DataProcessorDelegate {
         origin.y = Double(mapDisplayView.frame.midY)
         mapDisplayView.setOrigin(origin.x, y: origin.y)
         mapDisplayView.layerGradient(UIColor.whiteColor().CGColor, bottomColor: UIColor.cyanColor().colorWithAlphaComponent(0.5).CGColor)
-        
+    }
+    
+    override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+        if UIDevice.currentDevice().orientation.isLandscape.boolValue {
+            print("Landscape")
+            //viewDidLoad()
+//            let tempMap: MapDisplayView = MapDisplayView(frame: CGRectMake(30, 30, 100, 100))
+//            tempMap.setOrigin(origin.x, y: origin.y)
+//            mapDisplayView.addSubview(tempMap)
+
+     } else {
+            print("Portrait")
+//            let tempMap: MapDisplayView = MapDisplayView(frame: CGRectMake(100, 100, 100, 100))
+//            tempMap.setOrigin(origin.x, y: origin.y)
+//            mapDisplayView = tempMap
+        }
     }
     
     override func viewDidAppear(animated: Bool) {
@@ -114,9 +129,10 @@ class MapViewController: UIViewController, DataProcessorDelegate {
             velX.text = "\(roundNum(Double(data.x)))"
             velY.text = "\(roundNum(Double(data.y)))"
         case .distance:
-            mapDisplayView.movePointTo(Double(data.x), y: Double(data.y))
-            disX.text = "\(roundNum(Double(data.x)))"
-            disY.text = "\(roundNum(Double(data.y)))"
+            let magnify = 10.0
+            mapDisplayView.movePointTo(Double(data.x) * magnify, y: Double(data.y) * magnify)
+            disX.text = "\(roundNum(Double(data.x)) * magnify)"
+            disY.text = "\(roundNum(Double(data.y)) * magnify)"
         }
     }
     
