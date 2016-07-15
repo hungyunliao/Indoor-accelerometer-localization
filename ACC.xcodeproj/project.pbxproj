@@ -10,6 +10,9 @@
 		1389A5231D24992C000B24FF /* DataProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1389A5221D24992C000B24FF /* DataProcessor.swift */; };
 		1389A5261D2C2685000B24FF /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 1389A5241D2C2685000B24FF /* Model.xcdatamodeld */; };
 		13AE20C41CF8B0C4004B0D6B /* KalmanFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13AE20C31CF8B0C4004B0D6B /* KalmanFilter.swift */; };
+		13B24EF41D2F265A00C0476D /* PathLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13B24EF31D2F265A00C0476D /* PathLayer.swift */; };
+		13B24EF61D33765000C0476D /* TextLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13B24EF51D33765000C0476D /* TextLayer.swift */; };
+		13B24EF81D3565E800C0476D /* UIViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13B24EF71D3565E800C0476D /* UIViewExtension.swift */; };
 		13B648EC1CF3B82B00CA656A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13B648EB1CF3B82B00CA656A /* AppDelegate.swift */; };
 		13B648EE1CF3B82B00CA656A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13B648ED1CF3B82B00CA656A /* ViewController.swift */; };
 		13B648F11CF3B82B00CA656A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 13B648EF1CF3B82B00CA656A /* Main.storyboard */; };
@@ -22,12 +25,17 @@
 		9C6397C81D34015100966761 /* RawFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C6397C71D34015100966761 /* RawFilter.swift */; };
 		9C6397CA1D34016700966761 /* ThreePointFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C6397C91D34016700966761 /* ThreePointFilter.swift */; };
 		9C6397CC1D346C4000966761 /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C6397CB1D346C4000966761 /* Filter.swift */; };
+		9AAD7FD21D2D71FB000719DA /* GridLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AAD7FD11D2D71FB000719DA /* GridLayer.swift */; };
+		9AAD7FD51D2D7E3B000719DA /* MapDisplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AAD7FD41D2D7E3B000719DA /* MapDisplayView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		1389A5221D24992C000B24FF /* DataProcessor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataProcessor.swift; sourceTree = "<group>"; };
 		1389A5251D2C2685000B24FF /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		13AE20C31CF8B0C4004B0D6B /* KalmanFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = KalmanFilter.swift; path = ../KalmanFilter.swift; sourceTree = "<group>"; };
+		13B24EF31D2F265A00C0476D /* PathLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PathLayer.swift; sourceTree = "<group>"; };
+		13B24EF51D33765000C0476D /* TextLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextLayer.swift; sourceTree = "<group>"; };
+		13B24EF71D3565E800C0476D /* UIViewExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIViewExtension.swift; sourceTree = "<group>"; };
 		13B648E81CF3B82B00CA656A /* ACC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ACC.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B648EB1CF3B82B00CA656A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		13B648ED1CF3B82B00CA656A /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -42,6 +50,8 @@
 		9C6397C71D34015100966761 /* RawFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RawFilter.swift; sourceTree = "<group>"; };
 		9C6397C91D34016700966761 /* ThreePointFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThreePointFilter.swift; sourceTree = "<group>"; };
 		9C6397CB1D346C4000966761 /* Filter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Filter.swift; sourceTree = "<group>"; };
+		9AAD7FD11D2D71FB000719DA /* GridLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GridLayer.swift; sourceTree = "<group>"; };
+		9AAD7FD41D2D7E3B000719DA /* MapDisplayView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapDisplayView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,6 +97,7 @@
 		13B648EA1CF3B82B00CA656A /* ACC */ = {
 			isa = PBXGroup;
 			children = (
+				9AAD7FD31D2D7200000719DA /* MapView */,
 				13CCEB321D0890E9005556A8 /* MapView.swift */,
 				13CCEB2E1D088C97005556A8 /* MapViewController.swift */,
 				9C6397C51D34012000966761 /* Utilities.swift */,
@@ -101,6 +112,18 @@
 				1389A5481D2C2F8D000B24FF /* Supporting Files */,
 			);
 			path = ACC;
+			sourceTree = "<group>";
+		};
+		9AAD7FD31D2D7200000719DA /* MapView */ = {
+			isa = PBXGroup;
+			children = (
+				13B24EF71D3565E800C0476D /* UIViewExtension.swift */,
+				9AAD7FD11D2D71FB000719DA /* GridLayer.swift */,
+				13B24EF31D2F265A00C0476D /* PathLayer.swift */,
+				13B24EF51D33765000C0476D /* TextLayer.swift */,
+				9AAD7FD41D2D7E3B000719DA /* MapDisplayView.swift */,
+			);
+			name = MapView;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -135,7 +158,7 @@
 				TargetAttributes = {
 					13B648E71CF3B82B00CA656A = {
 						CreatedOnToolsVersion = 7.2;
-						DevelopmentTeam = U83PDB3ZXE;
+						DevelopmentTeam = AP6W2LX8JC;
 					};
 				};
 			};
@@ -179,12 +202,17 @@
 				9C6397CA1D34016700966761 /* ThreePointFilter.swift in Sources */,
 				9C6397C81D34015100966761 /* RawFilter.swift in Sources */,
 				13AE20C41CF8B0C4004B0D6B /* KalmanFilter.swift in Sources */,
+				9AAD7FD21D2D71FB000719DA /* GridLayer.swift in Sources */,
 				13B648EE1CF3B82B00CA656A /* ViewController.swift in Sources */,
+				9AAD7FD51D2D7E3B000719DA /* MapDisplayView.swift in Sources */,
 				1389A5231D24992C000B24FF /* DataProcessor.swift in Sources */,
 				1389A5261D2C2685000B24FF /* Model.xcdatamodeld in Sources */,
+				13B24EF81D3565E800C0476D /* UIViewExtension.swift in Sources */,
 				13CCEB331D0890E9005556A8 /* MapView.swift in Sources */,
 				13B648EC1CF3B82B00CA656A /* AppDelegate.swift in Sources */,
 				9C6397CC1D346C4000966761 /* Filter.swift in Sources */,
+				13B24EF41D2F265A00C0476D /* PathLayer.swift in Sources */,
+				13B24EF61D33765000C0476D /* TextLayer.swift in Sources */,
 				13CCEB2F1D088C97005556A8 /* MapViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

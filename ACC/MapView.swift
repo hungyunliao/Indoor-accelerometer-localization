@@ -8,6 +8,7 @@
 
 import UIKit
 
+
 class MapView: UIView {
     
     /* MARK: Private instances */
@@ -77,17 +78,15 @@ class MapView: UIView {
     
     override func drawRect(rect: CGRect) {
         
-        let xAxis = getLinePath(CGPoint(x: 0, y: bounds.midY), endPoint: CGPoint(x: bounds.width, y: bounds.midY))
-        xAxis.lineWidth = 2.0
-        UIColor.whiteColor().set()
-        xAxis.stroke()
-        
-        let yAxis = getLinePath(CGPoint(x: bounds.midX, y: 20), endPoint: CGPoint(x: bounds.midX, y: bounds.height))
-        yAxis.lineWidth = 2.0
-        UIColor.whiteColor().set()
-        yAxis.stroke()
-        
-        drawGrid(CGPoint(x: originX, y: originY), gridSize: CGFloat(10))
+//        let xAxis = getLinePath(CGPoint(x: 0, y: bounds.midY), endPoint: CGPoint(x: bounds.width, y: bounds.midY))
+//        xAxis.lineWidth = 2.0
+//        UIColor.whiteColor().set()
+//        xAxis.stroke()
+//        
+//        let yAxis = getLinePath(CGPoint(x: bounds.midX, y: 20), endPoint: CGPoint(x: bounds.midX, y: bounds.height))
+//        yAxis.lineWidth = 2.0
+//        UIColor.whiteColor().set()
+//        yAxis.stroke()
         
         path.moveToPoint(CGPoint(x: previousMapX + originX, y: previousMapY + originY))
         path.addLineToPoint(CGPoint(x: currentMapX + originX, y: currentMapY + originY))
@@ -101,19 +100,13 @@ class MapView: UIView {
         circle.fill()
         
     }
+}
+
+class MapViewGrid: UIView {
     
-    
-    private func getCircle(atCenter center: CGPoint, radius: CGFloat) -> UIBezierPath {
-        return UIBezierPath(arcCenter: center, radius: radius, startAngle: 0.0, endAngle: CGFloat(2*M_PI), clockwise: false)
-    }
-    
-    private func getLinePath(startPoint: CGPoint, endPoint: CGPoint) -> UIBezierPath {
-        
-        let linePath = UIBezierPath()
-        linePath.moveToPoint(startPoint)
-        linePath.addLineToPoint(endPoint)
-        
-        return linePath
+    // An empty implementation adversely affects performance during animation.
+    override func drawRect(rect: CGRect) {
+        drawGrid(CGPoint(x: bounds.midX, y: bounds.midY), gridSize: CGFloat(10))
     }
     
     private func drawGrid(centerPoint: CGPoint, gridSize: CGFloat) {
@@ -151,4 +144,17 @@ class MapView: UIView {
             i += 1
         }
     }
+}
+
+func getCircle(atCenter center: CGPoint, radius: CGFloat) -> UIBezierPath {
+    return UIBezierPath(arcCenter: center, radius: radius, startAngle: 0.0, endAngle: CGFloat(2*M_PI), clockwise: false)
+}
+
+func getLinePath(startPoint: CGPoint, endPoint: CGPoint) -> UIBezierPath {
+    
+    let linePath = UIBezierPath()
+    linePath.moveToPoint(startPoint)
+    linePath.addLineToPoint(endPoint)
+    
+    return linePath
 }

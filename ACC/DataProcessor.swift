@@ -195,6 +195,7 @@ class DataProcessor {
             
             newStatus("dynamic state") // sending status to delegate
             
+
             if fabs(absSys.accelerate.x) > accelerationThreshold {
                 absSys.velocity.x += absSys.accelerate.x * deviceMotionUpdateInterval
                 absSys.distance.x += absSys.velocity.x * deviceMotionUpdateInterval

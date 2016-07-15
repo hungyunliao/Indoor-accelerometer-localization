@@ -63,6 +63,12 @@ struct ThreeAxesSystemDouble {
     var z = 0.0
 }
 
+struct ThreeAxesSystem<Element> {
+    var x: Element
+    var y: Element
+    var z: Element
+}
+
 struct ThreeAxesSystemKalman {
     var x: KalmanFilter = KalmanFilter()
     var y: KalmanFilter = KalmanFilter()
