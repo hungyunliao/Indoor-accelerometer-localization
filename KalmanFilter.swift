@@ -7,7 +7,7 @@
 //
 
 import Foundation
-
+import CoreMotion
 
 // MARK: operator define
 infix operator ^ {}
@@ -15,19 +15,11 @@ func ^ (radix: Double, power: Double) -> Double {
     return pow(radix, power)
 }
 
-/*
-    Initializating Kalman object in C:
-        KalmanFilter kalman(15, 50)
-        Double x[3] = {1, 2, 3}
-        Double y[3] = {1, 2, 3}
-        Double lrCoef[2] = {0, 0}
-*/
-
 struct System {
     var isCalibrated = true
     var calibrationTimesDone = 0
     var staticStateJudgeTimer = 0.0
-    var threePtFilterPointsDone = 0
+    var threePtFilterPointsDone = 1
     
     var base = ThreeAxesSystemDouble()
     var accelerate = ThreeAxesSystemDouble()
@@ -77,13 +69,64 @@ struct ThreeAxesSystemKalman {
     var z: KalmanFilter = KalmanFilter()
 }
 
-class KalmanFilter {
+class KalmanFilter : Filter {
     
     private var k: Double = 0.0 // Kalman gain
     private var p: Double = 0.0 // estimation error cvariance
     private var q: Double = 1.0 // process(predict) noise cvariance
     private var r: Double = 0.0 // measurement noise covariance
     private var x: Double = 0.0 // value
+    
+    func filter<T>(x: T, y: T, z: T) -> (T, T, T) {
+        return (x, y, z)
+    }
+    
+    func initFilter(deviceMotionUpdateInterval: Double) {
+        var X = Matrix(rows: 9, columns: 1)
+        X[0,0] = 0.0
+        X[1,0] = 0.0
+        X[2,0] = 0.0
+        X[3,0] = 0.0
+        X[4,0] = 0.0
+        X[5,0] = 0.0
+        X[6,0] = 0.0
+        X[7,0] = 0.0
+        X[8,0] = 0.0
+        
+        var F = Matrix(rows: 9, columns: 9)
+        F[0,0] = 1.0
+        F[1,1] = 1.0
+        F[2,2] = 1.0
+        F[0,3] = 1.0
+        F[1,4] = 1.0
+        F[2,5] = 1.0
+        F[0,6] = 1/2*deviceMotionUpdateInterval^2
+        F[1,7] = 1/2*deviceMotionUpdateInterval^2
+        F[2,8] = 1/2*deviceMotionUpdateInterval^2
+        F[3,3] = 1.0
+        F[4,4] = 1.0
+        F[5,5] = 1.0
+        F[3,6] = deviceMotionUpdateInterval
+        F[4,7] = deviceMotionUpdateInterval
+        F[5,8] = deviceMotionUpdateInterval
+        F[6,6] = 1.0
+        F[7,7] = 1.0
+        F[8,8] = 1.0
+        
+        var H = Matrix(rows: 3, columns: 9)
+        H[0,0] = 1.0
+        H[1,1] = 1.0
+        H[2,2] = 1.0
+    }
+    
+    /*
+     for y in 0..<F.columns {
+     for x in 0..<F.rows {
+     print(String(F[x,y]))
+     }
+     print("")
+     }
+     */
     
     func Update(value: Double) -> Double {
         p = sqrt(q * q + r * r) //?
@@ -157,4 +200,3 @@ func modulusDifference(arr: [Double], avgModulus: Double) -> Double {
 func roundNum(number: Double) -> Double {
     return round(number * 10000) / 10000
 }
-

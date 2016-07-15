@@ -42,10 +42,9 @@ class DataProcessor {
     let publicDB = NSUserDefaults.standardUserDefaults()
     var accelerometerUpdateInterval: Double = 0.01
     var gyroUpdateInterval: Double = 0.01
-    var deviceMotionUpdateInterval: Double = 0.09
-    let accelerationThreshold = 0.1
-    var staticStateJudgeThreshold = (accModulus: 1.0, gyroModulus: 35/M_PI, modulusDiff: 0.1)
-    
+    var deviceMotionUpdateInterval: Double = 0.03
+    let accelerationThreshold = 0.001
+    var staticStateJudgeThreshold = (accModulus: 0.5, gyroModulus: 20/M_PI, modulusDiff: 0.05)
     
     var calibrationTimeAssigned: Int = 100
     
@@ -76,6 +75,21 @@ class DataProcessor {
     var arrayX = [Double]()
     var arrayY = [Double]()
     var arrayZ = [Double]()
+    
+    // MARK: Filter decision
+    enum Option {
+        case Raw
+        case ThreePoint
+        case Kalman
+    }
+    let filterChoice = Option.ThreePoint
+    
+    // MARK: Performance measure
+    var performanceDataArrayX = [Double]()
+    var performanceDataArrayY = [Double]()
+    var performanceDataArrayZ = [Double]()
+    var count = 1
+    var performanceDataSize = 100
     
     func startsDetection() {
         
@@ -119,78 +133,83 @@ class DataProcessor {
     // MARK: Functions
     func outputXTrueNorthMotionData(motion: CMDeviceMotion) {
       
-        /* 3-point Filter begins */
-        if absSys.threePtFilterPointsDone < numberOfPointsForThreePtFilter {
+        let acc: CMAcceleration = motion.userAcceleration
+        //print(acc)
+        let rot = motion.attitude.rotationMatrix
+        
+        var x = 0.0
+        var y = 0.0
+        var z = 0.0
+        
+        x = (acc.x*rot.m11 + acc.y*rot.m21 + acc.z*rot.m31) * gravityConstant
+        y = (acc.x*rot.m12 + acc.y*rot.m22 + acc.z*rot.m32) * gravityConstant
+        z = (acc.x*rot.m13 + acc.y*rot.m23 + acc.z*rot.m33) * gravityConstant
+        
+        if count <= performanceDataSize {
+            performanceDataArrayX.append(x)
+            performanceDataArrayY.append(y)
+            performanceDataArrayZ.append(z)
+            if count == performanceDataSize {
+                //print(performanceDataArrayX)
+                performance(performanceDataArrayX, arrY: performanceDataArrayY, arrZ: performanceDataArrayZ, performanceDataSize: performanceDataSize)
+            }
+            count += 1
+        }
+        
+        var test:Filter
+        
+        switch filterChoice {
+        case .Raw:
+            test = RawFilter()
+        case .ThreePoint:
+            test = ThreePointFilter()
+        case .Kalman:
+            test = KalmanFilter()
+        }
+        
+        (absSys.accelerate.x, absSys.accelerate.y, absSys.accelerate.z) = test.filter(x, y: y, z: z)
+        
+        determineVelocityAndCoculateDistance()
+        
+        newData(speedDataType.accelerate, sensorData: absSys.accelerate)
+        newData(speedDataType.velocity, sensorData: absSys.velocity)
+        newData(speedDataType.distance, sensorData: absSys.distance)
+        
+        absSys.accelerate.x = 0
+        absSys.accelerate.y = 0
+        absSys.accelerate.z = 0
+    }
+    
+    func determineVelocityAndCoculateDistance() {
+        
+        // Static Judgement Condition 1 && 2 && 3
+        if staticStateJudge.modulAcc && staticStateJudge.modulGyro && staticStateJudge.modulDiffAcc {
             
-            let acc: CMAcceleration = motion.userAcceleration
-            let rot = motion.attitude.rotationMatrix
+            newStatus("static state") // sending status to delegate
             
-            arrayX.append(acc.x*rot.m11 + acc.y*rot.m21 + acc.z*rot.m31)
-            arrayY.append(acc.x*rot.m12 + acc.y*rot.m22 + acc.z*rot.m32)
-            arrayZ.append(acc.x*rot.m13 + acc.y*rot.m23 + acc.z*rot.m33)
-            
-            absSys.threePtFilterPointsDone += 1
+            absSys.velocity.x = 0
+            absSys.velocity.y = 0
+            absSys.velocity.z = 0
             
         } else {
             
-            for i in 0..<3 {
-                absSys.accelerate.x += arrayX[i]
-                absSys.accelerate.y += arrayY[i]
-                absSys.accelerate.z += arrayZ[i]
+            newStatus("dynamic state") // sending status to delegate
+            
+            if fabs(absSys.accelerate.x) > accelerationThreshold {
+                absSys.velocity.x += absSys.accelerate.x * deviceMotionUpdateInterval
+                absSys.distance.x += absSys.velocity.x * deviceMotionUpdateInterval
             }
-            
-            arrayX.removeFirst()
-            arrayY.removeFirst()
-            arrayZ.removeFirst()
-            
-            absSys.accelerate.x = absSys.accelerate.x/Double(numberOfPointsForThreePtFilter) * gravityConstant
-            absSys.accelerate.y = absSys.accelerate.y/Double(numberOfPointsForThreePtFilter) * gravityConstant
-            absSys.accelerate.z = absSys.accelerate.z/Double(numberOfPointsForThreePtFilter) * gravityConstant
-            
-            absSys.threePtFilterPointsDone = 2 // only needs to save ONE point for the next average. (a1+a2+a3)/3, (a2+a3+a4)/3 ...
-            /* 3-point Filter ends */
-            
-            // Static Judgement Condition 1 && 2 && 3
-            if staticStateJudge.modulAcc && staticStateJudge.modulGyro && staticStateJudge.modulDiffAcc {
-                
-                newStatus("static state") // sending status to delegate
-                
-                absSys.velocity.x = 0
-                absSys.velocity.y = 0
-                absSys.velocity.z = 0
-                
-            } else {
-                
-                newStatus("dynamic state") // sending status to delegate
-                
-                if fabs(absSys.accelerate.x) > accelerationThreshold {
-                    absSys.velocity.x += absSys.accelerate.x * deviceMotionUpdateInterval * Double(numberOfPointsForThreePtFilter)
-                    absSys.distance.x += absSys.velocity.x * deviceMotionUpdateInterval * Double(numberOfPointsForThreePtFilter)
-                }
-                if fabs(absSys.accelerate.y) > accelerationThreshold {
-                    absSys.velocity.y += absSys.accelerate.y * deviceMotionUpdateInterval * Double(numberOfPointsForThreePtFilter)
-                    absSys.distance.y += absSys.velocity.y * deviceMotionUpdateInterval * Double(numberOfPointsForThreePtFilter)
-                }
-                if fabs(absSys.accelerate.z) > accelerationThreshold {
-                    absSys.velocity.z += absSys.accelerate.z * deviceMotionUpdateInterval * Double(numberOfPointsForThreePtFilter)
-                    absSys.distance.z += absSys.velocity.z * deviceMotionUpdateInterval * Double(numberOfPointsForThreePtFilter)
-                }
-                //publicDB.setValue(absSys.accelerate.x, forKey: "accX")
-                
+            if fabs(absSys.accelerate.y) > accelerationThreshold {
+                absSys.velocity.y += absSys.accelerate.y * deviceMotionUpdateInterval
+                absSys.distance.y += absSys.velocity.y * deviceMotionUpdateInterval
             }
-            
-            // sending data to delegate
-            newData(speedDataType.accelerate, sensorData: absSys.accelerate)
-            newData(speedDataType.velocity, sensorData: absSys.velocity)
-            newData(speedDataType.distance, sensorData: absSys.distance)
-            
-            absSys.accelerate.x = 0
-            absSys.accelerate.y = 0
-            absSys.accelerate.z = 0
+            if fabs(absSys.accelerate.z) > accelerationThreshold {
+                absSys.velocity.z += absSys.accelerate.z * deviceMotionUpdateInterval
+                absSys.distance.z += absSys.velocity.z * deviceMotionUpdateInterval
+            }
         }
     }
-    
-    
+
     func outputAccData(acceleration: CMAcceleration) {
         
         accSys.accelerate.x = acceleration.x * gravityConstant
@@ -250,6 +269,35 @@ class DataProcessor {
                 modulusDiff = modulusDifference(arrayForStatic, avgModulus: accModulusAvg)
             }
         }
+    }
+    
+    func performance (arrX : [Double], arrY : [Double], arrZ : [Double], performanceDataSize: Int) {
+        //let typeOfFilter = "Raw"
+        var test:Filter
+        var resultX = 0.0
+        var resultY = 0.0
+        var resultZ = 0.0
+        var outX = Array(count: performanceDataSize, repeatedValue:0.0)
+        var outY = Array(count: performanceDataSize, repeatedValue:0.0)
+        var outZ = Array(count: performanceDataSize, repeatedValue:0.0)
+        
+        test = RawFilter()
+        for index in 0..<performanceDataSize {
+            (outX[index], outY[index], outZ[index]) = test.filter(arrX[index], y: arrY[index], z: arrZ[index])
+        }
+        resultX = standardDeviation(outX)
+        resultY = standardDeviation(outY)
+        resultZ = standardDeviation(outZ)
+        print("Raw       :", resultX, resultY, resultZ)
+        
+        test = ThreePointFilter()
+        for index in 0..<performanceDataSize {
+            (outX[index], outY[index], outZ[index]) = test.filter(arrX[index], y: arrY[index], z: arrZ[index])
+        }
+        resultX = standardDeviation(outX)
+        resultY = standardDeviation(outY)
+        resultZ = standardDeviation(outZ)
+        print("ThreePoint:", resultX, resultY, resultZ)
     }
 
 }

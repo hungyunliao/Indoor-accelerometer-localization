@@ -33,7 +33,7 @@ class MapViewController: UIViewController, DataProcessorDelegate {
     
     // MARK: Override functions
     override func viewDidLoad() {
-        super.viewDidLoad()
+        
         mapView.backgroundColor = UIColor.blackColor()
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(receiveDataSource(_:)), name:"dataSource", object: nil)
         mapView.setScale(20.0)

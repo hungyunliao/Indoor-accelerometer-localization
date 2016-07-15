@@ -5,11 +5,8 @@
 //  Created by Hung-Yun Liao on 5/23/16.
 //  Copyright © 2016 Hung-Yun Liao. All rights reserved.
 //
-
 import UIKit
 import CoreMotion
-//import CoreLocation
-//import MapKit
 
 class ViewController: UIViewController, DataProcessorDelegate {
     
@@ -19,6 +16,8 @@ class ViewController: UIViewController, DataProcessorDelegate {
     // MARK: Model
     var dataSource: DataProcessor = DataProcessor()
     let publicDB = NSUserDefaults.standardUserDefaults()
+    
+
     
     // MARK: Outlets
     @IBOutlet var info: UILabel?
@@ -51,10 +50,10 @@ class ViewController: UIViewController, DataProcessorDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         dataSource.startsDetection()
-
-        // Print it to the console
-        //print(managedObjectContext)
+        //self.reset()
     }
+
+    // MARK: Functions
     
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
@@ -70,6 +69,7 @@ class ViewController: UIViewController, DataProcessorDelegate {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+ 
     
     // MARK: Delegate
     func sendingNewData(person: DataProcessor, type: speedDataType, data: ThreeAxesSystemDouble) {
@@ -94,5 +94,3 @@ class ViewController: UIViewController, DataProcessorDelegate {
     }
     
 }
-
-

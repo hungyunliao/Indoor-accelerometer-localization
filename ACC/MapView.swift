@@ -8,7 +8,6 @@
 
 import UIKit
 
-
 class MapView: UIView {
     
     /* MARK: Private instances */
