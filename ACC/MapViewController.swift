@@ -18,6 +18,7 @@ class MapViewController: UIViewController, DataProcessorDelegate {
     // MARK: PublicDB used to pass the object of DataProcessor
     var publicDB = NSUserDefaults.standardUserDefaults()
     
+    @IBOutlet weak var gridView: UIView!
     @IBOutlet weak var mapDisplayView: MapDisplayView! {
         didSet {
             mapDisplayView.addGestureRecognizer(UIPinchGestureRecognizer(

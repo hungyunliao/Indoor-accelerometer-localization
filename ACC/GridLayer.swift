@@ -8,58 +8,22 @@
 
 import UIKit
 
-class GridLayer: CAShapeLayer {
-    
-    /// Indicate the color of the grid line.
-    @IBInspectable var gridColor:UIColor = UIColor.blackColor().colorWithAlphaComponent(0.2) {
-        didSet {
-            self.strokeColor = gridColor.CGColor
-            self.setNeedsDisplay()
-        }
-    }
+class GridView: UIView {
     
     var origin = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z: 0)
     
-    init(frame: CGRect) {
-        super.init()
-        self.strokeColor = gridColor.CGColor
-        self.backgroundColor = UIColor.clearColor().CGColor
-        self.lineWidth = 1.0
-        self.lineDashPattern = [4, 2]
-        self.lineDashPhase = 0.0
-        self.frame = frame
-    }
-    
-    internal convenience required init?(coder aDecoder: NSCoder) {
-        self.init(frame: CGRectZero)
-    }
-    
-    override var frame: CGRect {
-        didSet {
-            updateGridPath(bounds)
-        }
-    }
-    
-    /**
-     Draw Grids in given rectangle
-     
-     - Parameter rect: The rectangle area to draw the grids in it.
-     
-     */
     
     func setOrigin(x: Double, y: Double) {
         origin.x = CGFloat(x)
         origin.y = CGFloat(y)
-        updateGridPath(bounds)
+        setNeedsDisplay()
     }
     
-    private func updateGridPath(rect: CGRect) {
+    override func drawRect(rect: CGRect) {
         // Draw nothing when the rect is too small
         if CGRectGetWidth(rect) < 1 || CGRectGetHeight(rect) < 1 {
             return
         }
-        
-        self.sublayers?.removeAll()
         
         let centerPoint = CGPointMake(origin.x, origin.y)
         
@@ -69,15 +33,11 @@ class GridLayer: CAShapeLayer {
         
         // draw the scales
         let scalePath = UIBezierPath()
-        let scaleLayer = CAShapeLayer()
-        scaleLayer.strokeColor = UIColor.blackColor().CGColor
-        scaleLayer.lineWidth = 1.5
+        
         
         // draw X, Y axises
         let axisPath = UIBezierPath()
-        let axisLayer = CAShapeLayer()
-        axisLayer.strokeColor = UIColor.blackColor().CGColor
-        axisLayer.lineWidth = 2
+        
         
         
         for i in 0...Int(bounds.height) {
@@ -123,12 +83,10 @@ class GridLayer: CAShapeLayer {
             gridPath.addLineToPoint(CGPoint(x: centerPoint.x - CGFloat(i) * gridSize, y: bounds.height))
         }
         
-        scaleLayer.path = scalePath.CGPath
-        axisLayer.path = axisPath.CGPath
+        UIColor.blackColor().set()
+        gridPath.stroke()
+        scalePath.stroke()
+        axisPath.stroke()
         
-        self.path = gridPath.CGPath
-        self.addSublayer(scaleLayer)
-        self.addSublayer(axisLayer)
-        self.setNeedsDisplay()
     }
 }

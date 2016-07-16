@@ -11,16 +11,16 @@ import UIKit
 @IBDesignable
 class MapDisplayView: UIView {
     private var pinchScale: CGFloat = 1
-    private var gridLayer: GridLayer
+    //private var gridLayer: GridLayer
     private var pathLayer: PathLayer
     private var textLayer: TextLayer
     
     override init(frame: CGRect) {
-        gridLayer = GridLayer(frame: frame)
+        //gridLayer = GridLayer(frame: frame)
         pathLayer = PathLayer(frame: frame)
         textLayer = TextLayer(frame: frame)
         super.init(frame: frame)
-        self.layer.addSublayer(gridLayer)
+        //self.layer.addSublayer(gridLayer)
         self.layer.addSublayer(pathLayer)
         self.layer.addSublayer(textLayer)
     }
@@ -32,14 +32,14 @@ class MapDisplayView: UIView {
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        self.layer.addSublayer(gridLayer)
+        //self.layer.addSublayer(gridLayer)
         self.layer.addSublayer(pathLayer)
         self.layer.addSublayer(textLayer)
     }
     
     override var frame: CGRect {
         didSet {
-            gridLayer.frame = frame
+            //gridLayer.frame = frame
             pathLayer.frame = frame
             //textLayer.frame = CGRectMake(0, frame.height/2, frame.width, frame.height)
             textLayer.frame = frame
@@ -90,7 +90,7 @@ class MapDisplayView: UIView {
     
     func setOrigin(x: Double, y: Double) {
         pathLayer.setOrigin(x, y: y)
-        gridLayer.setOrigin(x, y: y)
+        //gridLayer.setOrigin(x, y: y)
         textLayer.setOrigin(x, y: y)
     }
 

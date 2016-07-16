@@ -18,7 +18,11 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="redraw" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ikt-yS-bhX" customClass="MapDisplayView" customModule="ACC" customModuleProvider="target">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="uU0-wT-3Sm" customClass="GridView" customModule="ACC" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="551"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
+                            <view contentMode="redraw" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ikt-yS-bhX" customClass="MapDisplayView" customModule="ACC" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="551"/>
                             </view>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eJQ-cg-Vko">
@@ -161,11 +165,27 @@
                             </stackView>
                         </subviews>
                         <constraints>
+                            <constraint firstItem="uU0-wT-3Sm" firstAttribute="trailing" secondItem="Ikt-yS-bhX" secondAttribute="trailing" id="1kv-Pl-X27"/>
+                            <constraint firstItem="uU0-wT-3Sm" firstAttribute="bottom" secondItem="uSX-YK-u8I" secondAttribute="top" id="35i-cB-2mC"/>
                             <constraint firstItem="eJQ-cg-Vko" firstAttribute="leading" secondItem="Fcd-Xl-hJM" secondAttribute="leadingMargin" constant="20" id="3QV-if-tgX"/>
+                            <constraint firstAttribute="trailing" secondItem="uU0-wT-3Sm" secondAttribute="trailing" id="96E-bR-eKD"/>
                             <constraint firstItem="eJQ-cg-Vko" firstAttribute="top" secondItem="fvq-XD-dGA" secondAttribute="bottom" constant="20" id="Duu-BR-jNf"/>
                             <constraint firstItem="Dzf-2o-Ryg" firstAttribute="leading" secondItem="Fcd-Xl-hJM" secondAttribute="leadingMargin" id="PgA-5w-FAm"/>
+                            <constraint firstItem="uU0-wT-3Sm" firstAttribute="leading" secondItem="Fcd-Xl-hJM" secondAttribute="leading" id="QhS-Rx-BV3"/>
+                            <constraint firstItem="uU0-wT-3Sm" firstAttribute="top" secondItem="Ikt-yS-bhX" secondAttribute="top" id="UHx-Vz-MxI"/>
+                            <constraint firstItem="uU0-wT-3Sm" firstAttribute="top" secondItem="Fcd-Xl-hJM" secondAttribute="top" id="Wsu-AT-Nqy"/>
                             <constraint firstItem="uSX-YK-u8I" firstAttribute="top" secondItem="Dzf-2o-Ryg" secondAttribute="bottom" constant="20" id="gB5-EU-ei3"/>
+                            <constraint firstItem="uU0-wT-3Sm" firstAttribute="leading" secondItem="Ikt-yS-bhX" secondAttribute="leading" id="nAB-Qb-ar9"/>
+                            <constraint firstItem="uU0-wT-3Sm" firstAttribute="bottom" secondItem="Ikt-yS-bhX" secondAttribute="bottom" id="syO-fo-C2m"/>
                         </constraints>
+                        <variation key="default">
+                            <mask key="constraints">
+                                <exclude reference="1kv-Pl-X27"/>
+                                <exclude reference="UHx-Vz-MxI"/>
+                                <exclude reference="nAB-Qb-ar9"/>
+                                <exclude reference="syO-fo-C2m"/>
+                            </mask>
+                        </variation>
                     </view>
                     <tabBarItem key="tabBarItem" title="Map" id="p21-07-ElE"/>
                     <connections>
@@ -173,6 +193,7 @@
                         <outlet property="accY" destination="R8j-L2-Ew1" id="WNm-ot-8zv"/>
                         <outlet property="disX" destination="T2d-v9-RRX" id="tK5-4f-ohM"/>
                         <outlet property="disY" destination="w8H-lK-oDJ" id="z3E-iV-Qa3"/>
+                        <outlet property="gridView" destination="uU0-wT-3Sm" id="FhZ-R4-x8h"/>
                         <outlet property="mapDisplayView" destination="Ikt-yS-bhX" id="dHX-sw-TJn"/>
                         <outlet property="velX" destination="cXe-d3-W8X" id="n9a-FA-YnA"/>
                         <outlet property="velY" destination="hPW-am-frj" id="0x9-FU-JwZ"/>
