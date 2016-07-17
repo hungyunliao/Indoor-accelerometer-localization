@@ -29,8 +29,11 @@ class GridView: UIView {
         
         self.layer.sublayers?.removeAll()
         
+        self.layerGradient(UIColor.whiteColor().CGColor, bottomColor: UIColor.cyanColor().colorWithAlphaComponent(0.5).CGColor)
+        
         let textLayer: TextLayer = TextLayer(frame: self.frame)
         textLayer.scaleValue = scaleValueForTheText
+        textLayer.backgroundColor = UIColor.clearColor().CGColor
         textLayer.setOrigin(Double(origin.x), y: Double(origin.y))
         self.layer.addSublayer(textLayer)
         
@@ -97,13 +100,15 @@ class GridView: UIView {
             gridPath.addLineToPoint(CGPoint(x: centerPoint.x - CGFloat(i) * gridSize, y: bounds.height))
         }
         
-        UIColor.blackColor().set()
+        UIColor.blackColor().colorWithAlphaComponent(0.1).set()
         let pattern: [CGFloat] = [4, 2]
         gridPath.setLineDash(pattern, count: 2, phase: 0.0)
         gridPath.lineWidth = 1
         gridPath.stroke()
+        UIColor.blackColor().set()
         scalePath.lineWidth = 2
         scalePath.stroke()
+        UIColor.blackColor().set()
         axisPath.lineWidth = 2
         axisPath.stroke()
         
