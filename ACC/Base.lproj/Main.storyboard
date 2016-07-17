@@ -20,7 +20,7 @@
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="uU0-wT-3Sm" customClass="GridView" customModule="ACC" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="551"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="backgroundColor" white="1" alpha="0.0" colorSpace="calibratedWhite"/>
                             </view>
                             <view contentMode="redraw" translatesAutoresizingMaskIntoConstraints="NO" id="Ikt-yS-bhX" customClass="MapView" customModule="ACC" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="551"/>
@@ -165,6 +165,7 @@
                                 </constraints>
                             </stackView>
                         </subviews>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
                             <constraint firstItem="uU0-wT-3Sm" firstAttribute="trailing" secondItem="Ikt-yS-bhX" secondAttribute="trailing" id="1kv-Pl-X27"/>
                             <constraint firstItem="uU0-wT-3Sm" firstAttribute="bottom" secondItem="uSX-YK-u8I" secondAttribute="top" id="35i-cB-2mC"/>

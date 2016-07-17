@@ -123,24 +123,26 @@ class MapViewController: UIViewController, DataProcessorDelegate {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(receiveDataSource(_:)), name:"dataSource", object: nil)
         
         // MapDisplayView API setup
+        view.layerGradient(UIColor.whiteColor().CGColor, bottomColor: UIColor.cyanColor().colorWithAlphaComponent(0.5).CGColor)
         mapDisplayView.setScale(1.0)
         mapDisplayView.frame = view.frame
         (origin.x, origin.y) = (Double(mapDisplayView.frame.midX), Double(mapDisplayView.frame.midY))
         setOrigin(origin.x, y: origin.y)
         gridView.scaleValueForTheText = 1
-        mapDisplayView.layerGradient(UIColor.whiteColor().CGColor, bottomColor: UIColor.cyanColor().colorWithAlphaComponent(0.5).CGColor)
+        
+        mapDisplayView.backgroundColor = UIColor.clearColor()
     }
     
     override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
         if UIDevice.currentDevice().orientation.isLandscape.boolValue {
-            print("Landscape")
+            //print("Landscape")
             if mapDisplayView != nil {
                 mapDisplayView.frame = CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.height, view.frame.width)
                 (origin.x, origin.y) = (Double(mapDisplayView.frame.midX) + shiftedBySwipe.x, Double(mapDisplayView.frame.midY) + shiftedBySwipe.y)
                 setOrigin(origin.x, y: origin.y)
             }
      } else {
-            print("Portrait")
+            //print("Portrait")
             if mapDisplayView != nil {
                 mapDisplayView.frame = CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.height, view.frame.width)
                 (origin.x, origin.y) = (Double(mapDisplayView.frame.midX) + shiftedBySwipe.x, Double(mapDisplayView.frame.midY) + shiftedBySwipe.y)
