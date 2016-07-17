@@ -18,7 +18,7 @@ class MapViewController: UIViewController, DataProcessorDelegate {
     // MARK: PublicDB used to pass the object of DataProcessor
     var publicDB = NSUserDefaults.standardUserDefaults()
     
-    @IBOutlet weak var gridView: UIView!
+    @IBOutlet weak var gridView: GridView!
     @IBOutlet weak var mapDisplayView: MapDisplayView! {
         didSet {
             mapDisplayView.addGestureRecognizer(UIPinchGestureRecognizer(
@@ -85,8 +85,10 @@ class MapViewController: UIViewController, DataProcessorDelegate {
         // MapDisplayView API setup
         mapDisplayView.setScale(1.0)
         mapDisplayView.frame = view.frame
+        
         origin.x = Double(mapDisplayView.frame.midX)
         origin.y = Double(mapDisplayView.frame.midY)
+        gridView.setOrigin(origin.x, y: origin.y)
         mapDisplayView.setOrigin(origin.x, y: origin.y)
         mapDisplayView.layerGradient(UIColor.whiteColor().CGColor, bottomColor: UIColor.cyanColor().colorWithAlphaComponent(0.5).CGColor)
     }

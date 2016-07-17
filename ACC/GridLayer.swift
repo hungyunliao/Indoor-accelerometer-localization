@@ -12,7 +12,6 @@ class GridView: UIView {
     
     var origin = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z: 0)
     
-    
     func setOrigin(x: Double, y: Double) {
         origin.x = CGFloat(x)
         origin.y = CGFloat(y)
@@ -20,6 +19,8 @@ class GridView: UIView {
     }
     
     override func drawRect(rect: CGRect) {
+        
+        
         // Draw nothing when the rect is too small
         if CGRectGetWidth(rect) < 1 || CGRectGetHeight(rect) < 1 {
             return
@@ -84,8 +85,13 @@ class GridView: UIView {
         }
         
         UIColor.blackColor().set()
+        let pattern: [CGFloat] = [4, 2]
+        gridPath.setLineDash(pattern, count: 2, phase: 0.0)
+        gridPath.lineWidth = 1
         gridPath.stroke()
+        scalePath.lineWidth = 2
         scalePath.stroke()
+        axisPath.lineWidth = 2
         axisPath.stroke()
         
     }
