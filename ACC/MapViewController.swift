@@ -46,8 +46,8 @@ class MapViewController: UIViewController, DataProcessorDelegate {
     }
     
     func setOrigin(x: Double, y: Double) {
-        gridView.setOrigin(x, y: y)
-        mapDisplayView.setOrigin(x, y: y)
+        gridView?.setOrigin(x, y: y)
+        mapDisplayView?.setOrigin(x, y: y)
     }
     
     var pinchScale: CGFloat = 1
@@ -78,22 +78,29 @@ class MapViewController: UIViewController, DataProcessorDelegate {
 
     }
     
+    var shiftedBySwipe = ThreeAxesSystem<Double>(x:0, y:0, z:0)
+    
+    
     func moveScreenToRight() {
+        shiftedBySwipe.x += 20
         origin.x += 20
         setOrigin(origin.x, y: origin.y)
     }
     
     func moveScreenToUp() {
+        shiftedBySwipe.y -= 20
         origin.y -= 20
         setOrigin(origin.x, y: origin.y)
     }
     
     func moveScreenToDown() {
+        shiftedBySwipe.y += 20
         origin.y += 20
         setOrigin(origin.x, y: origin.y)
     }
     
     func moveScreenToLeft() {
+        shiftedBySwipe.x -= 20
         origin.x -= 20
         setOrigin(origin.x, y: origin.y)
     }
@@ -121,29 +128,24 @@ class MapViewController: UIViewController, DataProcessorDelegate {
         (origin.x, origin.y) = (Double(mapDisplayView.frame.midX), Double(mapDisplayView.frame.midY))
         setOrigin(origin.x, y: origin.y)
         gridView.scaleValueForTheText = 1
-        //mapDisplayView.layerGradient(UIColor.whiteColor().CGColor, bottomColor: UIColor.cyanColor().colorWithAlphaComponent(0.5).CGColor)
+        mapDisplayView.layerGradient(UIColor.whiteColor().CGColor, bottomColor: UIColor.cyanColor().colorWithAlphaComponent(0.5).CGColor)
     }
     
     override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
         if UIDevice.currentDevice().orientation.isLandscape.boolValue {
             print("Landscape")
-            mapDisplayView.frame = CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.height, view.frame.width)
-            (origin.x, origin.y) = (Double(mapDisplayView.frame.midX), Double(mapDisplayView.frame.midY))
-            setOrigin(origin.x, y: origin.y)
-
-            //viewDidLoad()
-//            let tempMap: MapDisplayView = MapDisplayView(frame: CGRectMake(30, 30, 100, 100))
-//            tempMap.setOrigin(origin.x, y: origin.y)
-//            mapDisplayView.addSubview(tempMap)
-
+            if mapDisplayView != nil {
+                mapDisplayView.frame = CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.height, view.frame.width)
+                (origin.x, origin.y) = (Double(mapDisplayView.frame.midX) + shiftedBySwipe.x, Double(mapDisplayView.frame.midY) + shiftedBySwipe.y)
+                setOrigin(origin.x, y: origin.y)
+            }
      } else {
             print("Portrait")
-            mapDisplayView.frame = CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.height, view.frame.width)
-            (origin.x, origin.y) = (Double(mapDisplayView.frame.midX), Double(mapDisplayView.frame.midY))
-            setOrigin(origin.x, y: origin.y)
-//            let tempMap: MapDisplayView = MapDisplayView(frame: CGRectMake(100, 100, 100, 100))
-//            tempMap.setOrigin(origin.x, y: origin.y)
-//            mapDisplayView = tempMap
+            if mapDisplayView != nil {
+                mapDisplayView.frame = CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.height, view.frame.width)
+                (origin.x, origin.y) = (Double(mapDisplayView.frame.midX) + shiftedBySwipe.x, Double(mapDisplayView.frame.midY) + shiftedBySwipe.y)
+                setOrigin(origin.x, y: origin.y)
+            }
         }
     }
     
