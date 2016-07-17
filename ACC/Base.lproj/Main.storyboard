@@ -209,7 +209,7 @@
                         <outlet property="disY" destination="w8H-lK-oDJ" id="z3E-iV-Qa3"/>
                         <outlet property="gradientView" destination="SlU-7h-99Y" id="BXf-ps-aLe"/>
                         <outlet property="gridView" destination="uU0-wT-3Sm" id="FhZ-R4-x8h"/>
-                        <outlet property="mapDisplayView" destination="Ikt-yS-bhX" id="boo-qq-odp"/>
+                        <outlet property="mapView" destination="Ikt-yS-bhX" id="jr4-oz-OVI"/>
                         <outlet property="velX" destination="cXe-d3-W8X" id="n9a-FA-YnA"/>
                         <outlet property="velY" destination="hPW-am-frj" id="0x9-FU-JwZ"/>
                     </connections>

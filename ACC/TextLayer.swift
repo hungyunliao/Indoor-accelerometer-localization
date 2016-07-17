@@ -20,16 +20,13 @@ class TextLayer: CATextLayer {
     
     var origin = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z: 0)
     
-    var scaleValue: Double {
+    var scaleValue: Double = 1.0 {
         didSet {
             updateUI()
-            setNeedsDisplay()
         }
     }
     
     init(frame: CGRect) {
-        
-        self.scaleValue = 1.0
         super.init()
         self.frame = frame
         self.foregroundColor = textColor.CGColor
@@ -45,7 +42,6 @@ class TextLayer: CATextLayer {
         didSet {
             updateUI()
             updateBounds(bounds)
-            setNeedsDisplay()
         }
     }
     

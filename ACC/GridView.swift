@@ -10,10 +10,11 @@ import UIKit
 
 class GridView: UIView {
     
+    // MARK: Instance variables
     var scaleValueForTheText: Double = 1 { didSet { setNeedsDisplay() } }
-    
     var origin = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z: 0)
     
+    // MARK: Public APIs
     func setScale(scale: Double) {
         scaleValueForTheText = scale
         setNeedsDisplay()
@@ -27,33 +28,36 @@ class GridView: UIView {
     
     override func drawRect(rect: CGRect) {
         
-        self.layer.sublayers?.removeAll()
-        
-        let textLayer: TextLayer = TextLayer(frame: self.frame)
-        textLayer.scaleValue = scaleValueForTheText
-        textLayer.backgroundColor = UIColor.clearColor().CGColor
-        textLayer.setOrigin(Double(origin.x), y: Double(origin.y))
-        self.layer.addSublayer(textLayer)
-        
         // Draw nothing when the rect is too small
         if CGRectGetWidth(rect) < 1 || CGRectGetHeight(rect) < 1 {
             return
         }
         
+        /* Draw Texts */
+        self.layer.sublayers?.removeAll() // removes the previous textLayer if has any
+        let textLayer: TextLayer = TextLayer(frame: self.frame)
+        textLayer.scaleValue = scaleValueForTheText
+        textLayer.setOrigin(Double(origin.x), y: Double(origin.y))
+        self.layer.addSublayer(textLayer)
+        
+        
+        /* Draw Grids */
         let centerPoint = CGPointMake(origin.x, origin.y)
         
         // draw the grid
         let gridPath = UIBezierPath()
         let gridSize = CGFloat(10)
+        let pattern: [CGFloat] = [4, 2]
+        gridPath.setLineDash(pattern, count: 2, phase: 0.0)
+        gridPath.lineWidth = 1
         
         // draw the scales
         let scalePath = UIBezierPath()
-        
+        scalePath.lineWidth = 2
         
         // draw X, Y axises
         let axisPath = UIBezierPath()
-        
-        
+        axisPath.lineWidth = 2
         
         for i in 0...Int(bounds.height) {
             if i == 0 {
@@ -99,28 +103,18 @@ class GridView: UIView {
         }
         
         UIColor.blackColor().colorWithAlphaComponent(0.1).set()
-        let pattern: [CGFloat] = [4, 2]
-        gridPath.setLineDash(pattern, count: 2, phase: 0.0)
-        gridPath.lineWidth = 1
         gridPath.stroke()
         UIColor.blackColor().set()
-        scalePath.lineWidth = 2
         scalePath.stroke()
         UIColor.blackColor().set()
-        axisPath.lineWidth = 2
         axisPath.stroke()
-        
     }
 }
 
 
 class GradientView: UIView {
     
-    override var frame: CGRect {
-        didSet {
-            setNeedsDisplay()
-        }
-    }
+    override var frame: CGRect { didSet { setNeedsDisplay() } }
     
     override func drawRect(rect: CGRect) {
         self.layer.sublayers?.removeAll()

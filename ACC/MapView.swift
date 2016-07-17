@@ -99,7 +99,6 @@ class MapView: UIView {
     
     override func drawRect(rect: CGRect) {
         
-        
         if isResetScale {
             routePath.removeAllPoints()
             for i in 0..<(pathPoints.count - 1) {
@@ -116,7 +115,7 @@ class MapView: UIView {
         var circle = UIBezierPath()
         circle = getCircle(atCenter: CGPoint(x: currentPoint.x + currentOrigin.x, y: currentPoint.y + currentOrigin.y), radius: CGFloat(5))
         
-        UIColor.cyanColor().set()
+        UIColor.blackColor().set()
         routePath.stroke()
         UIColor.blackColor().set()
         circle.fill()
