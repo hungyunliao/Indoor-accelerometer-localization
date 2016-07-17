@@ -13,90 +13,111 @@ class MapView: UIView {
     
     /* MARK: Private instances */
     // Not yet implement "Z" axis
-    private var previousMapX: CGFloat = 0 { didSet { setNeedsDisplay() } }
-    private var previousMapY: CGFloat = 0 { didSet { setNeedsDisplay() } }
-    private var currentMapX: CGFloat = 0 { didSet { setNeedsDisplay() } }
-    private var currentMapY: CGFloat = 0 { didSet { setNeedsDisplay() } }
-    private var path = UIBezierPath()
-    private var isReset = false
-    private var scale: CGFloat = 1.0
+    private var routePath = UIBezierPath()
+    private var pathPoints = [ThreeAxesSystem<CGFloat>]() // an array that keeps the original path points which are used to re-draw the routePath when the scale is changed.
+    private var previousOrigin = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z:0)
+    private var currentOrigin = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z:0)
+    private var previousPoint = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z: 0)
+    private var currentPoint = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z: 0)
+    private var resetOffset = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z:0)
     
-    private var resetXOffset: CGFloat = 0.0
-    private var resetYOffset: CGFloat = 0.0
-    
-    private var originX: CGFloat {
-        get {
-            return bounds.midX
-        }
-        set {
-            self.originX = newValue
-        }
-    }
-    
-    private var originY: CGFloat {
-        get {
-            return bounds.midY
-        }
-        set {
-            self.originY = newValue
-        }
-    }
+    private var isResetScale = false
+    private var accumulatedScale: CGFloat = 1.0
     
     
     /* MARK: Public APIs */
     func setScale(scale: Double) {
-        self.scale = CGFloat(scale)
+        accumulatedScale *= CGFloat(scale)
+        resetOffset.x *= CGFloat(scale)
+        resetOffset.y *= CGFloat(scale)
+        
+        if !pathPoints.isEmpty {
+            for i in 0..<pathPoints.count {
+                pathPoints[i].x *= CGFloat(scale)
+                pathPoints[i].y *= CGFloat(scale)
+                pathPoints[i].z *= CGFloat(scale)
+            }
+            
+            currentPoint.x = pathPoints[pathPoints.count-1].x
+            currentPoint.y = pathPoints[pathPoints.count-1].y
+            isResetScale = true
+        }
+        setNeedsDisplay()
     }
     
     func setOrigin(x: Double, y: Double) {
-        cleanPath()
-        originX = CGFloat(x)
-        originY = CGFloat(y)
+        
+        previousOrigin.x = currentOrigin.x
+        previousOrigin.y = currentOrigin.y
+        
+        if !pathPoints.isEmpty {
+            for i in 0..<pathPoints.count {
+                pathPoints[i].x -= (currentOrigin.x - previousOrigin.x)
+                pathPoints[i].y -= (currentOrigin.x - previousOrigin.x)
+            }
+            
+            currentPoint.x = pathPoints[pathPoints.count-1].x
+            currentPoint.y = pathPoints[pathPoints.count-1].y
+            isResetScale = true
+        }
+        
+        resetOffset.x += (currentOrigin.x - previousOrigin.x)
+        resetOffset.y += (currentOrigin.y - previousOrigin.y)
+        
+        currentOrigin.x = CGFloat(x)
+        currentOrigin.y = CGFloat(y)
+        setNeedsDisplay()
     }
     
     func movePointTo(x: Double, y: Double) {
-        if !isReset {
-            previousMapX = currentMapX
-            previousMapY = currentMapY
-        } else {
-            previousMapX = 0
-            previousMapY = 0
-            isReset = false
-        }
-        currentMapX = CGFloat(x)*scale - resetXOffset
-        currentMapY = CGFloat(y)*scale - resetYOffset
+        
+        previousPoint.x = currentPoint.x
+        previousPoint.y = currentPoint.y
+        
+        currentPoint.x = CGFloat(x)*accumulatedScale - resetOffset.x
+        currentPoint.y = CGFloat(y)*accumulatedScale - resetOffset.y
+        
+        pathPoints.append(ThreeAxesSystem<CGFloat>(x: currentPoint.x, y: currentPoint.y, z: 0)) // z has not yet been implemented
+        setNeedsDisplay()
     }
     
     func cleanPath() {
-        if currentMapX != 0 && currentMapY != 0 {
-            resetXOffset += currentMapX
-            resetYOffset += currentMapY
+        
+        if !pathPoints.isEmpty {
+            resetOffset.x += currentPoint.x
+            resetOffset.y += currentPoint.y
         }
-        isReset = true
-        path.removeAllPoints()
+        currentPoint.x = 0
+        currentPoint.y = 0
+        previousPoint.x = 0
+        previousPoint.y = 0
+        
+        routePath.removeAllPoints()
+        pathPoints.removeAll()
+        setNeedsDisplay()
     }
     
     override func drawRect(rect: CGRect) {
         
-//        let xAxis = getLinePath(CGPoint(x: 0, y: bounds.midY), endPoint: CGPoint(x: bounds.width, y: bounds.midY))
-//        xAxis.lineWidth = 2.0
-//        UIColor.whiteColor().set()
-//        xAxis.stroke()
-//        
-//        let yAxis = getLinePath(CGPoint(x: bounds.midX, y: 20), endPoint: CGPoint(x: bounds.midX, y: bounds.height))
-//        yAxis.lineWidth = 2.0
-//        UIColor.whiteColor().set()
-//        yAxis.stroke()
         
-        path.moveToPoint(CGPoint(x: previousMapX + originX, y: previousMapY + originY))
-        path.addLineToPoint(CGPoint(x: currentMapX + originX, y: currentMapY + originY))
-        path.lineWidth = 3.0
-        UIColor.yellowColor().set()
-        path.stroke()
-
+        if isResetScale {
+            routePath.removeAllPoints()
+            for i in 0..<(pathPoints.count - 1) {
+                routePath.moveToPoint(CGPoint(x: pathPoints[i].x + currentOrigin.x, y: pathPoints[i].y + currentOrigin.y))
+                routePath.addLineToPoint(CGPoint(x: pathPoints[i+1].x + currentOrigin.x, y: pathPoints[i+1].y + currentOrigin.y))
+            }
+            isResetScale = false
+            
+        } else {
+            routePath.moveToPoint(CGPoint(x: previousPoint.x + currentOrigin.x, y: previousPoint.y + currentOrigin.y))
+            routePath.addLineToPoint(CGPoint(x: currentPoint.x + currentOrigin.x, y: currentPoint.y + currentOrigin.y))
+        }
+        
         var circle = UIBezierPath()
-        circle = getCircle(atCenter: CGPoint(x: currentMapX + originX, y: currentMapY + originY), radius: CGFloat(5))
-        UIColor.cyanColor().set()
+        circle = getCircle(atCenter: CGPoint(x: currentPoint.x + currentOrigin.x, y: currentPoint.y + currentOrigin.y), radius: CGFloat(5))
+        
+        UIColor.blackColor().set()
+        routePath.stroke()
         circle.fill()
         
     }

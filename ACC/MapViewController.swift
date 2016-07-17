@@ -19,7 +19,7 @@ class MapViewController: UIViewController, DataProcessorDelegate {
     var publicDB = NSUserDefaults.standardUserDefaults()
     
     @IBOutlet weak var gridView: GridView!
-    @IBOutlet weak var mapDisplayView: MapDisplayView! {
+    @IBOutlet weak var mapDisplayView: MapView! {
         didSet {
             mapDisplayView.addGestureRecognizer(UIPinchGestureRecognizer(
                 target: mapDisplayView, action: #selector(MapDisplayView.changeScale(_:))
@@ -90,7 +90,7 @@ class MapViewController: UIViewController, DataProcessorDelegate {
         origin.y = Double(mapDisplayView.frame.midY)
         gridView.setOrigin(origin.x, y: origin.y)
         mapDisplayView.setOrigin(origin.x, y: origin.y)
-        mapDisplayView.layerGradient(UIColor.whiteColor().CGColor, bottomColor: UIColor.cyanColor().colorWithAlphaComponent(0.5).CGColor)
+        //mapDisplayView.layerGradient(UIColor.whiteColor().CGColor, bottomColor: UIColor.cyanColor().colorWithAlphaComponent(0.5).CGColor)
     }
     
     override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
