@@ -20,6 +20,9 @@ class GridView: UIView {
     
     override func drawRect(rect: CGRect) {
         
+        let textLayer: TextLayer = TextLayer(frame: self.frame)
+        textLayer.setOrigin(Double(origin.x), y: Double(origin.y))
+        self.layer.addSublayer(textLayer)
         
         // Draw nothing when the rect is too small
         if CGRectGetWidth(rect) < 1 || CGRectGetHeight(rect) < 1 {

@@ -116,8 +116,9 @@ class MapView: UIView {
         var circle = UIBezierPath()
         circle = getCircle(atCenter: CGPoint(x: currentPoint.x + currentOrigin.x, y: currentPoint.y + currentOrigin.y), radius: CGFloat(5))
         
-        UIColor.blackColor().set()
+        UIColor.cyanColor().set()
         routePath.stroke()
+        UIColor.blackColor().set()
         circle.fill()
         
     }
