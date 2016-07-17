@@ -10,7 +10,18 @@ import UIKit
 
 class GridView: UIView {
     
+    var scaleValueForTheText: Double = 1 {
+        didSet {
+            setNeedsDisplay()
+        }
+    }
+    
     var origin = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z: 0)
+    
+    func setScale(scale: Double) {
+        scaleValueForTheText = scale
+        setNeedsDisplay()
+    }
     
     func setOrigin(x: Double, y: Double) {
         origin.x = CGFloat(x)
@@ -23,6 +34,7 @@ class GridView: UIView {
         self.layer.sublayers?.removeAll()
         
         let textLayer: TextLayer = TextLayer(frame: self.frame)
+        textLayer.scaleValue = scaleValueForTheText
         textLayer.setOrigin(Double(origin.x), y: Double(origin.y))
         self.layer.addSublayer(textLayer)
         

@@ -50,8 +50,32 @@ class MapViewController: UIViewController, DataProcessorDelegate {
         mapDisplayView.setOrigin(x, y: y)
     }
     
-    func changeScale(sender: UIPinchGestureRecognizer) {
+    var pinchScale: CGFloat = 1
+    
+    func changeScale(recognizer: UIPinchGestureRecognizer) {
         print("in the mapviewController")
+        switch recognizer.state {
+        case .Ended:
+            
+            pinchScale *= recognizer.scale
+            pinchScale = toZeroPointFiveMultiples(pinchScale) // let pinchScale always be the multiples of 0.5 to keep the textLayer clean.
+            
+            if pinchScale == 0 { // restrict the minimum scale to 0.5 instead of 0, otherwise the scale will always be 0 afterwards.
+                pinchScale = 0.5
+            }
+            
+            let times = pinchScale/CGFloat(gridView.scaleValueForTheText)
+            
+            if gridView.scaleValueForTheText != 0.5 || pinchScale != 0.5 {
+                mapDisplayView.setScale(Double(1/times))
+            }
+            
+            gridView.scaleValueForTheText = Double(pinchScale)
+            recognizer.scale = 1
+        default:
+            break
+        }
+
     }
     
     func moveScreenToRight() {
@@ -97,6 +121,7 @@ class MapViewController: UIViewController, DataProcessorDelegate {
         origin.x = Double(mapDisplayView.frame.midX)
         origin.y = Double(mapDisplayView.frame.midY)
         setOrigin(origin.x, y: origin.y)
+        gridView.scaleValueForTheText = 1
         //mapDisplayView.layerGradient(UIColor.whiteColor().CGColor, bottomColor: UIColor.cyanColor().colorWithAlphaComponent(0.5).CGColor)
     }
     
