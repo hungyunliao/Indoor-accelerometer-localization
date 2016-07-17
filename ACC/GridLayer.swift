@@ -20,6 +20,8 @@ class GridView: UIView {
     
     override func drawRect(rect: CGRect) {
         
+        self.layer.sublayers?.removeAll()
+        
         let textLayer: TextLayer = TextLayer(frame: self.frame)
         textLayer.setOrigin(Double(origin.x), y: Double(origin.y))
         self.layer.addSublayer(textLayer)

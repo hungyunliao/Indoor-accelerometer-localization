@@ -45,28 +45,33 @@ class MapViewController: UIViewController, DataProcessorDelegate {
         }
     }
     
+    func setOrigin(x: Double, y: Double) {
+        gridView.setOrigin(x, y: y)
+        mapDisplayView.setOrigin(x, y: y)
+    }
+    
     func changeScale(sender: UIPinchGestureRecognizer) {
         print("in the mapviewController")
     }
     
     func moveScreenToRight() {
         origin.x += 20
-        mapDisplayView.setOrigin(origin.x, y: origin.y)
+        setOrigin(origin.x, y: origin.y)
     }
     
     func moveScreenToUp() {
         origin.y -= 20
-        mapDisplayView.setOrigin(origin.x, y: origin.y)
+        setOrigin(origin.x, y: origin.y)
     }
     
     func moveScreenToDown() {
         origin.y += 20
-        mapDisplayView.setOrigin(origin.x, y: origin.y)
+        setOrigin(origin.x, y: origin.y)
     }
     
     func moveScreenToLeft() {
         origin.x -= 20
-        mapDisplayView.setOrigin(origin.x, y: origin.y)
+        setOrigin(origin.x, y: origin.y)
     }
     
     @IBAction func cleanpath(sender: UIButton) {
@@ -89,11 +94,9 @@ class MapViewController: UIViewController, DataProcessorDelegate {
         // MapDisplayView API setup
         mapDisplayView.setScale(1.0)
         mapDisplayView.frame = view.frame
-        
         origin.x = Double(mapDisplayView.frame.midX)
         origin.y = Double(mapDisplayView.frame.midY)
-        gridView.setOrigin(origin.x, y: origin.y)
-        mapDisplayView.setOrigin(origin.x, y: origin.y)
+        setOrigin(origin.x, y: origin.y)
         //mapDisplayView.layerGradient(UIColor.whiteColor().CGColor, bottomColor: UIColor.cyanColor().colorWithAlphaComponent(0.5).CGColor)
     }
     
