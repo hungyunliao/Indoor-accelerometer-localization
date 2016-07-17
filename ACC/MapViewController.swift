@@ -22,7 +22,7 @@ class MapViewController: UIViewController, DataProcessorDelegate {
     @IBOutlet weak var mapDisplayView: MapView! {
         didSet {
             mapDisplayView.addGestureRecognizer(UIPinchGestureRecognizer(
-                target: mapDisplayView, action: #selector(MapDisplayView.changeScale(_:))
+                target: self, action: #selector(MapViewController.changeScale(_:))
                 ))
             
             let rightSwipeGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(MapViewController.moveScreenToRight))
@@ -43,6 +43,10 @@ class MapViewController: UIViewController, DataProcessorDelegate {
             
             
         }
+    }
+    
+    func changeScale(sender: UIPinchGestureRecognizer) {
+        print("in the mapviewController")
     }
     
     func moveScreenToRight() {
