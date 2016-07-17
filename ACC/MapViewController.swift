@@ -53,9 +53,9 @@ class MapViewController: UIViewController, DataProcessorDelegate {
     var pinchScale: CGFloat = 1
     
     func changeScale(recognizer: UIPinchGestureRecognizer) {
-        print("in the mapviewController")
+        
         switch recognizer.state {
-        case .Ended:
+        case .Changed, .Ended:
             
             pinchScale *= recognizer.scale
             pinchScale = toZeroPointFiveMultiples(pinchScale) // let pinchScale always be the multiples of 0.5 to keep the textLayer clean.
@@ -118,8 +118,9 @@ class MapViewController: UIViewController, DataProcessorDelegate {
         // MapDisplayView API setup
         mapDisplayView.setScale(1.0)
         mapDisplayView.frame = view.frame
-        origin.x = Double(mapDisplayView.frame.midX)
-        origin.y = Double(mapDisplayView.frame.midY)
+//        origin.x = Double(mapDisplayView.frame.midX)
+//        origin.y = Double(mapDisplayView.frame.midY)
+        (origin.x, origin.y) = (Double(mapDisplayView.frame.midX), Double(mapDisplayView.frame.midY))
         setOrigin(origin.x, y: origin.y)
         gridView.scaleValueForTheText = 1
         //mapDisplayView.layerGradient(UIColor.whiteColor().CGColor, bottomColor: UIColor.cyanColor().colorWithAlphaComponent(0.5).CGColor)
