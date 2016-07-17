@@ -118,8 +118,6 @@ class MapViewController: UIViewController, DataProcessorDelegate {
         // MapDisplayView API setup
         mapDisplayView.setScale(1.0)
         mapDisplayView.frame = view.frame
-//        origin.x = Double(mapDisplayView.frame.midX)
-//        origin.y = Double(mapDisplayView.frame.midY)
         (origin.x, origin.y) = (Double(mapDisplayView.frame.midX), Double(mapDisplayView.frame.midY))
         setOrigin(origin.x, y: origin.y)
         gridView.scaleValueForTheText = 1
@@ -129,6 +127,10 @@ class MapViewController: UIViewController, DataProcessorDelegate {
     override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
         if UIDevice.currentDevice().orientation.isLandscape.boolValue {
             print("Landscape")
+            mapDisplayView.frame = CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.height, view.frame.width)
+            (origin.x, origin.y) = (Double(mapDisplayView.frame.midX), Double(mapDisplayView.frame.midY))
+            setOrigin(origin.x, y: origin.y)
+
             //viewDidLoad()
 //            let tempMap: MapDisplayView = MapDisplayView(frame: CGRectMake(30, 30, 100, 100))
 //            tempMap.setOrigin(origin.x, y: origin.y)
@@ -136,6 +138,9 @@ class MapViewController: UIViewController, DataProcessorDelegate {
 
      } else {
             print("Portrait")
+            mapDisplayView.frame = CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.height, view.frame.width)
+            (origin.x, origin.y) = (Double(mapDisplayView.frame.midX), Double(mapDisplayView.frame.midY))
+            setOrigin(origin.x, y: origin.y)
 //            let tempMap: MapDisplayView = MapDisplayView(frame: CGRectMake(100, 100, 100, 100))
 //            tempMap.setOrigin(origin.x, y: origin.y)
 //            mapDisplayView = tempMap
