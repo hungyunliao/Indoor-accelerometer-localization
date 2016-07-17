@@ -9,83 +9,50 @@
 import Foundation
 import CoreMotion
 
-var threePtFilterPointsDone = 1
-let numberOfPointsForThreePtFilter = 3
-
-/*
-protocol Type {
+class ThreePointFilter : Filter {
     
-    func +(lhs: Self, rhs: Self) -> Self
-    func *(lhs: Self, rhs: Self) -> Self
-}
-
-extension Int: Type {}
-extension Double: Type {}
-extension Float: Type {}
-
-func add<Element : Type>(lhs: Element, rhs: Element) -> Element {
-    let lhs = lhs
-    let rhs = rhs
-    return lhs + rhs
-}
- */
-var arrayX = [Double]()
-var arrayY = [Double]()
-var arrayZ = [Double]()
-//
-
-class ThreePointFilter : Filter{
+    var threePtFilterPointsDone: Int = 0
+    let numberOfPointsForThreePtFilter: Int = 3
+    
+    var arrayX:[Double] = [Double]()
+    var arrayY:[Double] = [Double]()
+    var arrayZ:[Double] = [Double]()
     
     func initFilter(deviceMotionUpdateInterval: Double) {
+        threePtFilterPointsDone = 0
+        arrayX = [Double]()
+        arrayY = [Double]()
+        arrayZ = [Double]()
     }
-
-    /*
-    var arrayX = [T]()
-    var arrayY = [T]()
-    var arrayZ = [T]()
-    */
-    //func filter<T>(x: T, y: T, z: T) -> (T, T, T) {
+    
     func filter(x: Double, y: Double, z: Double) -> (Double, Double, Double) {
-        var avg = ThreeAxesSystem<Double>(x: 0, y: 0, z: 0)
-        
-        //print(x.dynamicType)
         
         arrayX.append(x)
         arrayY.append(y)
         arrayZ.append(z)
         
-        //print(arrayX[0])
+        threePtFilterPointsDone += 1
         
-        if threePtFilterPointsDone < numberOfPointsForThreePtFilter {
-            
-            threePtFilterPointsDone += 1
-            
-            avg.x = x
-            avg.y = y
-            avg.z = z
-            
-        } else {
-            
-            for i in 0..<numberOfPointsForThreePtFilter {
-                
-                avg.x += arrayX[i]
-                avg.y += arrayY[i]
-                avg.z += arrayZ[i]
- 
-                //print(add(2.562, rhs: 3.8))
-                //print(add(x, rhs: arrayX[i]))
-            }
-            
-            avg.x /= Double(numberOfPointsForThreePtFilter)
-            avg.y /= Double(numberOfPointsForThreePtFilter)
-            avg.z /= Double(numberOfPointsForThreePtFilter)
-            
+        // When we have (numberOfPointsForThreePtFilter + 1 = 4) or more elements, 
+        // we need to remove the first element.
+        if threePtFilterPointsDone > numberOfPointsForThreePtFilter {
             arrayX.removeFirst()
             arrayY.removeFirst()
             arrayZ.removeFirst()
-
+            threePtFilterPointsDone -= 1
         }
+        
+        var avg = ThreeAxesSystem<Double>(x: 0, y: 0, z: 0)
+        for i in 0..<threePtFilterPointsDone {
+            avg.x += arrayX[i]
+            avg.y += arrayY[i]
+            avg.z += arrayZ[i]
+        }
+        avg.x /= Double(threePtFilterPointsDone)
+        avg.y /= Double(threePtFilterPointsDone)
+        avg.z /= Double(threePtFilterPointsDone)
+        
         return (avg.x, avg.y, avg.z)
     }
-
 }
+
