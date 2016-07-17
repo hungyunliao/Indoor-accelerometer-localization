@@ -18,6 +18,7 @@ class MapViewController: UIViewController, DataProcessorDelegate {
     // MARK: PublicDB used to pass the object of DataProcessor
     var publicDB = NSUserDefaults.standardUserDefaults()
     
+    @IBOutlet weak var gradientView: GradientView!
     @IBOutlet weak var gridView: GridView!
     @IBOutlet weak var mapDisplayView: MapView! {
         didSet {
@@ -125,6 +126,7 @@ class MapViewController: UIViewController, DataProcessorDelegate {
         // MapDisplayView API setup
         
         gridView.backgroundColor = UIColor.clearColor()
+        gradientView.frame = view.frame
         mapDisplayView.setScale(1.0)
         mapDisplayView.frame = view.frame
         (origin.x, origin.y) = (Double(mapDisplayView.frame.midX), Double(mapDisplayView.frame.midY))
@@ -136,16 +138,19 @@ class MapViewController: UIViewController, DataProcessorDelegate {
     
     override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
         if UIDevice.currentDevice().orientation.isLandscape.boolValue {
-            print("Landscape - \(view.frame.size)")
+            //print("Landscape - \(view.frame.size)")
             if mapDisplayView != nil {
+                
                 mapDisplayView.frame = CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.height, view.frame.width)
+                gradientView.frame = mapDisplayView.frame
                 (origin.x, origin.y) = (Double(mapDisplayView.frame.midX) + shiftedBySwipe.x, Double(mapDisplayView.frame.midY) + shiftedBySwipe.y)
                 setOrigin(origin.x, y: origin.y)
             }
      } else {
-            print("Portrait - \(view.frame.size)")
+            //print("Portrait - \(view.frame.size)")
             if mapDisplayView != nil {
                 mapDisplayView.frame = CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.height, view.frame.width)
+                gradientView.frame = mapDisplayView.frame
                 (origin.x, origin.y) = (Double(mapDisplayView.frame.midX) + shiftedBySwipe.x, Double(mapDisplayView.frame.midY) + shiftedBySwipe.y)
                 setOrigin(origin.x, y: origin.y)
             }

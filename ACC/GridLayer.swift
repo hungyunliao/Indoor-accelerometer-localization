@@ -29,8 +29,6 @@ class GridView: UIView {
         
         self.layer.sublayers?.removeAll()
         
-        self.layerGradient(UIColor.whiteColor().CGColor, bottomColor: UIColor.cyanColor().colorWithAlphaComponent(0.5).CGColor)
-        
         let textLayer: TextLayer = TextLayer(frame: self.frame)
         textLayer.scaleValue = scaleValueForTheText
         textLayer.backgroundColor = UIColor.clearColor().CGColor
@@ -112,5 +110,20 @@ class GridView: UIView {
         axisPath.lineWidth = 2
         axisPath.stroke()
         
+    }
+}
+
+
+class GradientView: UIView {
+    
+    override var frame: CGRect {
+        didSet {
+            setNeedsDisplay()
+        }
+    }
+    
+    override func drawRect(rect: CGRect) {
+        self.layer.sublayers?.removeAll()
+        self.layerGradient(UIColor.whiteColor().CGColor, bottomColor: UIColor.cyanColor().colorWithAlphaComponent(0.5).CGColor)
     }
 }
