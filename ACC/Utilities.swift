@@ -62,7 +62,7 @@ struct Matrix {
         return results
     }
     func inverse(x: Matrix) -> Matrix {
-        var results = x
+        let results = x
         /*
          dgetrf_(UnsafeMutablePointer<__CLPK_integer>, <#T##UnsafeMutablePointer<__CLPK_integer>#>, <#T##UnsafeMutablePointer<__CLPK_doublereal>#>, <#T##UnsafeMutablePointer<__CLPK_integer>#>, <#T##UnsafeMutablePointer<__CLPK_integer>#>, <#T##UnsafeMutablePointer<__CLPK_integer>#>)
          */

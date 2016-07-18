@@ -21,12 +21,12 @@
 		13B648FE1CF3BA4A00CA656A /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 13B648FD1CF3BA4A00CA656A /* CoreMotion.framework */; };
 		13CCEB2F1D088C97005556A8 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13CCEB2E1D088C97005556A8 /* MapViewController.swift */; };
 		13CCEB331D0890E9005556A8 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13CCEB321D0890E9005556A8 /* MapView.swift */; };
+		9AAD7FD21D2D71FB000719DA /* GridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AAD7FD11D2D71FB000719DA /* GridView.swift */; };
+		9AAD7FD51D2D7E3B000719DA /* MapDisplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AAD7FD41D2D7E3B000719DA /* MapDisplayView.swift */; };
 		9C6397C61D34012000966761 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C6397C51D34012000966761 /* Utilities.swift */; };
 		9C6397C81D34015100966761 /* RawFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C6397C71D34015100966761 /* RawFilter.swift */; };
 		9C6397CA1D34016700966761 /* ThreePointFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C6397C91D34016700966761 /* ThreePointFilter.swift */; };
 		9C6397CC1D346C4000966761 /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C6397CB1D346C4000966761 /* Filter.swift */; };
-		9AAD7FD21D2D71FB000719DA /* GridLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AAD7FD11D2D71FB000719DA /* GridLayer.swift */; };
-		9AAD7FD51D2D7E3B000719DA /* MapDisplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AAD7FD41D2D7E3B000719DA /* MapDisplayView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,12 +46,12 @@
 		13B648FD1CF3BA4A00CA656A /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 		13CCEB2E1D088C97005556A8 /* MapViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
 		13CCEB321D0890E9005556A8 /* MapView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
+		9AAD7FD11D2D71FB000719DA /* GridView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GridView.swift; sourceTree = "<group>"; };
+		9AAD7FD41D2D7E3B000719DA /* MapDisplayView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapDisplayView.swift; sourceTree = "<group>"; };
 		9C6397C51D34012000966761 /* Utilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		9C6397C71D34015100966761 /* RawFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RawFilter.swift; sourceTree = "<group>"; };
 		9C6397C91D34016700966761 /* ThreePointFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThreePointFilter.swift; sourceTree = "<group>"; };
 		9C6397CB1D346C4000966761 /* Filter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Filter.swift; sourceTree = "<group>"; };
-		9AAD7FD11D2D71FB000719DA /* GridLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GridLayer.swift; sourceTree = "<group>"; };
-		9AAD7FD41D2D7E3B000719DA /* MapDisplayView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapDisplayView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,7 +98,6 @@
 			isa = PBXGroup;
 			children = (
 				9AAD7FD31D2D7200000719DA /* MapView */,
-				13CCEB321D0890E9005556A8 /* MapView.swift */,
 				13CCEB2E1D088C97005556A8 /* MapViewController.swift */,
 				9C6397C51D34012000966761 /* Utilities.swift */,
 				9C6397CB1D346C4000966761 /* Filter.swift */,
@@ -114,14 +113,23 @@
 			path = ACC;
 			sourceTree = "<group>";
 		};
+		13FE15C41D3C3C5800C68AED /* Files not in use */ = {
+			isa = PBXGroup;
+			children = (
+				13B24EF31D2F265A00C0476D /* PathLayer.swift */,
+				9AAD7FD41D2D7E3B000719DA /* MapDisplayView.swift */,
+			);
+			name = "Files not in use";
+			sourceTree = "<group>";
+		};
 		9AAD7FD31D2D7200000719DA /* MapView */ = {
 			isa = PBXGroup;
 			children = (
+				13FE15C41D3C3C5800C68AED /* Files not in use */,
 				13B24EF71D3565E800C0476D /* UIViewExtension.swift */,
-				9AAD7FD11D2D71FB000719DA /* GridLayer.swift */,
-				13B24EF31D2F265A00C0476D /* PathLayer.swift */,
+				13CCEB321D0890E9005556A8 /* MapView.swift */,
+				9AAD7FD11D2D71FB000719DA /* GridView.swift */,
 				13B24EF51D33765000C0476D /* TextLayer.swift */,
-				9AAD7FD41D2D7E3B000719DA /* MapDisplayView.swift */,
 			);
 			name = MapView;
 			sourceTree = "<group>";
@@ -202,7 +210,7 @@
 				9C6397CA1D34016700966761 /* ThreePointFilter.swift in Sources */,
 				9C6397C81D34015100966761 /* RawFilter.swift in Sources */,
 				13AE20C41CF8B0C4004B0D6B /* KalmanFilter.swift in Sources */,
-				9AAD7FD21D2D71FB000719DA /* GridLayer.swift in Sources */,
+				9AAD7FD21D2D71FB000719DA /* GridView.swift in Sources */,
 				13B648EE1CF3B82B00CA656A /* ViewController.swift in Sources */,
 				9AAD7FD51D2D7E3B000719DA /* MapDisplayView.swift in Sources */,
 				1389A5231D24992C000B24FF /* DataProcessor.swift in Sources */,
