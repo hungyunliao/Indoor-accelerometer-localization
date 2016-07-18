@@ -116,8 +116,17 @@ class GradientView: UIView {
     
     override var frame: CGRect { didSet { setNeedsDisplay() } }
     
+    private var topColor: CGColor = UIColor.clearColor().CGColor
+    private var bottomColor: CGColor = UIColor.clearColor().CGColor
+    
+    func colorSetUp(topColor: CGColor, bottomColor: CGColor) {
+        self.topColor = topColor
+        self.bottomColor = bottomColor
+        setNeedsDisplay()
+    }
+    
     override func drawRect(rect: CGRect) {
         self.layer.sublayers?.removeAll()
-        self.layerGradient(UIColor.whiteColor().CGColor, bottomColor: UIColor.cyanColor().colorWithAlphaComponent(0.5).CGColor)
+        self.layerGradient(topColor, bottomColor: bottomColor)
     }
 }
