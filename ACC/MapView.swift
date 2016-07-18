@@ -15,31 +15,26 @@ class MapView: UIView {
     // Not yet implement "Z" axis
     private var routePath = UIBezierPath()
     private var pathPoints = [ThreeAxesSystem<CGFloat>]() // an array that keeps the original path points which are used to re-draw the routePath when the scale is changed.
-    private var previousOrigin = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z:0)
-    private var currentOrigin = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z:0)
+    private var previousOrigin = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z: 0)
+    private var currentOrigin = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z: 0)
     private var previousPoint = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z: 0)
     private var currentPoint = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z: 0)
-    private var resetOffset = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z:0)
+    private var resetOffset = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z: 0)
     
     private var isResetScale = false
     private var accumulatedScale: CGFloat = 1.0
     
-    
     /* MARK: Public APIs */
     func setScale(scale: Double) {
         accumulatedScale *= CGFloat(scale)
-        resetOffset.x *= CGFloat(scale)
-        resetOffset.y *= CGFloat(scale)
+        threeAxisSysOperation(&resetOffset, operation: .multiply, aValue: CGFloat(scale))
         
         if !pathPoints.isEmpty {
             for i in 0..<pathPoints.count {
-                pathPoints[i].x *= CGFloat(scale)
-                pathPoints[i].y *= CGFloat(scale)
-                pathPoints[i].z *= CGFloat(scale)
+                threeAxisSysOperation(&pathPoints[i], operation: .multiply, aValue: CGFloat(scale))
             }
             
-            currentPoint.x = pathPoints[pathPoints.count-1].x
-            currentPoint.y = pathPoints[pathPoints.count-1].y
+            threeAxisSysOperation(&currentPoint, operation: .assign, operandPoint: pathPoints[pathPoints.count - 1])
             isResetScale = true
         }
         setNeedsDisplay()
@@ -47,35 +42,27 @@ class MapView: UIView {
     
     func setOrigin(x: Double, y: Double) {
         
-        previousOrigin.x = currentOrigin.x
-        previousOrigin.y = currentOrigin.y
+        threeAxisSysOperation(&previousOrigin, operation: .assign, operandPoint: currentOrigin)
+        threeAxisSysOperation(
+            &currentOrigin,
+            operation: .assign,
+            operandPoint: ThreeAxesSystem<CGFloat>(x: CGFloat(x), y: CGFloat(y), z: CGFloat(0))
+        )
         
         if !pathPoints.isEmpty {
-            for i in 0..<pathPoints.count {
-                pathPoints[i].x -= (currentOrigin.x - previousOrigin.x)
-                pathPoints[i].y -= (currentOrigin.x - previousOrigin.x)
-            }
-            
-            currentPoint.x = pathPoints[pathPoints.count-1].x
-            currentPoint.y = pathPoints[pathPoints.count-1].y
             isResetScale = true
         }
         
-        resetOffset.x += (currentOrigin.x - previousOrigin.x)
-        resetOffset.y += (currentOrigin.y - previousOrigin.y)
-        
-        currentOrigin.x = CGFloat(x)
-        currentOrigin.y = CGFloat(y)
         setNeedsDisplay()
     }
     
     func movePointTo(x: Double, y: Double) {
         
-        previousPoint.x = currentPoint.x
-        previousPoint.y = currentPoint.y
+        threeAxisSysOperation(&previousPoint, operation: .assign, operandPoint: currentPoint)
         
-        currentPoint.x = CGFloat(x)*accumulatedScale - resetOffset.x
-        currentPoint.y = CGFloat(y)*accumulatedScale - resetOffset.y
+        let incomingPoint =
+            ThreeAxesSystem<CGFloat>(x: CGFloat(x)*accumulatedScale - resetOffset.x, y: CGFloat(y)*accumulatedScale - resetOffset.y, z: 0)
+        threeAxisSysOperation(&currentPoint, operation: .assign, operandPoint: incomingPoint)
         
         pathPoints.append(ThreeAxesSystem<CGFloat>(x: currentPoint.x, y: currentPoint.y, z: 0)) // z has not yet been implemented
         setNeedsDisplay()
@@ -84,13 +71,11 @@ class MapView: UIView {
     func cleanPath() {
         
         if !pathPoints.isEmpty {
-            resetOffset.x += currentPoint.x
-            resetOffset.y += currentPoint.y
+            threeAxisSysOperation(&resetOffset, operation: .add, operandPoint: currentPoint)
         }
-        currentPoint.x = 0
-        currentPoint.y = 0
-        previousPoint.x = 0
-        previousPoint.y = 0
+        
+        threeAxisSysOperation(&currentPoint, operation: .assign, aValue: 0)
+        threeAxisSysOperation(&previousPoint, operation: .assign, aValue: 0)
         
         routePath.removeAllPoints()
         pathPoints.removeAll()
@@ -123,50 +108,6 @@ class MapView: UIView {
     }
 }
 
-class MapViewGrid: UIView {
-    
-    // An empty implementation adversely affects performance during animation.
-    override func drawRect(rect: CGRect) {
-        drawGrid(CGPoint(x: bounds.midX, y: bounds.midY), gridSize: CGFloat(10))
-    }
-    
-    private func drawGrid(centerPoint: CGPoint, gridSize: CGFloat) {
-        
-        var gridPath = UIBezierPath()
-        UIColor.grayColor().set()
-        gridPath.lineWidth = 1.0
-        let pattern: [CGFloat] = [4, 2]
-        var i: CGFloat = 1
-        
-        // draw x-direction lines
-        while (i <= bounds.height) {
-            gridPath = getLinePath(CGPoint(x: 0, y: centerPoint.y + i*gridSize), endPoint: CGPoint(x: bounds.width, y: centerPoint.y + i*gridSize))
-            gridPath.setLineDash(pattern, count: 2, phase: 0.0)
-            gridPath.stroke()
-            
-            gridPath = getLinePath(CGPoint(x: 0, y: centerPoint.y + -i*gridSize), endPoint: CGPoint(x: bounds.width, y: centerPoint.y + -i*gridSize))
-            gridPath.setLineDash(pattern, count: 2, phase: 0.0)
-            gridPath.stroke()
-            i += 1
-        }
-        
-        i = 1
-        
-        // draw y-direction lines
-        while (i <= bounds.width) {
-            gridPath = getLinePath(CGPoint(x: centerPoint.x + i*gridSize, y: 0), endPoint: CGPoint(x: centerPoint.x + i*gridSize, y: bounds.height))
-            gridPath.setLineDash(pattern, count: 2, phase: 0.0)
-            gridPath.stroke()
-            
-            gridPath = getLinePath(CGPoint(x: centerPoint.x + -i*gridSize, y: 0), endPoint: CGPoint(x: centerPoint.x + -i*gridSize, y: bounds.height))
-            gridPath.setLineDash(pattern, count: 2, phase: 0.0)
-            gridPath.stroke()
-            
-            i += 1
-        }
-    }
-}
-
 func getCircle(atCenter center: CGPoint, radius: CGFloat) -> UIBezierPath {
     return UIBezierPath(arcCenter: center, radius: radius, startAngle: 0.0, endAngle: CGFloat(2*M_PI), clockwise: false)
 }
@@ -178,4 +119,63 @@ func getLinePath(startPoint: CGPoint, endPoint: CGPoint) -> UIBezierPath {
     linePath.addLineToPoint(endPoint)
     
     return linePath
+}
+
+func threeAxisSysOperation(inout threeAxisSysPoint: ThreeAxesSystem<CGFloat>, operation: Operation, aValue: CGFloat) {
+    switch operation {
+    case .assign:
+        threeAxisSysPoint.x = aValue
+        threeAxisSysPoint.y = aValue
+        threeAxisSysPoint.z = aValue
+    case .add:
+        threeAxisSysPoint.x += aValue
+        threeAxisSysPoint.y += aValue
+        threeAxisSysPoint.z += aValue
+    case .minus:
+        threeAxisSysPoint.x -= aValue
+        threeAxisSysPoint.y -= aValue
+        threeAxisSysPoint.z -= aValue
+    case .multiply:
+        threeAxisSysPoint.x *= aValue
+        threeAxisSysPoint.y *= aValue
+        threeAxisSysPoint.z *= aValue
+        break
+    case .divide:
+        threeAxisSysPoint.x /= aValue
+        threeAxisSysPoint.x /= aValue
+        threeAxisSysPoint.x /= aValue
+    }
+}
+
+func threeAxisSysOperation(inout threeAxisSysPoint: ThreeAxesSystem<CGFloat>, operation: Operation, operandPoint: ThreeAxesSystem<CGFloat>) {
+    switch operation {
+    case .assign:
+        threeAxisSysPoint.x = operandPoint.x
+        threeAxisSysPoint.y = operandPoint.y
+        threeAxisSysPoint.z = operandPoint.z
+    case .add:
+        threeAxisSysPoint.x += operandPoint.x
+        threeAxisSysPoint.y += operandPoint.y
+        threeAxisSysPoint.z += operandPoint.z
+    case .minus:
+        threeAxisSysPoint.x -= operandPoint.x
+        threeAxisSysPoint.y -= operandPoint.y
+        threeAxisSysPoint.z -= operandPoint.z
+    case .multiply:
+        threeAxisSysPoint.x *= operandPoint.x
+        threeAxisSysPoint.y *= operandPoint.y
+        threeAxisSysPoint.z *= operandPoint.z
+    case .divide:
+        threeAxisSysPoint.x /= operandPoint.x
+        threeAxisSysPoint.y /= operandPoint.y
+        threeAxisSysPoint.z /= operandPoint.z
+    }
+}
+
+enum Operation {
+    case assign
+    case add
+    case minus
+    case multiply
+    case divide
 }
