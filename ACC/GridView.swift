@@ -11,7 +11,7 @@ import UIKit
 class GridView: UIView {
     
     // MARK: Instance variables
-    var scaleValueForTheText: Double = 1 { didSet { setNeedsDisplay() } }
+    var scaleValueForTheText: Double = 1
     var origin = ThreeAxesSystem<CGFloat>(x: 0, y: 0, z: 0)
     
     // MARK: Public APIs

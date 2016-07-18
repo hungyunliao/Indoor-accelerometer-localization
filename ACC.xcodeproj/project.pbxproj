@@ -98,7 +98,6 @@
 			isa = PBXGroup;
 			children = (
 				9AAD7FD31D2D7200000719DA /* MapView */,
-				13CCEB321D0890E9005556A8 /* MapView.swift */,
 				13CCEB2E1D088C97005556A8 /* MapViewController.swift */,
 				9C6397C51D34012000966761 /* Utilities.swift */,
 				9C6397CB1D346C4000966761 /* Filter.swift */,
@@ -128,6 +127,7 @@
 			children = (
 				13FE15C41D3C3C5800C68AED /* Files not in use */,
 				13B24EF71D3565E800C0476D /* UIViewExtension.swift */,
+				13CCEB321D0890E9005556A8 /* MapView.swift */,
 				9AAD7FD11D2D71FB000719DA /* GridView.swift */,
 				13B24EF51D33765000C0476D /* TextLayer.swift */,
 			);

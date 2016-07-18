@@ -68,7 +68,7 @@ class MapViewController: UIViewController, DataProcessorDelegate {
                 mapView.setScale(Double(1/times))
             }
             
-            gridView.scaleValueForTheText = Double(pinchScale)
+            gridView.setScale(Double(pinchScale))
             recognizer.scale = 1
         default:
             break
@@ -138,7 +138,7 @@ class MapViewController: UIViewController, DataProcessorDelegate {
         gradientView.colorSetUp(UIColor.whiteColor().CGColor, bottomColor: UIColor.cyanColor().colorWithAlphaComponent(0.5).CGColor)
         
         gridView.backgroundColor = UIColor.clearColor()
-        gridView.scaleValueForTheText = 1
+        gridView.setScale(1.0)
         
         mapView.backgroundColor = UIColor.clearColor()
         mapView.setScale(1.0)
