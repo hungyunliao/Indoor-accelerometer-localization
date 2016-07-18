@@ -122,29 +122,8 @@ func getLinePath(startPoint: CGPoint, endPoint: CGPoint) -> UIBezierPath {
 }
 
 func threeAxisSysOperation(inout threeAxisSysPoint: ThreeAxesSystem<CGFloat>, operation: Operation, aValue: CGFloat) {
-    switch operation {
-    case .assign:
-        threeAxisSysPoint.x = aValue
-        threeAxisSysPoint.y = aValue
-        threeAxisSysPoint.z = aValue
-    case .add:
-        threeAxisSysPoint.x += aValue
-        threeAxisSysPoint.y += aValue
-        threeAxisSysPoint.z += aValue
-    case .minus:
-        threeAxisSysPoint.x -= aValue
-        threeAxisSysPoint.y -= aValue
-        threeAxisSysPoint.z -= aValue
-    case .multiply:
-        threeAxisSysPoint.x *= aValue
-        threeAxisSysPoint.y *= aValue
-        threeAxisSysPoint.z *= aValue
-        break
-    case .divide:
-        threeAxisSysPoint.x /= aValue
-        threeAxisSysPoint.x /= aValue
-        threeAxisSysPoint.x /= aValue
-    }
+    let threeAxisSysPointWithValue = ThreeAxesSystem<CGFloat>(x: aValue, y: aValue, z: aValue)
+    threeAxisSysOperation(&threeAxisSysPoint, operation: operation, operandPoint: threeAxisSysPointWithValue)
 }
 
 func threeAxisSysOperation(inout threeAxisSysPoint: ThreeAxesSystem<CGFloat>, operation: Operation, operandPoint: ThreeAxesSystem<CGFloat>) {
