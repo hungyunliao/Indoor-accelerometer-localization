@@ -20,6 +20,7 @@ class ViewController: UIViewController, DataProcessorDelegate {
 
     
     // MARK: Outlets
+    @IBOutlet weak var gradientView: GradientView!
     @IBOutlet var info: UILabel?
     
     @IBOutlet var disX: UILabel?
@@ -34,14 +35,6 @@ class ViewController: UIViewController, DataProcessorDelegate {
     @IBOutlet var velY: UILabel?
     @IBOutlet var velZ: UILabel?
     
-    @IBOutlet var velXGyro: UILabel?
-    @IBOutlet var velYGyro: UILabel?
-    @IBOutlet var velZGyro: UILabel?
-    
-    @IBOutlet var disXGyro: UILabel?
-    @IBOutlet var disYGyro: UILabel?
-    @IBOutlet var disZGyro: UILabel?
-    
     @IBAction func reset() {
         dataSource.reset()
     }
@@ -50,6 +43,7 @@ class ViewController: UIViewController, DataProcessorDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         dataSource.startsDetection()
+        gradientView.colorSetUp(UIColor.whiteColor().CGColor, bottomColor: UIColor.greenColor().colorWithAlphaComponent(0.5).CGColor)
         //self.reset()
     }
 
