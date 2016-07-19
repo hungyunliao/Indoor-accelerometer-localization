@@ -43,7 +43,7 @@ class ViewController: UIViewController, DataProcessorDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         dataSource.startsDetection()
-        gradientView.colorSetUp(UIColor.whiteColor().CGColor, bottomColor: UIColor.greenColor().colorWithAlphaComponent(0.2).CGColor)
+        //gradientView.colorSetUp(UIColor.yellowColor().CGColor, bottomColor: UIColor.yellowColor().CGColor)
         //self.reset()
     }
 
