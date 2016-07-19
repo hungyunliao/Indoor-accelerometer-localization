@@ -20,6 +20,11 @@ class ViewController: UIViewController, DataProcessorDelegate {
 
     
     // MARK: Outlets
+    
+    @IBOutlet weak var currentSpeedLabel: UILabel!
+    @IBOutlet weak var currentSpeed: UILabel!
+    @IBOutlet weak var unitLable: UILabel!
+    
     @IBOutlet weak var gradientView: GradientView!
     @IBOutlet var info: UILabel?
     
@@ -48,6 +53,21 @@ class ViewController: UIViewController, DataProcessorDelegate {
     }
 
     // MARK: Functions
+    override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+        if UIDevice.currentDevice().orientation.isLandscape.boolValue {
+            // Landscape orientation
+            currentSpeedLabel.text = ""
+            currentSpeed.text = ""
+            unitLable.text = ""
+            
+        } else {
+            // Portrait orientation
+            currentSpeedLabel.text = "current speed:"
+            currentSpeed.text = "0.0"
+            unitLable.text = "m/s"
+        }
+    }
+    
     
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
@@ -76,6 +96,7 @@ class ViewController: UIViewController, DataProcessorDelegate {
             velX?.text = "\(roundNum(data.x))"
             velY?.text = "\(roundNum(data.y))"
             velZ?.text = "\(roundNum(data.z))"
+            currentSpeed.text = "\(Double(Int(modulus(data.x, y: data.y, z: data.z)*10))/10)"
         case .distance:
             disX?.text = "\(roundNum(data.x))"
             disY?.text = "\(roundNum(data.y))"

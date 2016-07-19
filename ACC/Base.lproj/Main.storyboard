@@ -283,7 +283,7 @@
                                 </connections>
                             </button>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="iC4-AH-nvc">
-                                <rect key="frame" x="0.0" y="50" width="600" height="240"/>
+                                <rect key="frame" x="0.0" y="30" width="600" height="240"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SHh-qE-oca">
                                         <rect key="frame" x="0.0" y="0.0" width="600" height="30"/>
@@ -482,24 +482,24 @@
                                     </stackView>
                                 </subviews>
                             </stackView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="CURRENT SPEED:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="VN1-Z7-UQ6">
-                                <rect key="frame" x="215" y="291" width="170" height="130"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0.0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="35" translatesAutoresizingMaskIntoConstraints="NO" id="VN1-Z7-UQ6">
+                                <rect key="frame" x="215" y="290" width="170" height="130"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="130" id="DjS-58-QPD"/>
                                     <constraint firstAttribute="width" constant="170" id="MPB-Rr-vhF"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="70"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Abi-r8-1K9">
-                                <rect key="frame" x="163" y="299" width="42" height="20.5"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="current speed:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Abi-r8-1K9">
+                                <rect key="frame" x="173" y="298" width="112" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="m/s" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rIQ-E9-WY7">
-                                <rect key="frame" x="395" y="410" width="29" height="21"/>
+                                <rect key="frame" x="385" y="369" width="29" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
@@ -509,7 +509,7 @@
                         <constraints>
                             <constraint firstItem="ecm-ci-oMs" firstAttribute="top" secondItem="iC4-AH-nvc" secondAttribute="bottom" constant="100" id="0Vz-rB-KUu"/>
                             <constraint firstAttribute="trailingMargin" secondItem="iC4-AH-nvc" secondAttribute="trailing" constant="-20" id="4L1-Gf-jy2"/>
-                            <constraint firstItem="VN1-Z7-UQ6" firstAttribute="top" secondItem="rIQ-E9-WY7" secondAttribute="bottom" constant="-140" id="9Sw-xp-HbH"/>
+                            <constraint firstItem="VN1-Z7-UQ6" firstAttribute="top" secondItem="rIQ-E9-WY7" secondAttribute="bottom" constant="-100" id="9Sw-xp-HbH"/>
                             <constraint firstItem="FO1-L2-TyQ" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="ByH-Tq-RMR"/>
                             <constraint firstItem="OyI-jS-sBt" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="KPm-Mq-hmP"/>
                             <constraint firstItem="FO1-L2-TyQ" firstAttribute="bottom" secondItem="wfy-db-euE" secondAttribute="top" id="KQG-BA-6gQ"/>
@@ -518,20 +518,22 @@
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="GPW-vL-p6e" secondAttribute="bottom" constant="20" id="Pe5-yZ-jtN"/>
                             <constraint firstAttribute="trailing" secondItem="FO1-L2-TyQ" secondAttribute="trailing" id="UBU-bj-Ed5"/>
                             <constraint firstItem="OyI-jS-sBt" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="YBO-s8-vNy"/>
-                            <constraint firstItem="rIQ-E9-WY7" firstAttribute="leading" secondItem="VN1-Z7-UQ6" secondAttribute="leading" constant="180" id="akq-3B-POX"/>
-                            <constraint firstItem="Abi-r8-1K9" firstAttribute="trailing" secondItem="VN1-Z7-UQ6" secondAttribute="trailing" constant="-180" id="egZ-DL-5J1"/>
+                            <constraint firstItem="rIQ-E9-WY7" firstAttribute="leading" secondItem="VN1-Z7-UQ6" secondAttribute="leading" constant="170" id="akq-3B-POX"/>
+                            <constraint firstItem="Abi-r8-1K9" firstAttribute="trailing" secondItem="VN1-Z7-UQ6" secondAttribute="trailing" constant="-100" id="egZ-DL-5J1"/>
                             <constraint firstItem="VN1-Z7-UQ6" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="gyF-Jz-BNV"/>
                             <constraint firstItem="iC4-AH-nvc" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-20" id="kcd-zo-v7E"/>
                             <constraint firstItem="GPW-vL-p6e" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-20" id="kii-uq-0vl"/>
                             <constraint firstItem="VN1-Z7-UQ6" firstAttribute="top" secondItem="Abi-r8-1K9" secondAttribute="bottom" constant="-29" id="oW1-ow-xds"/>
-                            <constraint firstItem="iC4-AH-nvc" firstAttribute="top" secondItem="OyI-jS-sBt" secondAttribute="top" constant="30" id="plS-HQ-18y"/>
-                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="VN1-Z7-UQ6" secondAttribute="bottom" constant="130" id="q58-7i-2BL"/>
+                            <constraint firstItem="iC4-AH-nvc" firstAttribute="top" secondItem="OyI-jS-sBt" secondAttribute="top" constant="10" id="plS-HQ-18y"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="VN1-Z7-UQ6" secondAttribute="bottom" constant="120" id="q58-7i-2BL"/>
+                            <constraint firstItem="VN1-Z7-UQ6" firstAttribute="top" secondItem="iC4-AH-nvc" secondAttribute="bottom" constant="20" id="uLw-9d-NfD"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="ecm-ci-oMs" secondAttribute="bottom" constant="20" id="vnQ-oi-Acs"/>
                             <constraint firstItem="FO1-L2-TyQ" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="xBS-CD-Rc7"/>
                         </constraints>
                         <variation key="default">
                             <mask key="constraints">
                                 <exclude reference="Nag-H7-9UZ"/>
+                                <exclude reference="q58-7i-2BL"/>
                                 <exclude reference="0Vz-rB-KUu"/>
                             </mask>
                         </variation>
@@ -541,11 +543,14 @@
                         <outlet property="accX" destination="oyW-el-kbY" id="jUg-vD-oRt"/>
                         <outlet property="accY" destination="5wI-0g-yJ5" id="MnD-Ro-Xh9"/>
                         <outlet property="accZ" destination="Bbb-NO-Ieb" id="eK8-jg-hBf"/>
+                        <outlet property="currentSpeed" destination="VN1-Z7-UQ6" id="uKD-Xu-NfM"/>
+                        <outlet property="currentSpeedLabel" destination="Abi-r8-1K9" id="Vdi-mg-a98"/>
                         <outlet property="disX" destination="R6m-DC-4D1" id="RzK-Ml-eYT"/>
                         <outlet property="disY" destination="5mE-C0-WMn" id="NRC-cs-FxJ"/>
                         <outlet property="disZ" destination="EHY-4m-Kni" id="pIc-Xj-nb2"/>
                         <outlet property="gradientView" destination="FO1-L2-TyQ" id="Jg5-Bc-4VB"/>
                         <outlet property="info" destination="hio-AP-BHW" id="aSd-I2-X8a"/>
+                        <outlet property="unitLable" destination="rIQ-E9-WY7" id="Abo-qA-lGH"/>
                         <outlet property="velX" destination="pwz-Jo-ZX0" id="sDO-69-xhs"/>
                         <outlet property="velY" destination="TzI-sB-TzM" id="2N9-Hj-Vbp"/>
                         <outlet property="velZ" destination="ffZ-fI-bHt" id="bx0-ls-mNZ"/>

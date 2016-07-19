@@ -135,7 +135,7 @@ class MapViewController: UIViewController, DataProcessorDelegate {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(receiveDataSource(_:)), name:"dataSource", object: nil)
         
         // Objects setup
-        gradientView.colorSetUp(UIColor.whiteColor().CGColor, bottomColor: UIColor.cyanColor().colorWithAlphaComponent(0.5).CGColor)
+        gradientView.colorSetUp(UIColor.whiteColor().CGColor, bottomColor: UIColor.yellowColor().colorWithAlphaComponent(0.5).CGColor)
         
         gridView.backgroundColor = UIColor.clearColor()
         gridView.setScale(1.0)
