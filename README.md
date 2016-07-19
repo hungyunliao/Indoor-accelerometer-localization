@@ -10,21 +10,13 @@ Project at Focus Universal (iOS- swift)
 - Visualize 2D Movement in Realtime.
 
 ### Two kinds of user interface:
-<tb>
-  <tr>1</tr>
-  <tr>2</tr>
-</tb>
-- #1
-- <img src = "pic/IMG_2849.jpg" width = "250"></img><br>
-- #2
-- <img src = "pic/IMG_2842.jpg" width = "250"></img><br>
+<img src = "pic/IMG_2849.jpg" width = "250"></img><br>
+<img src = "pic/IMG_2842.jpg" width = "250"></img><br>
 
 ### Map Interface:
 - Original
-- <img src = "pic/IMG_2843.jpg" width = "250"></img><br>
-- Zoom in
-- <img src = "pic/IMG_2845.jpg" width = "250"></img><br>
-- Zoom out
-- <img src = "pic/IMG_2844.jpg" width = "250"></img><br>
+<img src = "pic/IMG_2843.jpg" width = "250"></img><br>
+- Zoom in, Zoom out and Origin shift
+<img src = "pic/IMG_2845.jpg" width = "250"></img><img src = "pic/IMG_2844.jpg" width = "250"></img><br>
 
 
