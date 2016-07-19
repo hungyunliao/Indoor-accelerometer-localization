@@ -216,6 +216,9 @@ class DataProcessor {
         accSys.accelerate.y = acceleration.y * gravityConstant
         accSys.accelerate.z = acceleration.z * gravityConstant
         
+        print(modulus(accSys.accelerate.x, y: accSys.accelerate.y, z: accSys.accelerate.z) - gravityConstant, modulus(gyroSys.accelerate.x, y: gyroSys.accelerate.y, z: gyroSys.accelerate.z), modulusDiff, staticStateJudge)
+ 
+        
         // Static Judgement Condition 3
         modulusDiffCalculation()
         
