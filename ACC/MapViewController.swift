@@ -183,7 +183,7 @@ class MapViewController: UIViewController, DataProcessorDelegate {
             velX.text = "\(roundNum(Double(data.x)))"
             velY.text = "\(roundNum(Double(data.y)))"
         case .distance:
-            let magnify = 10.0 // this var is used to make the movement more observable
+            let magnify = 20.0 // this var is used to make the movement more observable. Basically, if the scale of the map is 1, then magnify should be 20. if 2, then 40.
             mapView.movePointTo(Double(data.x) * magnify, y: Double(data.y) * magnify)
             disX.text = "\(roundNum(Double(data.x)))"
             disY.text = "\(roundNum(Double(data.y)))"
