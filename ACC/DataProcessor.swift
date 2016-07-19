@@ -90,6 +90,7 @@ class DataProcessor {
     var performanceDataArrayZ = [Double]()
     var count = 1
     var performanceDataSize = 100
+    var executePerformanceCompare = true
     
     func startsDetection() {
         
@@ -141,15 +142,17 @@ class DataProcessor {
         let y = (acc.x*rot.m12 + acc.y*rot.m22 + acc.z*rot.m32) * gravityConstant
         let z = (acc.x*rot.m13 + acc.y*rot.m23 + acc.z*rot.m33) * gravityConstant
         
-        if count <= performanceDataSize {
-            performanceDataArrayX.append(x)
-            performanceDataArrayY.append(y)
-            performanceDataArrayZ.append(z)
-            if count == performanceDataSize {
-                //print(performanceDataArrayX)
-                performance(performanceDataArrayX, arrY: performanceDataArrayY, arrZ: performanceDataArrayZ, performanceDataSize: performanceDataSize)
+        if executePerformanceCompare == true {
+            if count <= performanceDataSize {
+                performanceDataArrayX.append(x)
+                performanceDataArrayY.append(y)
+                performanceDataArrayZ.append(z)
+                if count == performanceDataSize {
+                    //print(performanceDataArrayX)
+                    performance(performanceDataArrayX, arrY: performanceDataArrayY, arrZ: performanceDataArrayZ, performanceDataSize: performanceDataSize)
+                }
+                count += 1
             }
-            count += 1
         }
         
         var test:Filter
@@ -232,6 +235,10 @@ class DataProcessor {
     }
     
     func outputRotData(rotation: CMRotationRate) {
+        
+        gyroSys.accelerate.x = rotation.x
+        gyroSys.accelerate.y = rotation.y
+        gyroSys.accelerate.z = rotation.z
         
         // Static Judgement Condition 2
         if modulus(gyroSys.accelerate.x, y: gyroSys.accelerate.y, z: gyroSys.accelerate.z) < staticStateJudgeThreshold.gyroModulus {
