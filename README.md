@@ -17,8 +17,8 @@ Project at Focus Universal (iOS- swift)
 
 ### Map Interface:
 - Visualize 2D movement<br>
-<img src = "pic/IMG_2857.jpg" width = "250"></img><br>
+<img src = "pic/IMG_2861.jpg" width = "250"></img><br>
 - Zoom in, Zoom out and Origin shift<br>
-<img src = "pic/IMG_2858.jpg" width = "250">   </img><img src = "pic/IMG_2859.jpg" width = "250"></img>    </img><img src = "pic/IMG_2860.jpg" width = "250"></img><br>
+<img src = "pic/IMG_2862.jpg" width = "250">   </img><img src = "pic/IMG_2863.jpg" width = "250"></img>    </img><img src = "pic/IMG_2864.jpg" width = "250"></img><br>
 
 
