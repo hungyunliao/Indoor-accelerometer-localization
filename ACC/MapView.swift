@@ -97,14 +97,14 @@ class MapView: UIView {
             routePath.addLineToPoint(CGPoint(x: currentPoint.x + currentOrigin.x, y: currentPoint.y + currentOrigin.y))
         }
         
-        var circle = UIBezierPath()
-        circle = getCircle(atCenter: CGPoint(x: currentPoint.x + currentOrigin.x, y: currentPoint.y + currentOrigin.y), radius: CGFloat(5))
+        let circle =
+            getCircle(atCenter: CGPoint(x: currentPoint.x + currentOrigin.x, y: currentPoint.y + currentOrigin.y), radius: CGFloat(5))
         
         UIColor.blackColor().set()
         routePath.stroke()
+        
         UIColor.blackColor().set()
         circle.fill()
-        
     }
 }
 
@@ -152,9 +152,9 @@ func threeAxisSysOperation(inout threeAxisSysPoint: ThreeAxesSystem<CGFloat>, op
 }
 
 enum Operation {
-    case assign
-    case add
-    case minus
-    case multiply
-    case divide
+    case assign     // =
+    case add        // +=
+    case minus      // -=
+    case multiply   // *=
+    case divide     // /=
 }
