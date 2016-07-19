@@ -9,7 +9,11 @@ Project at Focus Universal (iOS- swift)
 - Display Direction Data via Megnetic Sensor in Realtime.
 - Visualize 2D Movement in Realtime.
 
-### Information Interface:
+### Two kinds of user interface:
+<tb>
+  <tr>1</tr>
+  <tr>2</tr>
+</tb>
 - #1
 - <img src = "pic/IMG_2849.jpg" width = "250"></img><br>
 - #2
