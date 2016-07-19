@@ -40,9 +40,9 @@ class DataProcessor {
     // MARK: System parameters setup
     let gravityConstant = 9.80665
     let publicDB = NSUserDefaults.standardUserDefaults()
-    var accelerometerUpdateInterval: Double = 0.01
-    var gyroUpdateInterval: Double = 0.01
-    var deviceMotionUpdateInterval: Double = 0.03
+    var accelerometerUpdateInterval: Double = 0.1
+    var gyroUpdateInterval: Double = 0.1
+    var deviceMotionUpdateInterval: Double = 0.3
     let accelerationThreshold = 0.001
     var staticStateJudgeThreshold = (accModulus: 0.5, gyroModulus: 20/M_PI, modulusDiff: 0.05)
     
