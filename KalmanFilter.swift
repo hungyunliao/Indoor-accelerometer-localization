@@ -204,5 +204,5 @@ func modulusDifference(arr: [Double], avgModulus: Double) -> Double {
 }
 
 func roundNum(number: Double) -> Double {
-    return round(number * 10000) / 10000
+    return round(number * 100) / 100
 }
