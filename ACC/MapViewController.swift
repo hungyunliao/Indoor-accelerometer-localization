@@ -190,8 +190,8 @@ class MapViewController: UIViewController, DataProcessorDelegate {
             disX.text = "\(roundNum(Double(data.x)))"
             disY.text = "\(roundNum(Double(data.y)))"
         case .rotation:
-            rotX.text = "\(roundNum(Double(data.pitch)))"
-
+            //rotX.text = "\(roundNum(Double(data.pitch)))"
+            break
         }
     }
     
