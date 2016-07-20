@@ -111,6 +111,8 @@ class MapViewController: UIViewController, DataProcessorDelegate {
     @IBOutlet weak var disX: UILabel!
     @IBOutlet weak var disY: UILabel!
     
+    @IBOutlet weak var rotX: UILabel!
+    
     @IBAction func cleanpath(sender: UIButton) {
         mapView?.cleanPath()
     }
@@ -187,6 +189,9 @@ class MapViewController: UIViewController, DataProcessorDelegate {
             mapView.movePointTo(Double(data.x) * magnify, y: Double(data.y) * magnify)
             disX.text = "\(roundNum(Double(data.x)))"
             disY.text = "\(roundNum(Double(data.y)))"
+        case .rotation:
+            rotX.text = "\(roundNum(Double(data.pitch)))"
+
         }
     }
     

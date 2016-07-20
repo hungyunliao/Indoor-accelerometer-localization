@@ -441,13 +441,13 @@
                                     <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="fHz-f7-Wy0">
                                         <rect key="frame" x="0.0" y="345" width="560" height="21"/>
                                         <subviews>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="X Rotation: " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Pq8-zf-Aef">
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Pitch Angle:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Pq8-zf-Aef">
                                                 <rect key="frame" x="0.0" y="0.0" width="275" height="21"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="y5a-G5-uwR">
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="y5a-G5-uwR" userLabel="anglePitch">
                                                 <rect key="frame" x="285" y="0.0" width="275" height="21"/>
                                                 <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
@@ -459,7 +459,7 @@
                                     <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="pL8-pk-0yU">
                                         <rect key="frame" x="0.0" y="376" width="560" height="22"/>
                                         <subviews>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Y Rotation: " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KFF-cD-OxT">
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Roll Angle:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KFF-cD-OxT">
                                                 <rect key="frame" x="0.0" y="0.0" width="275" height="22"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
@@ -477,7 +477,7 @@
                                     <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="moZ-co-vqq">
                                         <rect key="frame" x="0.0" y="408" width="560" height="22"/>
                                         <subviews>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Z Rotation: " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Fef-an-dS5">
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Yaw Angle:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Fef-an-dS5">
                                                 <rect key="frame" x="0.0" y="0.0" width="275" height="22"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
@@ -562,6 +562,9 @@
                         <outlet property="accX" destination="oyW-el-kbY" id="jUg-vD-oRt"/>
                         <outlet property="accY" destination="5wI-0g-yJ5" id="MnD-Ro-Xh9"/>
                         <outlet property="accZ" destination="Bbb-NO-Ieb" id="eK8-jg-hBf"/>
+                        <outlet property="anglePitch" destination="y5a-G5-uwR" id="ebI-JW-YOG"/>
+                        <outlet property="angleRoll" destination="kkh-CU-jjZ" id="Him-kn-bQ8"/>
+                        <outlet property="angleYaw" destination="Zaz-ds-ypw" id="FLo-34-T65"/>
                         <outlet property="disX" destination="R6m-DC-4D1" id="RzK-Ml-eYT"/>
                         <outlet property="disXGyro" destination="ZrZ-N6-vrW" id="hNc-aL-1Gc"/>
                         <outlet property="disY" destination="5mE-C0-WMn" id="NRC-cs-FxJ"/>
@@ -570,11 +573,8 @@
                         <outlet property="disZGyro" destination="mIx-KZ-Cjb" id="KCr-uJ-Zfz"/>
                         <outlet property="info" destination="hio-AP-BHW" id="aSd-I2-X8a"/>
                         <outlet property="velX" destination="pwz-Jo-ZX0" id="sDO-69-xhs"/>
-                        <outlet property="velXGyro" destination="y5a-G5-uwR" id="jMh-ci-1Bd"/>
                         <outlet property="velY" destination="TzI-sB-TzM" id="2N9-Hj-Vbp"/>
-                        <outlet property="velYGyro" destination="kkh-CU-jjZ" id="dAd-PT-Z5w"/>
                         <outlet property="velZ" destination="ffZ-fI-bHt" id="bx0-ls-mNZ"/>
-                        <outlet property="velZGyro" destination="Zaz-ds-ypw" id="fwE-Gk-7F1"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>

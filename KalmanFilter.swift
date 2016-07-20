@@ -26,6 +26,7 @@ struct System {
     var kValue = ThreeAxesSystemDouble()
     var velocity = ThreeAxesSystemDouble()
     var distance = ThreeAxesSystemDouble()
+    var rotation = ThreeAxesSystemDouble()
     
     var kalman = ThreeAxesSystemKalman()
     
@@ -61,6 +62,9 @@ struct ThreeAxesSystemDouble {
     var x = 0.0
     var y = 0.0
     var z = 0.0
+    var roll = 0.0
+    var pitch = 0.0
+    var yaw = 0.0
 }
 
 struct ThreeAxesSystem<Element> {

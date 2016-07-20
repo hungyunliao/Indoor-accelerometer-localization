@@ -34,9 +34,9 @@ class ViewController: UIViewController, DataProcessorDelegate {
     @IBOutlet var velY: UILabel?
     @IBOutlet var velZ: UILabel?
     
-    @IBOutlet var velXGyro: UILabel?
-    @IBOutlet var velYGyro: UILabel?
-    @IBOutlet var velZGyro: UILabel?
+    @IBOutlet var anglePitch: UILabel?
+    @IBOutlet var angleRoll: UILabel?
+    @IBOutlet var angleYaw: UILabel?
     
     @IBOutlet var disXGyro: UILabel?
     @IBOutlet var disYGyro: UILabel?
@@ -86,6 +86,10 @@ class ViewController: UIViewController, DataProcessorDelegate {
             disX?.text = "\(roundNum(data.x))"
             disY?.text = "\(roundNum(data.y))"
             disZ?.text = "\(roundNum(data.z))"
+        case .rotation:
+            anglePitch?.text = "\(roundNum(data.pitch))"
+            angleRoll?.text = "\(roundNum(data.roll))"
+            angleYaw?.text = "\(roundNum(data.yaw))"
         }
     }
     

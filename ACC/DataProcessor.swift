@@ -18,6 +18,7 @@ enum speedDataType {
     case accelerate
     case velocity
     case distance
+    case rotation
 }
 
 class DataProcessor {
@@ -44,7 +45,7 @@ class DataProcessor {
     var gyroUpdateInterval: Double = 0.01
     var deviceMotionUpdateInterval: Double = 0.03
     let accelerationThreshold = 0.001
-    var staticStateJudgeThreshold = (accModulus: 0.5, gyroModulus: 20/M_PI, modulusDiff: 0.05)
+    var staticStateJudgeThreshold = (accModulus: 0.25, gyroModulus: 0.2, modulusDiff: 0.05)
     
     var calibrationTimeAssigned: Int = 100
     
@@ -90,7 +91,7 @@ class DataProcessor {
     var performanceDataArrayZ = [Double]()
     var count = 1
     var performanceDataSize = 100
-    var executePerformanceCompare = true
+    var executePerformanceCompare = false
     
     func startsDetection() {
         
@@ -115,9 +116,9 @@ class DataProcessor {
             }
         })
         
-        motionManager.startDeviceMotionUpdatesUsingReferenceFrame(CMAttitudeReferenceFrame.XTrueNorthZVertical, toQueue: NSOperationQueue.currentQueue()!, withHandler: { (motion,  error) in
+        motionManager.startDeviceMotionUpdatesUsingReferenceFrame(CMAttitudeReferenceFrame.XArbitraryCorrectedZVertical , toQueue: NSOperationQueue.currentQueue()!, withHandler: { (motion,  error) in
             if motion != nil {
-                self.outputXTrueNorthMotionData(motion!)
+                self.XArbitraryCorrectedZVertical(motion!)
             }
             if error != nil {
                 print("\(error)")
@@ -132,7 +133,7 @@ class DataProcessor {
     }
     
     // MARK: Functions
-    func outputXTrueNorthMotionData(motion: CMDeviceMotion) {
+    func XArbitraryCorrectedZVertical(motion: CMDeviceMotion) {
       
         let acc: CMAcceleration = motion.userAcceleration
         //print(acc)
@@ -216,8 +217,10 @@ class DataProcessor {
         accSys.accelerate.y = acceleration.y * gravityConstant
         accSys.accelerate.z = acceleration.z * gravityConstant
         
-        print(modulus(accSys.accelerate.x, y: accSys.accelerate.y, z: accSys.accelerate.z) - gravityConstant, modulus(gyroSys.accelerate.x, y: gyroSys.accelerate.y, z: gyroSys.accelerate.z), modulusDiff, staticStateJudge)
- 
+        
+        
+        /*
+        print(modulus(accSys.accelerate.x, y: accSys.accelerate.y, z: accSys.accelerate.z) - gravityConstant, modulus(gyroSys.accelerate.x, y: gyroSys.accelerate.y, z: gyroSys.accelerate.z), modulusDiff, staticStateJudge)*/
         
         // Static Judgement Condition 3
         modulusDiffCalculation()
@@ -242,6 +245,13 @@ class DataProcessor {
         gyroSys.accelerate.x = rotation.x
         gyroSys.accelerate.y = rotation.y
         gyroSys.accelerate.z = rotation.z
+        
+        var attitude = motionManager.deviceMotion!.attitude
+        gyroSys.rotation.pitch = attitude.pitch*180/M_PI
+        gyroSys.rotation.roll = attitude.roll*180/M_PI
+        gyroSys.rotation.yaw = attitude.yaw*180/M_PI
+        
+        newData(speedDataType.rotation, sensorData: gyroSys.rotation)
         
         // Static Judgement Condition 2
         if modulus(gyroSys.accelerate.x, y: gyroSys.accelerate.y, z: gyroSys.accelerate.z) < staticStateJudgeThreshold.gyroModulus {
